@@ -313,7 +313,7 @@ main {
   background: transparent;
   font-size: 14px;
   line-height: 20px;
-  padding: 7px;
+  padding: 0 7px;
   width: 100%;
   outline: none;
 }
@@ -358,5 +358,12 @@ main {
 .q-layout__section--marginal {
     background-color: transparent;
 }
+.q-field--standard .q-field__control:before {
+    border-bottom: 1px solid rgba(0, 0, 0, 0) !important;
+  }
 
-
+  .import__inputWrap{
+    .q-field__control {
+        height: 36px !important;
+    }
+  }

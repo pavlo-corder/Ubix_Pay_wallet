@@ -8,95 +8,107 @@
                 @reset="onReset"
                 class="q-gutter-md"
               >
+                <!-- import__grid -->
                 <div class="import__grid">
+                  <!-- import__grid--left -->
                   <div class="import__grid--left">
+                    <!-- import__inputWrap -->
                     <div class="import__inputWrap">
-                      <q-input v-model="text" class="import__input" />
+                      <label for="">1</label>
+                      <q-input v-model="text1" class="import__input" />
                     </div>
+                    <!-- import__inputWrap -->
+                    <div class="import__inputWrap">
+                      <label for="">2</label>
+                      <q-input v-model="text2" class="import__input" />
+                    </div>
+                    <!-- import__inputWrap -->
+                    <div class="import__inputWrap">
+                      <label for="">3</label>
+                      <q-input v-model="text3" class="import__input" />
+                    </div>
+                    <!-- import__inputWrap -->
+                    <div class="import__inputWrap">
+                      <label for="">4</label>
+                      <q-input v-model="text4" class="import__input" />
+                    </div>
+                    <!-- import__inputWrap -->
+                    <div class="import__inputWrap">
+                      <label for="">5</label>
+                      <q-input v-model="text5" class="import__input" />
+                    </div>
+                    <!-- import__inputWrap -->
+                    <div class="import__inputWrap">
+                      <label for="">6</label>
+                      <q-input v-model="text6" class="import__input" />
+                    </div>
+                    <!-- import__inputWrap -->
+                  </div>
+                  <!-- import__grid--left -->
+                  <div class="import__grid--right">
+                      <!-- import__inputWrap -->
+                    <div class="import__inputWrap">
+                      <label for="">7</label>
+                      <q-input v-model="text7" class="import__input" />
+                    </div>
+                    <!-- import__inputWrap -->
+                    <div class="import__inputWrap">
+                      <label for="">8</label>
+                      <q-input v-model="text8" class="import__input" />
+                    </div>
+                    <!-- import__inputWrap -->
+                    <div class="import__inputWrap">
+                      <label for="">9</label>
+                      <q-input v-model="text9" class="import__input" />
+                    </div>
+                    <!-- import__inputWrap -->
+                    <div class="import__inputWrap">
+                      <label for="">10</label>
+                      <q-input v-model="text10" class="import__input" />
+                    </div>
+                    <!-- import__inputWrap -->
+                    <div class="import__inputWrap">
+                      <label for="">11</label>
+                      <q-input v-model="text11" class="import__input" />
+                    </div>
+                    <!-- import__inputWrap -->
+                    <div class="import__inputWrap">
+                      <label for="">12</label>
+                      <q-input v-model="text12" class="import__input" />
+                    </div>
+                    <!-- import__inputWrap -->
                   </div>
                 </div>
-
-                <div>
-                  <q-btn label="Submit" type="submit" color="primary"/>
-                  <q-btn label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
+                <!-- import__grid -->
+                  <q-input v-model="password" lazy-rules :rules="Required" ref="fldPasswordChange" filled :type="isPwd2 ? 'password' : 'text'" label="New password">
+                      <template v-slot:append>
+                        <q-icon
+                          :name="isPwd2 ? 'visibility_off' : 'visibility'"
+                          class="cursor-pointer"
+                          @click="isPwd2 = !isPwd2"
+                        />
+                      </template>
+                    </q-input>
+                    <q-input v-model="confirmPassword" lazy-rules ref="fldPasswordChangeConfirm" :rules="ConfirmPWD" label="Confirm password" filled :type="isPwd3 ? 'password' : 'text'">
+                      <template v-slot:append>
+                        <q-icon
+                          :name="isPwd3 ? 'visibility_off' : 'visibility'"
+                          class="cursor-pointer"
+                          @click="isPwd3 = !isPwd3"
+                        />
+                      </template>
+                  </q-input>
+                 <div class="import__password">
+                  <input type="text" class="input input--borderDark" placeholder="New password">
                 </div>
+
+                <div class="import__password">
+                  <input type="text" class="input input--borderDark" placeholder="Confirm password">
+                </div>
+
+                 <a href="/" class="btn btn--primary import__btn">Import</a>
             </q-form>
 
-            <div class="import__grid">
-              <div class="import__grid--left">
-                <div class="import__inputWrap">
-                  <label for="phrase_1">1</label>
-                  <input type="text" id="phrase_1" class="import__input">
-                </div>
-
-                <div class="import__inputWrap">
-                  <label for="phrase_2">2</label>
-                  <input type="text" id="phrase_2" class="import__input">
-                </div>
-
-                <div class="import__inputWrap">
-                  <label for="phrase_3">3</label>
-                  <input type="text" id="phrase_3" class="import__input">
-                </div>
-
-                <div class="import__inputWrap">
-                  <label for="phrase_4">4</label>
-                  <input type="text" id="phrase_4" class="import__input">
-                </div>
-
-                <div class="import__inputWrap">
-                  <label for="phrase_5">5</label>
-                  <input type="text" id="phrase_5" class="import__input">
-                </div>
-
-                <div class="import__inputWrap">
-                  <label for="phrase_6">6</label>
-                  <input type="text" id="phrase_6" class="import__input">
-                </div>
-              </div>
-
-              <div class="import__grid--right">
-                <div class="import__inputWrap">
-                  <label for="phrase_7">7</label>
-                  <input type="text" id="phrase_7" class="import__input">
-                </div>
-
-                <div class="import__inputWrap">
-                  <label for="phrase_8">8</label>
-                  <input type="text" id="phrase_8" class="import__input">
-                </div>
-
-                <div class="import__inputWrap">
-                  <label for="phrase_9">9</label>
-                  <input type="text" id="phrase_9" class="import__input">
-                </div>
-
-                <div class="import__inputWrap">
-                  <label for="phrase_10">10</label>
-                  <input type="text" id="phrase_10" class="import__input">
-                </div>
-
-                <div class="import__inputWrap">
-                  <label for="phrase_11">11</label>
-                  <input type="text" id="phrase_11" class="import__input">
-                </div>
-
-                <div class="import__inputWrap">
-                  <label for="phrase_12">12</label>
-                  <input type="text" id="phrase_12" class="import__input">
-                </div>
-              </div>
-            </div>
-
-            <div class="import__password">
-              <input type="text" class="input input--borderDark" placeholder="New password">
-            </div>
-
-            <div class="import__password">
-              <input type="text" class="input input--borderDark" placeholder="Confirm password">
-            </div>
-
-            <a href="/" class="btn btn--primary import__btn">Import</a>
           </div>
         </main>
 
@@ -107,6 +119,17 @@ import { useQuasar } from 'quasar'
 import { ref } from 'vue'
 
 export default {
+  computed: {
+  ConfirmPWD() {
+    return [
+        (v) => !!v || "The required field",
+        (v) => v == this.$refs.fldPasswordChange.value || "Different passwords"
+        ]
+    },
+    Required() {
+        return [(v) => !!v || 'The required field']
+    }
+  },
   setup () {
     const $q = useQuasar()
 
@@ -114,8 +137,20 @@ export default {
     const age = ref(null)
     const accept = ref(false)
     return {
-      text: ref(''),     
-
+      text1: ref(''),     
+      text2: ref(''),     
+      text3: ref(''),     
+      text4: ref(''),     
+      text5: ref(''),     
+      text6: ref(''),     
+      text7: ref(''),     
+      text8: ref(''),     
+      text9: ref(''),     
+      text10: ref(''),     
+      text11: ref(''),     
+      text12: ref(''),  
+      password: ref(''),
+      confirmPassword: ref(''),  
     
       name,
       age,
