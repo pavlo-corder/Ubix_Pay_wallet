@@ -1,10 +1,20 @@
 <template>
   <q-page class="flex flex-center">
-    <img
-      alt="Quasar logo"
-      src="~assets/quasar-logo-vertical.svg"
-      style="width: 200px; height: 200px"
-    />
+   <main class="welcome">
+      <div class="container">
+        <h1 class="welcome__title">Welcome<br>
+          to <a href="/" class="welcome__link">ubix pay</a>,<br>
+          first digital wallet implementing<br>
+          the concept of<br>
+          self-ownership!
+        </h1>
+
+        <h2 class="welcome__subtitle">To start you can</h2>
+        <a href="/" class="btn btn--primary welcome__btn">create new wallet</a>
+        <h2 class="welcome__subtitle">Or</h2>
+        <a href="/" class="btn">import existing wallet</a>
+      </div>
+    </main>
   </q-page>
 </template>
 

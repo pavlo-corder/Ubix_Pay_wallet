@@ -80,33 +80,26 @@
                   </div>
                 </div>
                 <!-- import__grid -->
-                  <q-input v-model="password" lazy-rules :rules="Required" ref="fldPasswordChange" filled :type="isPwd2 ? 'password' : 'text'" label="New password">
-                      <template v-slot:append>
-                        <q-icon
-                          :name="isPwd2 ? 'visibility_off' : 'visibility'"
-                          class="cursor-pointer"
-                          @click="isPwd2 = !isPwd2"
-                        />
-                      </template>
-                    </q-input>
-                    <q-input v-model="confirmPassword" lazy-rules ref="fldPasswordChangeConfirm" :rules="ConfirmPWD" label="Confirm password" filled :type="isPwd3 ? 'password' : 'text'">
-                      <template v-slot:append>
-                        <q-icon
-                          :name="isPwd3 ? 'visibility_off' : 'visibility'"
-                          class="cursor-pointer"
-                          @click="isPwd3 = !isPwd3"
-                        />
-                      </template>
-                  </q-input>
-                 <div class="import__password">
-                  <input type="text" class="input input--borderDark" placeholder="New password">
-                </div>
-
-                <div class="import__password">
-                  <input type="text" class="input input--borderDark" placeholder="Confirm password">
-                </div>
-
-                 <a href="/" class="btn btn--primary import__btn">Import</a>
+                  <q-input 
+                    v-model="password" 
+                    lazy-rules 
+                    :rules="Required" 
+                    ref="fldPasswordChange" 
+                    class="input input--borderDark"
+                    filled :type="isPwd2 ? 'password' : 'text'" 
+                    label="New password"
+                    />
+                  <q-input 
+                    v-model="confirmPassword" 
+                    lazy-rules ref="fldPasswordChangeConfirm" 
+                    :rules="ConfirmPWD" 
+                    label="Confirm password" 
+                    filled 
+                    class="input input--borderDark"
+                    :type="isPwd3 ? 'password' : 'text'"
+                    />
+                      
+                 <a href="/#/createwalletstep1" class="btn btn--primary import__btn">Import</a>
             </q-form>
 
           </div>
@@ -119,6 +112,7 @@ import { useQuasar } from 'quasar'
 import { ref } from 'vue'
 
 export default {
+  name: "Import",
   computed: {
   ConfirmPWD() {
     return [
