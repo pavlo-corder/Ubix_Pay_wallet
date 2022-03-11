@@ -26,19 +26,33 @@ h2
   &-center
     text-align: center
 
-.link--big
-  color: $black
-  font-size: 16px
-  line-height: 24px
-  font-weight: bold
-  display: inline
-  position: relative
+  &-caption
+    font-size: 12px
+    line-height: 12px
+    font-weight: 600
 
-  &:after
-    content: ''
-    display: block
-    position: absolute
-    height: 2px
-    width: 100%
-    bottom: -1px
-    background: $blue
+  &-grey-dark
+    color: $grey-dark
+
+
+.link
+  &--big
+    color: $black
+    font-size: 16px
+    line-height: 24px
+    font-weight: bold
+    display: inline
+    position: relative
+
+    &:after
+      content: ''
+      display: block
+      position: absolute
+      height: 2px
+      width: 100%
+      bottom: -1px
+      background: $blue
+
+  &--noUnderline
+    &:after
+      display: none

@@ -1,6 +1,6 @@
 <template>
   <q-layout class="layout__root">
-    <q-header>
+    <q-header class="z-top">
       <q-toolbar class="header">
         <!-- <q-btn
           flat
@@ -14,28 +14,51 @@
             <img src="~/assets/images/logo.svg" alt="UbixPay">
           </a>
           <a href="/" class="header__invite">+ Invite a friend</a>
+        <div class="burger" @click="drawer = !drawer">
+          <div class="burger__line"></div>
+          <div class="burger__line"></div>
+          <div class="burger__line"></div>
+        </div>
       </q-toolbar>
     </q-header>
 
-    <!-- <q-drawer
-      v-model="leftDrawerOpen"
-      show-if-above
-      bordered
+    <q-drawer
+      v-model="drawer"
+      overlay
+      side="right"
+      :breakpoint="500"
     >
-      <q-list>
-        <q-item-label
-          header
-        >
-          Essential Links
-        </q-item-label>
-
-        <EssentialLink
-          v-for="link in essentialLinks"
-          :key="link.title"
-          v-bind="link"
-        />
+      <q-list class="drawer">
+        <q-item>
+          <q-item-section>
+            <a href="#">
+              <span class="link--big link--noUnderline">Support</span>
+            </a>
+          </q-item-section>
+        </q-item>
+        <q-item>
+          <q-item-section>
+            <a href="#">
+              <span class="link--big link--noUnderline">Backup seed phrase</span>
+            </a>
+          </q-item-section>
+        </q-item>
+        <q-item>
+          <q-item-section>
+            <a href="#">
+              <span class="link--big link--noUnderline">A link in several lines to check the interlineation</span>
+            </a>
+          </q-item-section>
+        </q-item>
+        <q-item>
+          <q-item-section>
+            <a href="#">
+              <span class="link--big link--noUnderline">Link</span>
+            </a>
+          </q-item-section>
+        </q-item>
       </q-list>
-    </q-drawer> -->
+    </q-drawer>
 
     <q-page-container class="layout__main">
       <router-view />
@@ -98,25 +121,17 @@
 //   }
 // ]
 
-// import { defineComponent, ref } from 'vue'
+import {ref} from 'vue'
 
 export default ({
   name: 'MainLayout',
 
-  // components: {
-  //   EssentialLink
-  // },
-
   setup () {
-    // const leftDrawerOpen = ref(false)
+    const drawer = ref(false)
 
-    // return {
-    //   essentialLinks: linksList,
-    //   leftDrawerOpen,
-    //   toggleLeftDrawer () {
-    //     leftDrawerOpen.value = !leftDrawerOpen.value
-    //   }
-    // }
+    return {
+      drawer
+    }
   }
 })
 </script>
