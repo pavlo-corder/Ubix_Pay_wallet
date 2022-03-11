@@ -1,5 +1,4 @@
 <template>
-  <q-page class="flex flex-center">
    <main class="welcome">
       <div class="container">
         <h1 class="welcome__title">Welcome<br>
@@ -15,7 +14,6 @@
         <a href="/" class="btn">import existing wallet</a>
       </div>
     </main>
-  </q-page>
 </template>
 
 <script>

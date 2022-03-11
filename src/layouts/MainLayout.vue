@@ -1,5 +1,5 @@
 <template>
-  <q-layout>
+  <q-layout class="layout__root">
     <q-header>
       <q-toolbar class="header">
         <!-- <q-btn
@@ -37,7 +37,7 @@
       </q-list>
     </q-drawer> -->
 
-    <q-page-container>
+    <q-page-container class="layout__main">
       <router-view />
     </q-page-container>
     <!-- footer -->

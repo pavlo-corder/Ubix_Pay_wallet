@@ -1,5 +1,6 @@
 // app global css in SCSS form
 // app global css in SCSS form
+@import "layout";
 
 html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
   margin: 0;
@@ -111,11 +112,11 @@ body, html {
   overflow-x: hidden;
 }
 
-body {
-  display: flex;
-  flex-direction: column;
-  background: #EFEFEF;
-}
+//body {
+//  display: flex;
+//  flex-direction: column;
+//  background: #EFEFEF;
+//}
 
 main {
   flex-grow: 1;
@@ -222,7 +223,7 @@ main {
   background-image: url(../assets/icons/check.svg);
   background-repeat: no-repeat;
   background-position: center;
-} 
+}
 .stepper__step--complete:after {
   background: #1FB731;
 }
@@ -279,6 +280,7 @@ main {
 .welcome {
   padding-top: 50px;
   background-color: #fff;
+  flex-grow: 1;
 }
 .welcome__title {
   font-size: 28px;
@@ -373,9 +375,9 @@ main {
 .input--borderDark {
   .q-field--filled.q-field--highlighted .q-field__control:before {
       opacity: 1;
-      background: transparent;      
+      background: transparent;
   }
-  
+
 }
 .input--borderDark.input{
     padding: 0 !important;
