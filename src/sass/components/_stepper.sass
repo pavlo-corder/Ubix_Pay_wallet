@@ -1,0 +1,81 @@
+.stepper
+  display: flex
+  justify-content: center
+  align-items: center
+
+  &__step
+    display: flex
+    flex-direction: column
+    justify-content: center
+    align-items: center
+    position: relative
+
+    &:before,
+    &:after
+      content: ''
+      position: absolute
+      display: block
+      height: 1px
+      background: $grey-dark
+      width: calc(50% - 12px)
+      top: 12px
+
+    &:before
+      left: 0
+
+    &:after
+      right: 0
+
+    &:first-child
+      &:before
+        display: none
+
+    &:last-child
+      &:after
+        display: none
+
+
+    &--active
+      .stepper__circle
+        border-color: $blue
+
+        &:before
+          content: ''
+          display: block
+          width: 14px
+          height: 14px
+          background: $blue
+          border-radius: 14px
+
+    &--complete
+      .stepper__circle
+        border-color: $green
+        background:
+          color: $green
+          image: url(../assets/icons/check.svg)
+          repeat: no-repeat
+          position: center
+
+      &:after
+        background: $green
+
+      & + .stepper__step
+        &:before
+          background: $green
+
+
+  &__circle
+    width: 24px
+    height: 24px
+    border: 1px solid $grey-dark
+    border-radius: 24px
+    display: flex
+    justify-content: center
+    align-items: center
+    margin: 0 25px 4px 25px
+
+  &__text
+    color: $grey-dark
+    font-size: 14px
+    line-height: 20px
+

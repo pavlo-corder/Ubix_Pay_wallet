@@ -1,0 +1,39 @@
+@import "layout"
+@import "src/sass/main"
+
+//layout fix
+.layout
+  &__root
+    display: flex
+    flex-direction: column
+    background: $white-dark
+
+  &__main
+    flex-grow: 1
+    display: flex
+    flex-direction: column
+
+//quasar style fixes
+.q-layout__section--marginal
+  background-color: transparent
+
+.q-field--standard .q-field__control:before
+  border-bottom: 1px solid rgba(0, 0, 0, 0) !important
+
+  .import__inputWrap
+    .q-field__control
+      height: 36px !important
+
+.input--borderDark
+  .q-field--filled.q-field--highlighted .q-field__control:before
+    opacity: 1
+    background: transparent
+
+.input--borderDark.input
+  padding: 0 !important
+  overflow: hidden
+  width: auto
+
+.input--borderDark .q-field__control
+  background: #fff!important
+

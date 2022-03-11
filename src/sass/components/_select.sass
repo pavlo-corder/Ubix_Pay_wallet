@@ -1,0 +1,25 @@
+.select
+  background: $white
+  border: 1px solid $grey-light
+  border-radius: 8px
+  padding: 16px 9px 16px 15px
+  width: 100%
+  font-size: 14px
+  line-height: 20px
+  position: relative
+
+  &__current
+    font-size: 14px
+    line-height: 20px
+    color: $grey-dark
+
+  &:after
+    content: ''
+    display: block
+    position: absolute
+    top: 19px
+    right: 10px
+    height: 16px
+    width: 16px
+    background:
+      image: url(../assets/icons/triangle.svg)

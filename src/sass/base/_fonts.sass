@@ -1,0 +1,44 @@
+html, body
+  font-family: 'Poppins', sans-serif
+
+a
+  text-decoration: none
+
+h1
+  color: $dark
+  font:
+    family: 'Poppins', sans-serif
+    size: 24px
+    weight: 700
+  line-height: 28px
+  letter-spacing: -0.02em
+
+
+h2
+  color: $white
+  font:
+    family: 'Poppins', sans-serif
+    size: 20px
+    weight: 700
+  line-height: 24px
+
+.text
+  &-center
+    text-align: center
+
+.link--big
+  color: $black
+  font-size: 16px
+  line-height: 24px
+  font-weight: bold
+  display: inline
+  position: relative
+
+  &:after
+    content: ''
+    display: block
+    position: absolute
+    height: 2px
+    width: 100%
+    bottom: -1px
+    background: $blue
