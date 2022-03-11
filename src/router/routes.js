@@ -30,6 +30,34 @@ const routes = [
       { path: "", component: () => import("pages/CreateWalletStep3.vue") },
     ],
   },
+  {
+    path: "/startscreen",
+    component: () => import("layouts/MainLayout.vue"),
+    children: [
+      { path: "", component: () => import("pages/StartScreen.vue") },
+    ],
+  },
+  {
+    path: "/startscreenperson",
+    component: () => import("layouts/MainLayout.vue"),
+    children: [
+      { path: "", component: () => import("pages/StartScreenPerson.vue") },
+    ],
+  },
+  {
+    path: "/createpersonality",
+    component: () => import("layouts/MainLayout.vue"),
+    children: [
+      { path: "", component: () => import("pages/CreatePersonality.vue") },
+    ],
+  },
+  {
+    path: "/startscreenaccounts",
+    component: () => import("layouts/MainLayout.vue"),
+    children: [
+      { path: "", component: () => import("pages/StartScreenAccounts.vue") },
+    ],
+  },
 
   // Always leave this as last one,
   // but you can also remove it

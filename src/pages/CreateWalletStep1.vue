@@ -26,23 +26,23 @@
                 <q-form
                     @submit="onSubmit"
                     @reset="onReset"
-                    class="q-gutter-md"
+                    class="q-gutter-md q-mb-md"
                 >
-                    <q-input 
-                        v-model="password" 
-                        lazy-rules 
-                        :rules="Required" 
-                        ref="fldPasswordChange" 
+                    <q-input
+                        v-model="password"
+                        lazy-rules
+                        :rules="Required"
+                        ref="fldPasswordChange"
                         class="input input--borderDark"
-                        filled :type="isPwd2 ? 'password' : 'text'" 
+                        filled :type="isPwd2 ? 'password' : 'text'"
                         label="New password"
                         />
-                    <q-input 
-                        v-model="confirmPassword" 
-                        lazy-rules ref="fldPasswordChangeConfirm" 
-                        :rules="ConfirmPWD" 
-                        label="Confirm password" 
-                        filled 
+                    <q-input
+                        v-model="confirmPassword"
+                        lazy-rules ref="fldPasswordChangeConfirm"
+                        :rules="ConfirmPWD"
+                        label="Confirm password"
+                        filled
                         class="input input--borderDark"
                         :type="isPwd3 ? 'password' : 'text'"
                         />
@@ -70,7 +70,7 @@ export default({
     }
   },
   setup () {
-    return { 
+    return {
       password: ref(''),
       confirmPassword: ref(''),
     }
