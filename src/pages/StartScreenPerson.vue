@@ -2,14 +2,14 @@
   <main class="start-screen">
     <div class="container">
       <q-card flat class="start-screen__person">
-        <div>
-          <div class="text-caption text-grey-dark">name</div>
-          <div class="start-screen__personValue">Mr. Evil Genius</div>
-        </div>
-        <div>
-          <div class="text-caption text-grey-dark">Social networks linked:</div>
-          <div class="start-screen__personValue--small">0</div>
-        </div>
+        <q-item class="q-pa-none">
+          <q-item-section>
+            <q-item-label caption>name</q-item-label>
+            <q-item-label class="text-h6 text-bold q-mb-sm">Mr. John Doe</q-item-label>
+            <q-item-label caption>Social networks linked:</q-item-label>
+            <q-item-label class="text-body2">2</q-item-label>
+          </q-item-section>
+        </q-item>
       </q-card>
 
       <p class="start-screen__subtitle">
