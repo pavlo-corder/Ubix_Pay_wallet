@@ -19,9 +19,13 @@
                 <q-item-label class="text-h6 text-bold q-mb-sm">Mr. Evil Genius</q-item-label>
                 <q-item-label caption>Social networks linked:</q-item-label>
                 <q-item-label class="text-body2">0</q-item-label>
+                <q-item-label>
+                  <a href="#" class="link--big">Setup your person</a>
+                </q-item-label>
               </q-item-section>
             </q-item>
           </q-card>
+
         </q-carousel-slide>
         <q-carousel-slide :name="1" class="start-screen__slide">
           <q-card flat class="start-screen__person">
@@ -31,6 +35,9 @@
                 <q-item-label class="text-h6 text-bold q-mb-sm">Mr. Elton John</q-item-label>
                 <q-item-label caption>Social networks linked:</q-item-label>
                 <q-item-label class="text-body2">1</q-item-label>
+                <q-item-label>
+                  <a href="#" class="link--big">Setup your person</a>
+                </q-item-label>
               </q-item-section>
             </q-item>
           </q-card>
@@ -43,6 +50,9 @@
                 <q-item-label class="text-h6 text-bold q-mb-sm">Mr. John Doe</q-item-label>
                 <q-item-label caption>Social networks linked:</q-item-label>
                 <q-item-label class="text-body2">2</q-item-label>
+                <q-item-label>
+                  <a href="#" class="link--big">Setup your person</a>
+                </q-item-label>
               </q-item-section>
             </q-item>
           </q-card>
@@ -61,12 +71,9 @@
           inline dense/>
       </div>
 
-      <!-- Person setup and add buttons -->
-      <p class="start-screen__subtitle">
-        <a href="#" class="link--big">Setup your person</a>
-      </p>
+      <!-- Person add buttons -->
 
-      <a href="#" class="btn q-mb-md">Add another person</a>
+      <a class="btn q-mb-md" @click="createAccount">Add another person</a>
 
       <!-- Account controls -->
       <div class="row items-center q-mb-md q-gutter-sm">
@@ -151,7 +158,7 @@
         </q-item>
       </q-list>
 
-      <a href="/" class="btn btn--primary q-mb-lg">Import tokens</a>
+      <a class="btn btn--primary q-mb-lg" @click="importToken">Import tokens</a>
     </div>
   </main>
 </template>
@@ -159,6 +166,9 @@
 <script>
   import { ref } from 'vue'
   import {matAdd, matIosShare, matChevronRight} from '@quasar/extras/material-icons'
+  import { useQuasar } from 'quasar'
+  import ImportToken from "components/ImportToken";
+  import AddAccount from "components/AddAccount";
 
   export default {
     name: "StartScreen",
@@ -168,27 +178,55 @@
       this.matChevronRight = matChevronRight
     },
     setup() {
-        return {
-          currency: ref('ETH'),
-          currencyOptions: ['ETH', 'ETH1', 'ETH2'],
-          carousel: ref(0),
-          carouselOptions: [
-              {
-                label: '',
-                value: 0
-              },
-              {
-                label: '',
-                value: 1
-              },
-              {
-                label: '',
-                value: 2
-              }
-            ],
-          account: ref('Account 1'),
-          accountsOptions: ['Account 1', 'Account 2', 'Account 3']
-        }
+      const $q = useQuasar()
+
+      function createAccount () {
+        $q.dialog({
+          component: AddAccount
+        }).onOk(() => {
+          // console.log('OK')
+        }).onCancel(() => {
+          // console.log('Cancel')
+        }).onDismiss(() => {
+          // console.log('I am triggered on both OK and Cancel')
+        })
       }
+
+      function importToken () {
+        $q.dialog({
+          component: ImportToken
+        }).onOk(() => {
+          // console.log('OK')
+        }).onCancel(() => {
+          // console.log('Cancel')
+        }).onDismiss(() => {
+          // console.log('I am triggered on both OK and Cancel')
+        })
+      }
+
+      return {
+        currency: ref('ETH'),
+        currencyOptions: ['ETH', 'ETH1', 'ETH2'],
+        carousel: ref(0),
+        carouselOptions: [
+            {
+              label: '',
+              value: 0
+            },
+            {
+              label: '',
+              value: 1
+            },
+            {
+              label: '',
+              value: 2
+            }
+          ],
+        account: ref('Account 1'),
+        accountsOptions: ['Account 1', 'Account 2', 'Account 3'],
+        createAccount,
+        importToken
+      }
+    }
   }
 </script>
