@@ -58,6 +58,20 @@ const routes = [
       { path: "", component: () => import("pages/StartScreenAccounts.vue") },
     ],
   },
+  {
+    path: "/send",
+    component: () => import("layouts/MainLayout.vue"),
+    children: [
+      { path: "", component: () => import("pages/Send.vue") },
+    ],
+  },
+  {
+    path: "/addaddress",
+    component: () => import("layouts/MainLayout.vue"),
+    children: [
+      { path: "", component: () => import("pages/AddAddress.vue") },
+    ],
+  },
 
   // Always leave this as last one,
   // but you can also remove it
