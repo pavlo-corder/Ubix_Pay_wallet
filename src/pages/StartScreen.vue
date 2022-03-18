@@ -17,6 +17,7 @@
           v-model="currency"
           filled
           :options="currencyOptions"
+          behavior="menu"
           class="input input--borderDark"
         />
       </div>

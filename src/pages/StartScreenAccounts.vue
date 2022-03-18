@@ -81,11 +81,13 @@
           v-model="currency"
           filled
           :options="currencyOptions"
+          behavior="menu"
           class="input input--borderDark col-auto"/>
         <q-select
           v-model="account"
           filled
           :options="accountsOptions"
+          behavior="menu"
           class="input input--borderDark col-grow"/>
         <q-btn round unelevated color="primary" :icon="matAdd"/>
       </div>
