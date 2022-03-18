@@ -30,7 +30,7 @@
 
       <q-card-actions>
         <a class="btn btn--primary q-mb-sm" @click="onCancelClick">Import tokens</a>
-        <a class="btn btn--transparent create-wallet__btn" @click="onOKClick">Skip for now</a>
+        <a class="btn btn--transparent" @click="onOKClick">Skip for now</a>
       </q-card-actions>
     </q-card>
   </q-dialog>

@@ -16,7 +16,7 @@
 
       <q-card-actions>
         <a class="btn btn--primary q-mb-sm" @click="onCancelClick">Create</a>
-        <a class="btn btn--transparent create-wallet__btn" @click="onOKClick">Cancel</a>
+        <a class="btn btn--transparent" @click="onOKClick">Cancel</a>
       </q-card-actions>
     </q-card>
   </q-dialog>
