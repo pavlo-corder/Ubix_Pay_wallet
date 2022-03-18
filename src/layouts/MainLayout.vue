@@ -2,19 +2,18 @@
   <q-layout class="layout__root">
     <q-header class="z-top">
       <q-toolbar class="header">
-        <!-- <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="toggleLeftDrawer"
-        /> -->
-          <a href="/" class="header__logo">
-            <img src="~/assets/images/logo.svg" alt="UbixPay">
-          </a>
-          <a href="/" class="header__invite">+ Invite a friend</a>
-        <div class="burger" @click="drawer = !drawer">
+        <!-- back btn -->
+        <div v-if="false" class="header__back">
+          <div class="header__backIcon"/>
+          <div class="header__backText">Back</div>
+        </div>
+        <!-- logo -->
+        <a href="/" class="header__logo">
+          <img src="~/assets/images/logo.svg" alt="UbixPay">
+        </a>
+        <a href="/" class="header__invite">+ Invite a friend</a>
+        <!-- menu -->
+        <div :class="`burger ${drawer ? 'burger--close' : ''}`" @click="drawer = !drawer">
           <div class="burger__line"></div>
           <div class="burger__line"></div>
           <div class="burger__line"></div>
