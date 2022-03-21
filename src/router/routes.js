@@ -63,6 +63,8 @@ const routes = [
     component: () => import("layouts/MainLayout.vue"),
     children: [
       { path: "", component: () => import("pages/Send.vue") },
+      { path: "selected", component: () => import("pages/SendSelected.vue") },
+      { path: "amount", component: () => import("pages/SendAmount.vue") },
     ],
   },
   {
