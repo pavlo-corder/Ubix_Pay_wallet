@@ -65,6 +65,7 @@ const routes = [
       { path: "", component: () => import("pages/Send.vue") },
       { path: "selected", component: () => import("pages/SendSelected.vue") },
       { path: "amount", component: () => import("pages/SendAmount.vue") },
+      { path: "final", component: () => import("pages/SendFinal.vue") },
     ],
   },
   {
