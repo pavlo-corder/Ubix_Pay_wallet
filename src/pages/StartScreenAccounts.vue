@@ -109,9 +109,9 @@
       </q-field>
 
       <div class="row q-my-sm q-gutter-sm">
-        <a href="#" class="btn col">Send</a>
-        <a href="#" class="btn col">Receive</a>
-        <a href="#" class="btn col">Link</a>
+        <a class="btn col" @click="showNotifPositive">Send</a>
+        <a class="btn col" @click="showNotifNegative">Receive</a>
+        <a class="btn col" @click="showNotifInfo">Link</a>
       </div>
 
       <!-- Tokens list -->
@@ -206,6 +206,38 @@
         })
       }
 
+      function showNotifPositive() {
+        $q.notify({
+          //needs sanitizing!!!
+          message: 'Transaction status: <span class="notification__msg notification__msg--positive">success</span>',
+          html: true
+        })
+      }
+
+      function showNotifNegative() {
+        $q.notify({
+          //needs sanitizing!!!
+          message: 'Transaction status: <span class="notification__msg notification__msg--negative">fail</span>',
+          html: true
+        })
+      }
+
+      function showNotifWarning() {
+        $q.notify({
+          //needs sanitizing!!!
+          message: 'Transaction status: <span class="notification__msg notification__msg--warning">warning</span>',
+          html: true
+        })
+      }
+
+      function showNotifInfo() {
+        $q.notify({
+          //needs sanitizing!!!
+          message: 'Transaction status: <span class="notification__msg notification__msg--info">info</span>',
+          html: true
+        })
+      }
+
       return {
         currency: ref('ETH'),
         currencyOptions: ['ETH', 'ETH1', 'ETH2'],
@@ -227,7 +259,11 @@
         account: ref('Account 1'),
         accountsOptions: ['Account 1', 'Account 2', 'Account 3'],
         createAccount,
-        importToken
+        importToken,
+        showNotifPositive,
+        showNotifNegative,
+        showNotifWarning,
+        showNotifInfo
       }
     }
   }
