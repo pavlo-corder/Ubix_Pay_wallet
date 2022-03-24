@@ -1,5 +1,5 @@
 <template>
-  <q-dialog ref="dialogRef" @hide="onDialogHide" class="dialog z-max">
+  <q-dialog ref="dialogRef" @hide="onDialogHide" class="dialog z-top">
     <q-card class="q-dialog-plugin bg-white-dark">
       <q-card-section>
         <q-toolbar-title class="q-dialog__title">Create account</q-toolbar-title>

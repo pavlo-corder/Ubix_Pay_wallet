@@ -1,5 +1,5 @@
 <template>
-  <q-dialog ref="dialogRef" @hide="onDialogHide" class="dialog z-max">
+  <q-dialog ref="dialogRef" @hide="onDialogHide" class="dialog z-top">
     <q-card class="q-dialog-plugin">
       <q-card-section>
         <q-toolbar-title class="q-dialog__title">Import token</q-toolbar-title>
