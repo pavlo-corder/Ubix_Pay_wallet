@@ -26,7 +26,7 @@
           <a class="link--big">What is it?</a>
         </div>
 
-        <a class="btn btn--primary btn--autoWidth">Link external identifiers</a>
+        <a class="btn btn--primary btn--autoWidth" @click="chooseIdentityProvider">Link external identifiers</a>
       </q-form>
 
       <q-list class="input input--borderDark q-mb-md" separator>
@@ -52,10 +52,26 @@
 
 <script>
   import {ref} from 'vue'
+  import {useQuasar} from 'quasar'
+  import ChooseIdentityProvider from "components/ChooseIdentityProvider";
 
   export default {
     name: "SetUpPerson",
     setup() {
+      const $q = useQuasar()
+
+      function chooseIdentityProvider() {
+        $q.dialog({
+          component: ChooseIdentityProvider
+        }).onOk(() => {
+
+        }).onCancel(() => {
+
+        }).onDismiss(() => {
+
+        })
+      }
+
       return {
         name: ref(''),
         details: ref(''),
@@ -72,7 +88,8 @@
             socialNetwork: 'twitter',
             id: '@twitter_acc'
           }
-        ]
+        ],
+        chooseIdentityProvider
       }
     }
   }
