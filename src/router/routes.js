@@ -82,6 +82,13 @@ const routes = [
       { path: "", component: () => import("pages/SetUpPerson.vue") },
     ],
   },
+  {
+    path: "/linkaccount",
+    component: () => import("layouts/MainLayout.vue"),
+    children: [
+      { path: "", component: () => import("pages/LinkAccount.vue") },
+    ],
+  },
 
   // Always leave this as last one,
   // but you can also remove it
