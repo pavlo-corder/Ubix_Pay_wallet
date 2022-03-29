@@ -30,7 +30,12 @@
             bottom-slots
           >
             <template v-slot:append>
-              <q-btn size="12px" round flat dense icon="content_copy" @click="() => copy(verificationText)"></q-btn>
+              <q-btn
+                size="12px"
+                round
+                flat
+                dense
+                icon="content_copy" @click="() => copy(verificationText)"></q-btn>
             </template>
           </q-input>
 

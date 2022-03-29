@@ -89,6 +89,20 @@ const routes = [
       { path: "", component: () => import("pages/LinkAccount.vue") },
     ],
   },
+  {
+    path: "/shareaddress",
+    component: () => import("layouts/MainLayout.vue"),
+    children: [
+      { path: "", component: () => import("pages/ShareAddress.vue") },
+    ],
+  },
+  {
+    path: "/receivecoins",
+    component: () => import("layouts/MainLayout.vue"),
+    children: [
+      { path: "", component: () => import("pages/ReceiveCoins.vue") },
+    ],
+  },
 
   // Always leave this as last one,
   // but you can also remove it
