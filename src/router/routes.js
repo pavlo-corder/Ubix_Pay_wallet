@@ -103,6 +103,27 @@ const routes = [
       { path: "", component: () => import("pages/ReceiveCoins.vue") },
     ],
   },
+  {
+    path: "/requestpayment",
+    component: () => import("layouts/MainLayout.vue"),
+    children: [
+      { path: "", component: () => import("pages/RequestPayment.vue") },
+    ],
+  },
+  {
+    path: "/requestpaymentlink",
+    component: () => import("layouts/MainLayout.vue"),
+    children: [
+      { path: "", component: () => import("pages/RequestPaymentLink.vue") },
+    ],
+  },
+  {
+    path: "/accountdetails",
+    component: () => import("layouts/MainLayout.vue"),
+    children: [
+      { path: "", component: () => import("pages/AccountDetails.vue") },
+    ],
+  },
 
   // Always leave this as last one,
   // but you can also remove it

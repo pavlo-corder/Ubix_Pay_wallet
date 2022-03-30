@@ -26,9 +26,7 @@
             filled
             type="textarea"
             class="input input--borderDark q-mb-sm"
-            :icon="matContentCopy"
-            bottom-slots
-          >
+            bottom-slots>
             <template v-slot:append>
               <q-btn
                 size="12px"

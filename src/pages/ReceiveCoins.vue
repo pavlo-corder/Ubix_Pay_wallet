@@ -77,8 +77,7 @@
             id: '@twitter_acc'
           }
         ],
-        copied: false,
-        copy,
+        copy
       }
     }
   }
