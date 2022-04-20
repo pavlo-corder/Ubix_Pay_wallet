@@ -1,7 +1,7 @@
 <template>
   <main class="q-pt-md">
     <div class="container">
-      <div class="q-mb-md text-center">
+      <div class="q-mb-md text-center text-desktop-left">
         <p class="text-bold text-h6 text-blue">65,458 ETH</p>
         <p class="text-subtitle2 text-bold">1000 $</p>
       </div>

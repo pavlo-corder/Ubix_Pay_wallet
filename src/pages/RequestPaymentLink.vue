@@ -19,7 +19,7 @@
         </template>
       </q-input>
 
-      <div class="row justify-center q-mb-lg">
+      <div class="row justify-center flex-desktop-left q-mb-lg">
         <div class="text-center bg-white q-pa-md">
           <qrcode-vue
             :value="link"
