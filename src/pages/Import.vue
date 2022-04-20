@@ -2,7 +2,7 @@
     <div>
         <main class="import">
           <div class="container">
-            <h1>You can import wallet by posting your secret set phrase:</h1>            
+            <h1>You can import wallet by posting your secret set phrase:</h1>
             <q-form
                 @submit="onSubmit"
                 @reset="onReset"
@@ -15,32 +15,32 @@
                     <!-- import__inputWrap -->
                     <div class="import__inputWrap">
                       <label for="">1</label>
-                      <q-input v-model="text1" class="import__input" />
+                      <q-input v-model="text1" class="import__input" dense borderless/>
                     </div>
                     <!-- import__inputWrap -->
                     <div class="import__inputWrap">
                       <label for="">2</label>
-                      <q-input v-model="text2" class="import__input" />
+                      <q-input v-model="text2" class="import__input" dense borderless/>
                     </div>
                     <!-- import__inputWrap -->
                     <div class="import__inputWrap">
                       <label for="">3</label>
-                      <q-input v-model="text3" class="import__input" />
+                      <q-input v-model="text3" class="import__input" dense borderless/>
                     </div>
                     <!-- import__inputWrap -->
                     <div class="import__inputWrap">
                       <label for="">4</label>
-                      <q-input v-model="text4" class="import__input" />
+                      <q-input v-model="text4" class="import__input" dense borderless/>
                     </div>
                     <!-- import__inputWrap -->
                     <div class="import__inputWrap">
                       <label for="">5</label>
-                      <q-input v-model="text5" class="import__input" />
+                      <q-input v-model="text5" class="import__input" dense borderless/>
                     </div>
                     <!-- import__inputWrap -->
                     <div class="import__inputWrap">
                       <label for="">6</label>
-                      <q-input v-model="text6" class="import__input" />
+                      <q-input v-model="text6" class="import__input" dense borderless/>
                     </div>
                     <!-- import__inputWrap -->
                   </div>
@@ -49,56 +49,56 @@
                       <!-- import__inputWrap -->
                     <div class="import__inputWrap">
                       <label for="">7</label>
-                      <q-input v-model="text7" class="import__input" />
+                      <q-input v-model="text7" class="import__input" dense borderless/>
                     </div>
                     <!-- import__inputWrap -->
                     <div class="import__inputWrap">
                       <label for="">8</label>
-                      <q-input v-model="text8" class="import__input" />
+                      <q-input v-model="text8" class="import__input" dense borderless/>
                     </div>
                     <!-- import__inputWrap -->
                     <div class="import__inputWrap">
                       <label for="">9</label>
-                      <q-input v-model="text9" class="import__input" />
+                      <q-input v-model="text9" class="import__input" dense borderless/>
                     </div>
                     <!-- import__inputWrap -->
                     <div class="import__inputWrap">
                       <label for="">10</label>
-                      <q-input v-model="text10" class="import__input" />
+                      <q-input v-model="text10" class="import__input" dense borderless/>
                     </div>
                     <!-- import__inputWrap -->
                     <div class="import__inputWrap">
                       <label for="">11</label>
-                      <q-input v-model="text11" class="import__input" />
+                      <q-input v-model="text11" class="import__input" dense borderless/>
                     </div>
                     <!-- import__inputWrap -->
                     <div class="import__inputWrap">
                       <label for="">12</label>
-                      <q-input v-model="text12" class="import__input" />
+                      <q-input v-model="text12" class="import__input" dense borderless/>
                     </div>
                     <!-- import__inputWrap -->
                   </div>
                 </div>
                 <!-- import__grid -->
-                  <q-input 
-                    v-model="password" 
-                    lazy-rules 
-                    :rules="Required" 
-                    ref="fldPasswordChange" 
+                  <q-input
+                    v-model="password"
+                    lazy-rules
+                    :rules="Required"
+                    ref="fldPasswordChange"
                     class="input input--borderDark"
-                    filled :type="isPwd2 ? 'password' : 'text'" 
+                    filled :type="isPwd2 ? 'password' : 'text'"
                     label="New password"
                     />
-                  <q-input 
-                    v-model="confirmPassword" 
-                    lazy-rules ref="fldPasswordChangeConfirm" 
-                    :rules="ConfirmPWD" 
-                    label="Confirm password" 
-                    filled 
+                  <q-input
+                    v-model="confirmPassword"
+                    lazy-rules ref="fldPasswordChangeConfirm"
+                    :rules="ConfirmPWD"
+                    label="Confirm password"
+                    filled
                     class="input input--borderDark"
                     :type="isPwd3 ? 'password' : 'text'"
                     />
-                      
+
                  <a href="/#/createwalletstep1" class="btn btn--primary import__btn">Import</a>
             </q-form>
 
@@ -131,21 +131,21 @@ export default {
     const age = ref(null)
     const accept = ref(false)
     return {
-      text1: ref(''),     
-      text2: ref(''),     
-      text3: ref(''),     
-      text4: ref(''),     
-      text5: ref(''),     
-      text6: ref(''),     
-      text7: ref(''),     
-      text8: ref(''),     
-      text9: ref(''),     
-      text10: ref(''),     
-      text11: ref(''),     
-      text12: ref(''),  
+      text1: ref(''),
+      text2: ref(''),
+      text3: ref(''),
+      text4: ref(''),
+      text5: ref(''),
+      text6: ref(''),
+      text7: ref(''),
+      text8: ref(''),
+      text9: ref(''),
+      text10: ref(''),
+      text11: ref(''),
+      text12: ref(''),
       password: ref(''),
-      confirmPassword: ref(''),  
-    
+      confirmPassword: ref(''),
+
       name,
       age,
       accept,

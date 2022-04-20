@@ -2,13 +2,13 @@
     <div>
         <main class="create-wallet">
             <div class="container">
-                <h1 class="text-center">Create wallet</h1>
+                <h1 class="text-center text-desktop-left">Create wallet</h1>
 
                 <!-- start stepper
                 .stepper__step--active - active step (blue dot)
                 .stepper__step--complete -- complete step (green dot & check icon)
                 -->
-                <div class="stepper create-wallet__stepper">
+                <div class="stepper create-wallet__stepper flex-desktop-left">
                 <div class="stepper__step stepper__step--active">
                     <div class="stepper__circle"></div>
                     <span class="stepper__text">Step 1</span>

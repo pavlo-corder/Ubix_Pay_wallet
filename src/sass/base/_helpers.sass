@@ -2,11 +2,29 @@
   &-center
     text-align: center
 
+  &-desktop-left
+    @media screen and (min-width: 768px)
+      text-align: left !important
+
   &-black
     color: $black
 
   &-white
     color: $white
 
+.flex-desktop-left
+  @media screen and (min-width: 768px)
+    justify-content: start !important
+
 .container
   padding: 0 30px
+
+  @media screen and (min-width: 768px)
+    max-width: 420px
+
+.desktop-2-cols-container
+  @media screen and (min-width: 768px)
+    display: grid
+    grid-template-columns: 1fr 1fr
+    grid-gap: 30px
+    max-width: 810px

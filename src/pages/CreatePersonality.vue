@@ -2,7 +2,7 @@
   <main class="start-screen">
     <div class="container">
       <h1>You can<br>
-        <a href="#">create your digital personality</a>
+        <a class="link" href="#">create your digital personality</a>
       </h1>
 
       <p class="start-screen__subtitle">
