@@ -35,11 +35,11 @@
           </div>
         </div>
 
-        <p class="row items-center">
+        <p class="row items-center q-mb-lg">
           <span class="text-caption text-grey-dark">Balance:&nbsp;</span>
           <span class="text-bold text-h6">{{balance}}</span>
         </p>
-
+        <a class="btn btn--primary">Next</a>
       </q-form>
     </div>
   </main>

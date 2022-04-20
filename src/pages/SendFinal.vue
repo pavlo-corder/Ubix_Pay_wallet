@@ -48,7 +48,7 @@
           </template>
         </q-input>
 
-        <h2 class="text-dark text-center q-mt-lg q-mb-md">Amount<br>0.5 ETH</h2>
+        <h2 class="text-dark text-center text-desktop-left q-mt-lg q-mb-md">Amount<br>0.5 ETH</h2>
 
 
         <q-card flat class="start-screen__person q-mb-md">
