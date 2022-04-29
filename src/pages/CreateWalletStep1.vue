@@ -48,7 +48,7 @@
                         />
                 </q-form>
 
-                <a href="/#/createwalletstep2" class="btn btn--primary create-wallet__btn">Create new wallet</a>
+                <router-link to="/createwalletstep2" class="btn btn--primary create-wallet__btn">Create new wallet</router-link>
             </div>
         </main>
     </div>

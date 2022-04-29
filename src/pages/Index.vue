@@ -9,9 +9,9 @@
         </h1>
 
         <h2 class="welcome__subtitle">To start you can</h2>
-        <a href="/" class="btn btn--primary welcome__btn">create new wallet</a>
+        <router-link to="/createwalletstep1" class="btn btn--primary welcome__btn">create new wallet</router-link>
         <h2 class="welcome__subtitle">Or</h2>
-        <a href="/" class="btn">import existing wallet</a>
+        <router-link to="/import" class="btn">import existing wallet</router-link>
       </div>
     </main>
 </template>

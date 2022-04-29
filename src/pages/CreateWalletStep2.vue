@@ -43,7 +43,7 @@
                     <q-card-section class="seed-phrase__word">eat</q-card-section>
                 </q-card>
 
-                <a href="/#/createwalletstep3" class="btn btn--primary create-wallet__btn">Next</a>
+                <router-link to="/createwalletstep3" class="btn btn--primary create-wallet__btn">Next</router-link>
                 <a href="/" class="btn btn--transparent create-wallet__btn">Skip for now</a>
             </div>
         </main>
