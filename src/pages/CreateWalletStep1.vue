@@ -29,17 +29,20 @@
                     class="q-gutter-md q-mb-md"
                 >
                     <q-input
-                        v-model="password"
+                        v-model="model_password"
                         lazy-rules
                         :rules="Required"
                         ref="fldPasswordChange"
                         class="input input--borderDark"
-                        filled :type="isPwd2 ? 'password' : 'text'"
+                        filled
+                        :type="isPwd2 ? 'password' : 'text'"
                         label="New password"
+
                         />
                     <q-input
-                        v-model="confirmPassword"
-                        lazy-rules ref="fldPasswordChangeConfirm"
+                        v-model="model_confirmpassword"
+                        lazy-rules
+                        ref="fldPasswordChangeConfirm"
                         :rules="ConfirmPWD"
                         label="Confirm password"
                         filled
@@ -47,8 +50,13 @@
                         :type="isPwd3 ? 'password' : 'text'"
                         />
                 </q-form>
+              <button
+                @click="createWallet"
+                class="btn btn--primary create-wallet__btn"
+              >Create new wallet</button>
 
                 <router-link to="/createwalletstep2" class="btn btn--primary create-wallet__btn">Create new wallet</router-link>
+
             </div>
         </main>
     </div>
@@ -56,8 +64,24 @@
 <script>
 import { ref } from 'vue'
 
+
 export default({
   name: "CreateWalletStep1",
+  data(){
+    return{
+      isPwd2: true,
+      isPwd3: true,
+      model_password: '',
+      model_confirmpassword: ''
+    }
+  },
+  methods: {
+    createWallet(){
+      if(this.model_password === this.model_confirmpassword){
+        alert('Yes')
+      }
+    }
+  },
   computed: {
   ConfirmPWD() {
     return [

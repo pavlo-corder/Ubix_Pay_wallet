@@ -29,23 +29,20 @@
                 </div>
 
                 <div class="seed-phrase create-wallet__seed-phrase">
-                    <div class="seed-phrase__word">eat</div>
-                    <div class="seed-phrase__word">buns</div>
+                    <div
+                      v-for="(phraseCheck, key) in mnemonicPhraseCheck"
+                      :key="key"
+                      class="seed-phrase__word"
+                    >{{phraseCheck}}</div>
                 </div>
 
                 <div class="phrase-suggestions create-wallet__seed-phrase">
-                  <div class="phrase-suggestions__word">eat</div>
-                  <div class="phrase-suggestions__word phrase-suggestions__word--selected">buns</div>
-                  <div class="phrase-suggestions__word">these</div>
-                  <div class="phrase-suggestions__word">soft</div>
-                  <div class="phrase-suggestions__word">eat</div>
-                  <div class="phrase-suggestions__word phrase-suggestions__word--selected">eat</div>
-                  <div class="phrase-suggestions__word">french</div>
-                  <div class="phrase-suggestions__word">eat</div>
-                  <div class="phrase-suggestions__word">eat</div>
-                  <div class="phrase-suggestions__word">have</div>
-                  <div class="phrase-suggestions__word">eat</div>
-                  <div class="phrase-suggestions__word">eat</div>
+                    <div v-for="(phraseRandom, key) in mnemonicPhraseRandom"
+                       :key="key"
+                       @click="checkWord(phraseRandom, key)"
+                       class="phrase-suggestions__word"
+                       :class="{  'phrase-suggestions__word--selected': phraseRandom.check  }"
+                    >{{phraseRandom.word}}</div>
                 </div>
 
                 <a href="/#/createwalletstep3" class="btn btn--primary create-wallet__btn disabled" >Next</a>
@@ -58,5 +55,39 @@
 
 export default({
   name: "CreateWalletStep3",
+  data(){
+    return{
+      mnemonicPhraseCheck: [],
+      mnemonicPhraseStore: [],
+      mnemonicPhraseRandom: []
+    }
+  },
+  methods: {
+    checkWord(item, key){
+      if(!item.check){
+        this.mnemonicPhraseRandom.map((word) => {
+          if(word.word === item.word ){
+            word.check = true
+          }
+        })
+        this.mnemonicPhraseCheck.push(item.word)
+      }
+
+    }
+  },
+  mounted(){
+    let phraseStore = localStorage.getItem('phrase');
+    if(phraseStore){
+      console.log(phraseStore)
+      this.mnemonicPhraseStore = JSON.parse(phraseStore)
+      let randomPhrase = this.mnemonicPhraseStore.sort(() => Math.random() - 0.5)
+      randomPhrase.map((word) => {
+        this.mnemonicPhraseRandom.push({
+          'word': word,
+          'check': false
+        })
+      })
+    }
+  }
 });
 </script>

@@ -29,21 +29,11 @@
                 </div>
 
                 <div class="seed-phrase create-wallet__seed-phrase">
-                    <div class="seed-phrase__word">eat</div>
-                    <div class="seed-phrase__word">buns</div>
-                    <div class="seed-phrase__word">these</div>
-                    <div class="seed-phrase__word">soft</div>
-                    <div class="seed-phrase__word">eat</div>
-                    <div class="seed-phrase__word">eat</div>
-                    <div class="seed-phrase__word">french</div>
-                    <div class="seed-phrase__word">eat</div>
-                    <div class="seed-phrase__word">eat</div>
-                    <div class="seed-phrase__word">have</div>
-                    <div class="seed-phrase__word">eat</div>
-                    <div class="seed-phrase__word">eat</div>
+                    <div v-for="(phrase, key) in mnemonicPhrase" :key="key" class="seed-phrase__word">{{phrase}}</div>
                 </div>
 
-                <router-link to="/createwalletstep3" class="btn btn--primary create-wallet__btn">Next</router-link>
+                <button @click="savePhrase" class="btn btn--primary create-wallet__btn">Next</button>
+<!--                <router-link to="/createwalletstep3" class="btn btn&#45;&#45;primary create-wallet__btn">Next</router-link>-->
                 <a href="/" class="btn btn--transparent create-wallet__btn">Skip for now</a>
             </div>
         </main>
@@ -51,8 +41,39 @@
 </template>
 <script>
 import { ref } from 'vue'
+import axios from 'axios'
 
 export default({
   name: "CreateWalletStep2",
+  data(){
+    return{
+      countwords: 12,
+      mnemonicPhrase: []
+    }
+  },
+  methods: {
+
+    generateRandomPhrase() {
+      //TODO: вынести в env
+      axios.get('http://localhost:3000/mnemonic')
+        .then((response) => {
+          console.log(response.data);
+          if(response.data){
+            this.mnemonicPhrase = response.data
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
+    savePhrase(){
+      localStorage.setItem('phrase', JSON.stringify(this.mnemonicPhrase))
+      this.$router.push('/createwalletstep3')
+    },
+  },
+  mounted(){
+    //TODO: отрефакторить и вынести в отдельный модуль
+    this.generateRandomPhrase()
+  }
 });
 </script>
