@@ -45,7 +45,10 @@
                     >{{phraseRandom.word}}</div>
                 </div>
 
-                <a href="/#/createwalletstep3" class="btn btn--primary create-wallet__btn disabled" >Next</a>
+                <a href="/#/createwalletstep3"
+                   class="btn btn--primary create-wallet__btn"
+                  :class="{disabled: dasableNextStep}"
+                >Next</a>
                 <a href="/" class="btn btn--transparent create-wallet__btn">Skip for now</a>
             </div>
         </main>
@@ -59,7 +62,8 @@ export default({
     return{
       mnemonicPhraseCheck: [],
       mnemonicPhraseStore: [],
-      mnemonicPhraseRandom: []
+      mnemonicPhraseRandom: [],
+      dasableNextStep: true
     }
   },
   methods: {
@@ -72,15 +76,38 @@ export default({
         })
         this.mnemonicPhraseCheck.push(item.word)
       }
+      this.nextStep()
+    },
+    nextStep(){
+      // console.log('mnemonicPhraseCheck',this.mnemonicPhraseCheck)
+      // console.log('mnemonicPhraseStore',JSON.parse(localStorage.getItem('phrase')))
+      //
 
+      if(this.mnemonicPhraseCheck.length === this.mnemonicPhraseStore.length){
+
+        if(this.validation()){
+          this.dasableNextStep = false
+        }else{
+          console.error('Not walid phrase')
+        }
+
+      }
+    },
+    validation() {
+      for(let key in this.mnemonicPhraseStore){
+        if(this.mnemonicPhraseStore[key] !== this.mnemonicPhraseCheck[key]){
+          return false
+        }
+      }
+      return true
     }
   },
   mounted(){
     let phraseStore = localStorage.getItem('phrase');
     if(phraseStore){
-      console.log(phraseStore)
+      console.log('phraseStore  ',phraseStore)
       this.mnemonicPhraseStore = JSON.parse(phraseStore)
-      let randomPhrase = this.mnemonicPhraseStore.sort(() => Math.random() - 0.5)
+      let randomPhrase = JSON.parse(phraseStore).sort(() => Math.random() - 0.5)
       randomPhrase.map((word) => {
         this.mnemonicPhraseRandom.push({
           'word': word,

@@ -57,7 +57,6 @@ export default({
       //TODO: вынести в env
       axios.get('http://localhost:3000/mnemonic')
         .then((response) => {
-          console.log(response.data);
           if(response.data){
             this.mnemonicPhrase = response.data
           }
@@ -67,9 +66,42 @@ export default({
         });
     },
     savePhrase(){
-      localStorage.setItem('phrase', JSON.stringify(this.mnemonicPhrase))
-      this.$router.push('/createwalletstep3')
+      if(this.validationPhrase()){
+        localStorage.setItem('phrase', JSON.stringify(this.mnemonicPhrase))
+        this.$router.push('/createwalletstep3')
+      }
     },
+    validationPhrase(){
+
+      const resultValidate = async () => {
+
+        await axios.post('http://localhost:3000/validation_phrase', {
+          'mnemonic': this.phraseToString(this.mnemonicPhrase)
+        })
+          .then((response) => {
+            if(response.data.success){
+              return response.data.success
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+          })
+      }
+
+      return resultValidate()
+
+    },
+    phraseToString(phrase){
+      let string = ''
+      phrase.map((item, key) => {
+        if(key === 0){
+          string += `${item}`
+        }else{
+          string += ` ${item}`
+        }
+      })
+      return string
+    }
   },
   mounted(){
     //TODO: отрефакторить и вынести в отдельный модуль
