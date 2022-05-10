@@ -55,7 +55,7 @@ export default({
 
     generateRandomPhrase() {
       //TODO: вынести в env
-      axios.get('http://localhost:3000/mnemonic')
+      axios.get(`${process.env. API}/mnemonic`)
         .then((response) => {
           if(response.data){
             this.mnemonicPhrase = response.data
@@ -75,7 +75,7 @@ export default({
 
       const resultValidate = async () => {
 
-        await axios.post('http://localhost:3000/validation_phrase', {
+        await axios.post(`${process.env. API}/validation_phrase`, {
           'mnemonic': this.phraseToString(this.mnemonicPhrase)
         })
           .then((response) => {
