@@ -43,27 +43,66 @@
 import { ref } from 'vue'
 import axios from 'axios'
 
+import bip39 from '../assets/libs/bip39.min.js'
+import hdkey from '../assets/libs/hdkey.min.js'
+
 export default({
   name: "CreateWalletStep2",
   data(){
     return{
       countwords: 12,
-      mnemonicPhrase: []
+      mnemonicPhrase: [],
+      password: ''
     }
   },
   methods: {
 
     generateRandomPhrase() {
-      //TODO: вынести в env
-      axios.get(`${process.env. API}/mnemonic`)
-        .then((response) => {
-          if(response.data){
-            this.mnemonicPhrase = response.data
-          }
-        })
-        .catch((error) => {
-          console.error(error);
-        });
+
+      const strength = 128;
+      const wordList = eval(bip39.wordlists.english)
+
+      const mnemonic = bip39.generateMnemonic(strength, null, wordList)
+      console.log('phrase', mnemonic)
+      this.mnemonicPhrase = mnemonic.split(' ')
+      localStorage.setItem('phrase', JSON.stringify(this.mnemonicPhrase))
+      const seedHex = bip39.mnemonicToSeedHex(mnemonic, null);
+      console.log('seedHex', seedHex)
+      const seed = bip39.mnemonicToSeed(mnemonic, null);
+      console.log('seed', seedHex)
+
+      const randomNumber = bip39.mnemonicToEntropy(mnemonic, wordList);
+      console.log('randomNumber', randomNumber)
+
+      const isMnemonicValid = bip39.validateMnemonic(mnemonic, wordList);
+      console.log('isMnemonicValid', isMnemonicValid)
+
+      const numberOfWords = (parseInt(strength) + (strength / 32)) / 11;
+      console.log('numberOfWords', numberOfWords)
+
+      const hdwallet = hdkey.fromMasterSeed(seed);
+      const privateExtendedKey= hdwallet.privateExtendedKey();
+      const publicExtendedKey= hdwallet.publicExtendedKey();
+      console.log('privateExtendedKey', privateExtendedKey)
+      console.log('publicExtendedKey', publicExtendedKey)
+      localStorage.setItem('privateExtendedKey', JSON.stringify(privateExtendedKey))
+      localStorage.setItem('publicExtendedKey', JSON.stringify(publicExtendedKey))
+
+
+
+      if(false){
+        //TODO: вынести в env
+        axios.get(`${process.env. API}/mnemonic`)
+          .then((response) => {
+            if(response.data){
+              this.mnemonicPhrase = response.data
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
+
     },
     savePhrase(){
       if(this.validationPhrase()){
@@ -104,6 +143,8 @@ export default({
     }
   },
   mounted(){
+    this.password = localStorage.getItem('password')
+    console.log('this.password', this.password)
     //TODO: отрефакторить и вынести в отдельный модуль
     this.generateRandomPhrase()
   }

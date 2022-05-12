@@ -45,10 +45,11 @@
                     >{{phraseRandom.word}}</div>
                 </div>
 
-                <a href="/#/createwalletstep3"
+                <button
+                   @click="buttonNextStep"
                    class="btn btn--primary create-wallet__btn"
                   :class="{disabled: dasableNextStep}"
-                >Next</a>
+                >Next</button>
                 <a href="/" class="btn btn--transparent create-wallet__btn">Skip for now</a>
             </div>
         </main>
@@ -100,6 +101,11 @@ export default({
         }
       }
       return true
+    },
+    buttonNextStep(){
+      if(!this.dasableNextStep){
+        this.$router.push('/startscreen')
+      }
     }
   },
   mounted(){

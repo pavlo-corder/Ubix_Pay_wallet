@@ -21,9 +21,7 @@
           class="input input--borderDark"
         />
       </div>
-
-
-      <a href="/" class="btn btn--primary">Create new wallet</a>
+      <router-link to="/" class="btn btn--primary">Create new wallet</router-link>
     </div>
   </main>
 </template>
@@ -36,7 +34,7 @@
       setup() {
         return {
           currency: ref('ETH'),
-          currencyOptions: ['ETH', 'ETH1', 'ETH2']
+          currencyOptions: ['BTN', 'ETH', 'UBX']
         }
       }
   }

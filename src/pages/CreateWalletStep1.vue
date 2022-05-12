@@ -55,8 +55,6 @@
                 class="btn btn--primary create-wallet__btn"
               >Create new wallet</button>
 
-                <router-link to="/createwalletstep2" class="btn btn--primary create-wallet__btn">Create new wallet</router-link>
-
             </div>
         </main>
     </div>
@@ -78,7 +76,8 @@ export default({
   methods: {
     createWallet(){
       if(this.model_password === this.model_confirmpassword){
-        alert('Yes')
+        localStorage.setItem('password', JSON.stringify(this.model_password))
+        this.$router.push('/createwalletstep2')
       }
     }
   },
