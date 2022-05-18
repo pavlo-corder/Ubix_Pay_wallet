@@ -49,6 +49,7 @@
         }
       },
     methods: {
+        //TODO: Обязательно вынести в миксин
         createWallet(){
           axios.post(`${process.env. API}/create_wallet`, {
             mnemonic: this.phraseToString(JSON.parse(localStorage.getItem('phrase'))),

@@ -1,3 +1,5 @@
+
+import {auth} from './middlewares'
 const routes = [
   {
     path: "/",
@@ -54,6 +56,9 @@ const routes = [
   },
   {
     path: "/accounts",
+    meta: {
+      middlewares: [ auth ]
+    },
     component: () => import("layouts/MainLayout.vue"),
     children: [
       { path: "", component: () => import("pages/StartScreenAccounts.vue") },

@@ -61,9 +61,15 @@
             v-model="model_account"
             filled
             :options="accountsWallets"
+            @update:model-value="changeWallet"
             behavior="menu"
             class="input input--borderDark col-grow"/>
-          <q-btn round unelevated color="primary" :icon="matAdd"/>
+
+          <q-btn
+            @click="createWallet"
+            round unelevated color="primary"
+            :icon="matAdd"/>
+
         </div>
       </div>
 
@@ -97,41 +103,17 @@
             <q-item-section side>
               <q-avatar rounded size="56px" color="blue-transparent" text-color="blue-light">
                 <q-icon v-show="token.label === 'ETH'" name="img:https://cdn.cdnlogo.com/logos/e/39/ethereum.svg"/>
+                <q-avatar v-show="token.label === 'UBX'" rounded size="56px" color="blue-transparent" text-color="blue-light">
+                  U
+                </q-avatar>
+                <q-avatar v-show="token.label === 'BTC'" rounded size="56px" color="blue-transparent" text-color="blue-light">
+                  B
+                </q-avatar>
               </q-avatar>
             </q-item-section>
             <q-item-section>
               <q-item-label caption>Balance:</q-item-label>
               <q-item-label class="text-subtitle2 text-bold">{{token.balance}} {{token.label}}</q-item-label>
-            </q-item-section>
-            <q-item-section side>
-              <q-btn round unelevated color="grey-gradient" text-color="dark" :icon="matChevronRight"/>
-            </q-item-section>
-          </q-item>
-
-          <q-item class="q-pl-none">
-            <q-item-section side>
-              <q-avatar rounded size="56px" color="blue-transparent" text-color="blue-light">
-                U
-              </q-avatar>
-            </q-item-section>
-            <q-item-section>
-              <q-item-label caption>Balance:</q-item-label>
-              <q-item-label class="text-subtitle2 text-bold">65,458 UBX</q-item-label>
-            </q-item-section>
-            <q-item-section side>
-              <q-btn round unelevated color="grey-gradient" text-color="dark" :icon="matChevronRight"/>
-            </q-item-section>
-          </q-item>
-
-          <q-item class="q-pl-none">
-            <q-item-section side>
-              <q-avatar rounded size="56px" color="blue-transparent" text-color="blue-light">
-                <q-icon name="img:https://cdn.cdnlogo.com/logos/e/39/ethereum.svg"/>
-              </q-avatar>
-            </q-item-section>
-            <q-item-section>
-              <q-item-label caption>Balance:</q-item-label>
-              <q-item-label class="text-subtitle2 text-bold">65,458 UBX</q-item-label>
             </q-item-section>
             <q-item-section side>
               <q-btn round unelevated color="grey-gradient" text-color="dark" :icon="matChevronRight"/>
@@ -221,11 +203,10 @@
 
       return {
         currency: ref('ETH'),
-        currencyOptions: [],
         carousel: ref(0),
         carouselOptions: [],
         account: ref(''),
-        accountsWallets: [],
+
         createAccount,
         importToken,
         showNotifPositive,
@@ -239,13 +220,15 @@
         accounts: [],
         model_blockchain: {},
         model_account: {},
-        tokens: []
+        tokens: [],
+        currencyOptions: [],
+        accountsWallets: [],
       }
     },
     methods:{
       getBalance(){
         axios.post(`${process.env. API}/get_balance`, {
-          wallet: this.model_account.wallet
+          wallet: this.model_account.value
         })
         .then((response) => {
           if(response.status === 200 && response.data.success){
@@ -255,40 +238,104 @@
         .catch((error) => {
           console.error(error);
         })
+      },
+      //TODO: Обязательно вынести в миксин
+      createWallet(){
+
+        // this.accounts.
+
+        console.log(this.model_blockchain)
+
+        let wallet_number = (this.model_blockchain.wallets.length)
+
+        axios.post(`${process.env. API}/create_wallet`, {
+          mnemonic: this.phraseToString(JSON.parse(localStorage.getItem('phrase'))),
+          blockchain: {
+            label: this.model_blockchain.label,
+            value: this.model_blockchain.value
+          },
+          wallet_number: wallet_number
+        })
+          .then((response) => {
+            console.log(response)
+            if(response.status === 200 && response.data.success){
+              this.accounts[0].blockchains.map((blockchain) => {
+                if(blockchain.value === this.model_blockchain.value){
+
+                  console.log('blockchain.wallets', blockchain.wallets)
+
+
+                  blockchain.wallets.push({
+                    wallet: response.data.wallet,
+                    value: response.data.wallet,
+                    label: `Account ${wallet_number + 1}_`,
+                    name: `Account ${wallet_number + 1}_`
+                  })
+
+                }
+              })
+              localStorage.setItem('accounts', JSON.stringify(this.accounts))
+              this.setData()
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+          })
+      },
+      changeWallet(){
+        console.log('this.model_account', this.model_account)
+        this.getBalance()
+      },
+      phraseToString(phrase){
+        let string = ''
+        phrase.map((item, key) => {
+          if(key === 0){
+            string += `${item}`
+          }else{
+            string += ` ${item}`
+          }
+        })
+        return string
+      },
+      setData(){
+        this.accounts = []
+        this.carouselOptions = []
+        this.accountsWallets = []
+        this.model_blockchain = []
+        this.model_account = {}
+        this.accounts = JSON.parse(localStorage.getItem('accounts'))
+        // console.log(this.accounts)
+        this.accounts.map(( item, key ) => {
+          this.carouselOptions.push({
+            label: '',
+            value: key
+          })
+
+          item.blockchains.map((blockchain) => {
+            this.currencyOptions.push({
+              label: blockchain.label,
+              value: blockchain.value,
+            })
+
+            this.model_blockchain = item.blockchains[0]
+            this.model_blockchain.wallets.map((wallet) => {
+              this.accountsWallets.push({
+                label: wallet.name,
+                value: wallet.wallet
+              })
+            })
+
+            this.model_account = blockchain.wallets[0]
+            //
+          })
+
+        })
       }
     },
     mounted(){
-
-      this.accounts = JSON.parse(localStorage.getItem('accounts'))
-      // console.log(this.accounts)
-      this.accounts.map(( item, key ) => {
-        this.carouselOptions.push({
-          label: '',
-          value: key
-        })
-
-        item.blockchains.map((blockchain) => {
-          this.currencyOptions.push({
-            label: blockchain.label,
-            value: blockchain.value,
-          })
-
-        this.model_blockchain = item.blockchains[0]
-          blockchain.wallets.map((wallet) => {
-            this.accountsWallets.push({
-              label: wallet.name,
-              value: wallet.wallet
-            })
-          })
-
-          this.model_account = blockchain.wallets[0]
-        //
-        })
-
-      })
+      this.setData()
       this.getBalance()
       console.log(this.accountsWallets)
-
     }
   }
 </script>

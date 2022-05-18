@@ -55,21 +55,37 @@ app.post('/validation_phrase', (req, res) => {
 app.post('/get_balance', (req, res) => {
 
   const wallet = req.body.wallet
+
+  if(!wallet){
+    res.json({
+      'success': false
+    })
+  }
   // const wallet = '0x3c2247057d43e79cff79f4ce790ebde048f777ab'
   // const wallet = '0x7cacf18f931259c30a7194fa96ab3a44c38b3535'
   // const wallet = '0x407d73d8a49eeb85d32cf465507dd71d507100c1'
   // const wallet = '0x0c57852BE39e256ddCc753B719CCcc943CdF91fC'
   web3.eth.getBalance(wallet, (err, wei) => {
   let balance = web3.utils.fromWei(wei, 'ether')
-  console.log('getBalance', balance)
+  // console.log('getBalance', balance)
     if(balance){
       res.json({
         'success': true,
         tokens: [
           {
             label: 'ETH',
-            balance: balance,
+            balance,
             wallet: wallet
+          },
+          {
+            label: 'BTC',
+            balance: 0,
+            wallet: false
+          },
+          {
+            label: 'UBX',
+            balance: 0,
+            wallet: false
           }
         ]
 

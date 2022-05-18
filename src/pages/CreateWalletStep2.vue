@@ -130,6 +130,7 @@ export default({
       return resultValidate()
 
     },
+    //TODO: Обязательно вынести в миксин
     phraseToString(phrase){
       let string = ''
       phrase.map((item, key) => {

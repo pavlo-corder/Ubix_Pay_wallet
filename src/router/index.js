@@ -6,6 +6,7 @@ import {
   createWebHashHistory,
 } from "vue-router";
 import routes from "./routes";
+import middlewarePipeline from './middleware-pipeline'
 
 /*
  * If not building with SSR mode, you can
@@ -16,7 +17,7 @@ import routes from "./routes";
  * with the Router instance.
  */
 
-export default route(function (/* { store, ssrContext } */) {
+export default route(function ({ store }) {
   const createHistory = process.env.SERVER
     ? createMemoryHistory
     : process.env.VUE_ROUTER_MODE === "history"
@@ -34,6 +35,16 @@ export default route(function (/* { store, ssrContext } */) {
       process.env.MODE === "ssr" ? void 0 : process.env.VUE_ROUTER_BASE
     ),
   });
+
+  Router.beforeEach((to, from, next) => {
+    if (!to.meta.middlewares) return next()
+    let middlewares = to.meta.middlewares
+    let context = { to, from, next, store }
+    return middlewares[0]({
+      ...context,
+      next: middlewarePipeline(context, middlewares, 1)
+    })
+  })
 
   return Router;
 });
