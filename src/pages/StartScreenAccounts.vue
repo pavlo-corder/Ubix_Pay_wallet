@@ -12,44 +12,14 @@
           transition-prev="jump-right"
           transition-next="jump-left"
           class="start-screen__carousel">
-          <q-carousel-slide :name="0" class="start-screen__slide">
+          <q-carousel-slide v-for="account in accounts" :key="account.id" :name="0" class="start-screen__slide">
             <q-card flat class="start-screen__person">
               <q-item class="q-pa-none">
                 <q-item-section>
-                  <q-item-label caption>name</q-item-label>
-                  <q-item-label class="text-h6 text-bold q-mb-sm">Mr. Evil Genius</q-item-label>
+                  <q-item-label caption>{{account.name}}</q-item-label>
+                  <q-item-label class="text-h6 text-bold q-mb-sm">{{account.name}}</q-item-label>
                   <q-item-label caption>Social networks linked:</q-item-label>
                   <q-item-label class="text-body2">0</q-item-label>
-                  <q-item-label>
-                    <a href="#" class="link--big">Setup your person</a>
-                  </q-item-label>
-                </q-item-section>
-              </q-item>
-            </q-card>
-          </q-carousel-slide>
-          <q-carousel-slide :name="1" class="start-screen__slide">
-            <q-card flat class="start-screen__person">
-              <q-item class="q-pa-none">
-                <q-item-section>
-                  <q-item-label caption>name</q-item-label>
-                  <q-item-label class="text-h6 text-bold q-mb-sm">Mr. Elton John</q-item-label>
-                  <q-item-label caption>Social networks linked:</q-item-label>
-                  <q-item-label class="text-body2">1</q-item-label>
-                  <q-item-label>
-                    <a href="#" class="link--big">Setup your person</a>
-                  </q-item-label>
-                </q-item-section>
-              </q-item>
-            </q-card>
-          </q-carousel-slide>
-          <q-carousel-slide :name="2" class="start-screen__slide">
-            <q-card flat class="start-screen__person">
-              <q-item class="q-pa-none">
-                <q-item-section>
-                  <q-item-label caption>name</q-item-label>
-                  <q-item-label class="text-h6 text-bold q-mb-sm">Mr. John Doe</q-item-label>
-                  <q-item-label caption>Social networks linked:</q-item-label>
-                  <q-item-label class="text-body2">2</q-item-label>
                   <q-item-label>
                     <a href="#" class="link--big">Setup your person</a>
                   </q-item-label>
@@ -79,16 +49,18 @@
       <div>
         <!-- Account controls -->
         <div class="row items-center q-mb-md q-gutter-sm">
+
           <q-select
-            v-model="currency"
+            v-model="model_blockchain"
             filled
             :options="currencyOptions"
             behavior="menu"
             class="input input--borderDark col-auto"/>
+
           <q-select
-            v-model="account"
+            v-model="model_account"
             filled
-            :options="accountsOptions"
+            :options="accountsWallets"
             behavior="menu"
             class="input input--borderDark col-grow"/>
           <q-btn round unelevated color="primary" :icon="matAdd"/>
@@ -120,6 +92,22 @@
 
         <!-- Tokens list -->
         <q-list class="q-pb-md">
+
+          <q-item v-for="token in tokens" :key="token.label" class="q-pl-none">
+            <q-item-section side>
+              <q-avatar rounded size="56px" color="blue-transparent" text-color="blue-light">
+                <q-icon v-show="token.label === 'ETH'" name="img:https://cdn.cdnlogo.com/logos/e/39/ethereum.svg"/>
+              </q-avatar>
+            </q-item-section>
+            <q-item-section>
+              <q-item-label caption>Balance:</q-item-label>
+              <q-item-label class="text-subtitle2 text-bold">{{token.balance}} {{token.label}}</q-item-label>
+            </q-item-section>
+            <q-item-section side>
+              <q-btn round unelevated color="grey-gradient" text-color="dark" :icon="matChevronRight"/>
+            </q-item-section>
+          </q-item>
+
           <q-item class="q-pl-none">
             <q-item-section side>
               <q-avatar rounded size="56px" color="blue-transparent" text-color="blue-light">
@@ -134,20 +122,7 @@
               <q-btn round unelevated color="grey-gradient" text-color="dark" :icon="matChevronRight"/>
             </q-item-section>
           </q-item>
-          <q-item class="q-pl-none">
-            <q-item-section side>
-              <q-avatar rounded size="56px" color="blue-transparent" text-color="blue-light">
-                <q-icon name="img:https://cdn.cdnlogo.com/logos/e/39/ethereum.svg"/>
-              </q-avatar>
-            </q-item-section>
-            <q-item-section>
-              <q-item-label caption>Balance:</q-item-label>
-              <q-item-label class="text-subtitle2 text-bold">65,458 UBX</q-item-label>
-            </q-item-section>
-            <q-item-section side>
-              <q-btn round unelevated color="grey-gradient" text-color="dark" :icon="matChevronRight"/>
-            </q-item-section>
-          </q-item>
+
           <q-item class="q-pl-none">
             <q-item-section side>
               <q-avatar rounded size="56px" color="blue-transparent" text-color="blue-light">
@@ -171,6 +146,7 @@
 </template>
 
 <script>
+  import axios from "axios";
   import { ref } from 'vue'
   import {matAdd, matIosShare, matChevronRight} from '@quasar/extras/material-icons'
   import { useQuasar } from 'quasar'
@@ -245,24 +221,11 @@
 
       return {
         currency: ref('ETH'),
-        currencyOptions: ['ETH', 'ETH1', 'ETH2'],
+        currencyOptions: [],
         carousel: ref(0),
-        carouselOptions: [
-            {
-              label: '',
-              value: 0
-            },
-            {
-              label: '',
-              value: 1
-            },
-            {
-              label: '',
-              value: 2
-            }
-          ],
-        account: ref('Account 1'),
-        accountsOptions: ['Account 1', 'Account 2', 'Account 3'],
+        carouselOptions: [],
+        account: ref(''),
+        accountsWallets: [],
         createAccount,
         importToken,
         showNotifPositive,
@@ -270,6 +233,62 @@
         showNotifWarning,
         showNotifInfo
       }
+    },
+    data(){
+      return{
+        accounts: [],
+        model_blockchain: {},
+        model_account: {},
+        tokens: []
+      }
+    },
+    methods:{
+      getBalance(){
+        axios.post(`${process.env. API}/get_balance`, {
+          wallet: this.model_account.wallet
+        })
+        .then((response) => {
+          if(response.status === 200 && response.data.success){
+            this.tokens = response.data.tokens
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        })
+      }
+    },
+    mounted(){
+
+      this.accounts = JSON.parse(localStorage.getItem('accounts'))
+      // console.log(this.accounts)
+      this.accounts.map(( item, key ) => {
+        this.carouselOptions.push({
+          label: '',
+          value: key
+        })
+
+        item.blockchains.map((blockchain) => {
+          this.currencyOptions.push({
+            label: blockchain.label,
+            value: blockchain.value,
+          })
+
+        this.model_blockchain = item.blockchains[0]
+          blockchain.wallets.map((wallet) => {
+            this.accountsWallets.push({
+              label: wallet.name,
+              value: wallet.wallet
+            })
+          })
+
+          this.model_account = blockchain.wallets[0]
+        //
+        })
+
+      })
+      this.getBalance()
+      console.log(this.accountsWallets)
+
     }
   }
 </script>

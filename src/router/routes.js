@@ -42,6 +42,7 @@ const routes = [
     component: () => import("layouts/MainLayout.vue"),
     children: [
       { path: "", component: () => import("pages/StartScreenPerson.vue") },
+      { path: "/writename", component: () => import("pages/StartScreenAccounts.vue") },
     ],
   },
   {
@@ -52,7 +53,7 @@ const routes = [
     ],
   },
   {
-    path: "/startscreenaccounts",
+    path: "/accounts",
     component: () => import("layouts/MainLayout.vue"),
     children: [
       { path: "", component: () => import("pages/StartScreenAccounts.vue") },

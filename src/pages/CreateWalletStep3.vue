@@ -45,6 +45,10 @@
                     >{{phraseRandom.word}}</div>
                 </div>
 
+              <button
+                @click="clearTable"
+                class="btn btn--transparent create-wallet__btn">Clear</button>
+
                 <button
                    @click="buttonNextStep"
                    class="btn btn--primary create-wallet__btn"
@@ -79,6 +83,12 @@ export default({
       }
       this.nextStep()
     },
+    clearTable(){
+      this.mnemonicPhraseCheck = []
+      this.mnemonicPhraseRandom.map((item) => {
+        item.check = false
+      })
+    },
     nextStep(){
       // console.log('mnemonicPhraseCheck',this.mnemonicPhraseCheck)
       // console.log('mnemonicPhraseStore',JSON.parse(localStorage.getItem('phrase')))
@@ -88,8 +98,10 @@ export default({
 
         if(this.validation()){
           this.dasableNextStep = false
+          localStorage.setItem('confirmPhrase', 'true')
         }else{
           console.error('Not walid phrase')
+          localStorage.setItem('confirmPhrase', 'false')
         }
 
       }

@@ -13,7 +13,9 @@
     "bip32": "^3.0.1",
     "bip39": "^3.0.4",
     "bitcoinjs-lib": "^6.0.1",
+    "ethereum-hdwallet": "^0.1.0",
     "web3": "^1.7.3",
+    "web3-eth": "^1.7.3",
     "web3-eth-accounts": "^1.7.3",
     "web3-eth-personal": "^1.7.3"
   }

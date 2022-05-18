@@ -30,9 +30,10 @@
           label="Any details you'd like to share"
           type="textarea"
         />
+        <button class="btn btn--primary">Create personality</button>
+
       </q-form>
 
-      <a href="/" class="btn btn--primary">Create personality</a>
     </div>
   </main>
 </template>
@@ -41,12 +42,35 @@
   import { ref } from 'vue'
 
   export default {
-      name: "StartScreen",
+      name: "CreatePersonality",
       setup() {
         return {
           name: ref(''),
           details: ref('')
         }
+      },
+    data(){
+        return{
+          accounts: []
+        }
+    },
+      methods: {
+        onSubmit(e){
+          e.preventDefault()
+         if(this.name.length > 2){
+           this.accounts[0].name = this.name
+           this.accounts[0].details = this.details
+           localStorage.setItem('accounts', JSON.stringify(this.accounts))
+           this.$router.push('/accounts')
+         }
+        },
+        onReset(){
+
+        }
+      },
+      mounted() {
+        this.accounts = JSON.parse(localStorage.getItem('accounts'))
+
       }
   }
 </script>
