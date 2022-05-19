@@ -13,7 +13,6 @@
 <!--        <div class="select__current">ETH</div>-->
 <!--      </div>-->
       <div class="q-mb-md">
-        {{model_currency}}
         <q-select
           v-model="model_currency"
           filled

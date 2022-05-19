@@ -12,16 +12,16 @@
           transition-prev="jump-right"
           transition-next="jump-left"
           class="start-screen__carousel">
-          <q-carousel-slide v-for="account in accounts" :key="account.id" :name="0" class="start-screen__slide">
+          <q-carousel-slide v-for="(account, key) in accounts" :key="key" :name="0" class="start-screen__slide">
             <q-card flat class="start-screen__person">
               <q-item class="q-pa-none">
                 <q-item-section>
-                  <q-item-label caption>{{account.name}}</q-item-label>
+                  <q-item-label caption>{{account.details}}</q-item-label>
                   <q-item-label class="text-h6 text-bold q-mb-sm">{{account.name}}</q-item-label>
                   <q-item-label caption>Social networks linked:</q-item-label>
-                  <q-item-label class="text-body2">0</q-item-label>
+                  <q-item-label class="text-body2">{{key}}</q-item-label>
                   <q-item-label>
-                    <a href="#" class="link--big">Setup your person</a>
+                    <a @click="editAccount(key)" class="link--big cursor-pointer">Setup your person</a>
                   </q-item-label>
                 </q-item-section>
               </q-item>
@@ -134,9 +134,10 @@
   import { useQuasar } from 'quasar'
   import ImportToken from "components/ImportToken";
   import AddAccount from "components/AddAccount";
+  import EditAccount from "components/EditAccount";
 
   export default {
-    name: "StartScreen",
+    name: "Accounts",
     created() {
       this.matAdd = matAdd
       this.matIosShare = matIosShare
@@ -144,6 +145,22 @@
     },
     setup() {
       const $q = useQuasar()
+
+      function editAccount (key) {
+        console.log(key)
+        $q.dialog({
+          componentProps: {
+            idAccount: key
+          },
+          component: EditAccount
+        }).onOk(() => {
+          // console.log('OK')
+        }).onCancel(() => {
+          // console.log('Cancel')
+        }).onDismiss(() => {
+          // console.log('I am triggered on both OK and Cancel')
+        })
+      }
 
       function createAccount () {
         $q.dialog({
@@ -207,6 +224,7 @@
         carouselOptions: [],
         account: ref(''),
 
+        editAccount,
         createAccount,
         importToken,
         showNotifPositive,
@@ -333,6 +351,14 @@
       }
     },
     mounted(){
+      this.$global.$on('ACCOUNT_UPDATE', (data) => {
+        if(data){
+          this.setData()
+        }
+      })
+      // useQuasar.$on('UPDATE_ACCOUNT', (data) => {
+      //   console.log(data)
+      // })
       this.setData()
       this.getBalance()
       console.log(this.accountsWallets)

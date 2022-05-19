@@ -1,4 +1,4 @@
-export function auth ({ next, store }) {
+function auth ({ next, store }) {
 
   let accounts = JSON.parse(localStorage.getItem('accounts'))
 
@@ -7,3 +7,15 @@ export function auth ({ next, store }) {
   }
   return next()
 }
+
+function account ({ next, store }) {
+
+  let accounts = JSON.parse(localStorage.getItem('accounts'))
+
+  if(accounts) {
+    return next({ name: "accounts" })
+  }
+  return next()
+}
+
+export {auth, account}

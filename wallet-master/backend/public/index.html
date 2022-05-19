@@ -1,0 +1,13 @@
+<!doctype html><html><head><base href="/"/><title>Title</title><meta name="fragment" content="!"><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="manifest" href="/manifest.json"><link rel="apple-touch-icon" sizes="144x144" href="/images/touch-icon-iphone.png"><meta name="theme-color" content="#7ACCE5"></head><body id="appMain" class="unloaded"><div class="container"><header id="appControls"></header></div><div class="container"><div id="mainView"></div></div><div class="container"><div id="footer"></div></div><div id="dialogs"></div><script>if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(function(registration) {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                })
+                .catch(function(err) {
+                    console.log(err);
+                });
+        });
+    } else {
+        console.error('service worker is not supported');
+    }</script><script src="vendor-application-runtime.js.ac898ad3a6f770b624ac.js"></script><script src="vendor-application-backbone.marionette.js.23191d65757fc24d96e9.js"></script><script src="vendor-application-jquery.js.c46ae9f131e7ad54466b.js"></script><script src="vendor-application-jsQR.js.76c67d5476c74edf4dbf.js"></script><script src="application.05184fd4f39eee30f329.js"></script></body><link rel="stylesheet" href="/css/bootstrap.min.css"></html>

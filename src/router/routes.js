@@ -1,8 +1,11 @@
 
-import {auth} from './middlewares'
+import {auth, account} from './middlewares'
 const routes = [
   {
     path: "/",
+    meta: {
+      middlewares: [ account ]
+    },
     component: () => import("layouts/MainLayout.vue"),
     children: [{ path: "", component: () => import("pages/Index.vue") }],
   },
@@ -13,6 +16,9 @@ const routes = [
   },
   {
     path: "/createwalletstep1",
+    meta: {
+      middlewares: [ account ]
+    },
     component: () => import("layouts/MainLayout.vue"),
     children: [
       { path: "", component: () => import("pages/CreateWalletStep1.vue") },
@@ -20,6 +26,9 @@ const routes = [
   },
   {
     path: "/createwalletstep2",
+    meta: {
+      middlewares: [ account ]
+    },
     component: () => import("layouts/MainLayout.vue"),
     children: [
       { path: "", component: () => import("pages/CreateWalletStep2.vue") },
@@ -27,6 +36,9 @@ const routes = [
   },
   {
     path: "/createwalletstep3",
+    meta: {
+      middlewares: [ account ]
+    },
     component: () => import("layouts/MainLayout.vue"),
     children: [
       { path: "", component: () => import("pages/CreateWalletStep3.vue") },
@@ -34,6 +46,9 @@ const routes = [
   },
   {
     path: "/startscreen",
+    meta: {
+      middlewares: [ account ]
+    },
     component: () => import("layouts/MainLayout.vue"),
     children: [
       { path: "", component: () => import("pages/StartScreen.vue") },
@@ -49,6 +64,7 @@ const routes = [
   },
   {
     path: "/createpersonality",
+
     component: () => import("layouts/MainLayout.vue"),
     children: [
       { path: "", component: () => import("pages/CreatePersonality.vue") },
@@ -61,7 +77,7 @@ const routes = [
     },
     component: () => import("layouts/MainLayout.vue"),
     children: [
-      { path: "", component: () => import("pages/StartScreenAccounts.vue") },
+      { path: "", name: 'accounts', component: () => import("pages/StartScreenAccounts.vue") },
     ],
   },
   {

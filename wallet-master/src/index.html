@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+<head>
+    <base href="/"/>
+    <title>Title</title>
+
+    <meta name="fragment" content="!">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" sizes="144x144" href="/images/touch-icon-iphone.png">
+    <meta name="theme-color" content="#7ACCE5">
+</head>
+<body id="appMain" class="unloaded">
+<div class="container">
+    <header id="appControls"></header>
+</div>
+<div class="container">
+    <div id="mainView">
+    </div>
+</div>
+<div class="container">
+    <div id="footer"></div>
+</div>
+
+<div id="dialogs"></div>
+<%=htmlWebpackPlugin.files.webpackManifest%>
+
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(function(registration) {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                })
+                .catch(function(err) {
+                    console.log(err);
+                });
+        });
+    } else {
+        console.error('service worker is not supported');
+    }
+</script>
+
+</body>
+
+<link rel="stylesheet" href="/css/bootstrap.min.css">
+
+</html>
