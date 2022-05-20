@@ -24,7 +24,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.options("*", cors({ origin: ['http://localhost:8080', 'http://deva.ubix.network'], optionsSuccessStatus: 200 }));
-app.use(cors({ origin: "http://localhost:8080", optionsSuccessStatus: 200 }));
+app.use(cors({ origin: ['http://localhost:8080', 'http://deva.ubix.network'], optionsSuccessStatus: 200 }));
 
 let corsOptions = {
   origin: ['http://localhost:8080', 'http://deva.ubix.network'],
