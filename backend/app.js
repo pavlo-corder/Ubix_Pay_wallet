@@ -23,11 +23,11 @@ let web3 = new Web3(new Web3.providers.HttpProvider(rpcURL));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.options("*", cors({ origin: 'http://localhost:8080', optionsSuccessStatus: 200 }));
+app.options("*", cors({ origin: ['http://localhost:8080', 'http://deva.ubix.network'], optionsSuccessStatus: 200 }));
 app.use(cors({ origin: "http://localhost:8080", optionsSuccessStatus: 200 }));
 
 let corsOptions = {
-  origin: 'http://localhost:8080',
+  origin: ['http://localhost:8080', 'http://deva.ubix.network'],
   methods: ["GET", "POST"],
   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 }
