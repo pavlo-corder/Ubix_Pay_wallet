@@ -47,7 +47,7 @@ module.exports = configure(function (ctx) {
       env: {
         API: ctx.dev
           ? 'http://localhost:3000'
-          : 'https://productionspidomain'
+          : 'http://devp.ubix.network'
       },
 
       // transpile: false,
