@@ -80,7 +80,6 @@
       if(this.account.details){
         this.details = this.account.details
       }
-      console.log('account', this.account)
     }
   }
 </script>
