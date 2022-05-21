@@ -16,7 +16,7 @@
         <q-select
           v-model="model_currency"
           filled
-          :options="account.blockchain"
+          :options="blockchains"
           behavior="menu"
           class="input input--borderDark"
         />
@@ -36,41 +36,45 @@
         return {
           model_currency: ref({label:'ETH', value: 60}),
           accounts: [],
-          account: {
-            blockchains: [
+          account_id: 0,
+          key_account: 0,
+          blockchains: [
               {
                 label:'ETH',
                 value: 60,
                 wallets: []
               }
             ]
-          }
         }
       },
     methods: {
         //TODO: Обязательно вынести в миксин
         createWallet(){
           axios.post(`${process.env. API}/create_wallet`, {
-            mnemonic: this.phraseToString(JSON.parse(localStorage.getItem('phrase'))),
+            mnemonic: this.phraseToString(this.accounts[this.key_account].phrase),
             blockchain: this.model_currency,
             wallet_number: 0
           })
             .then((response) => {
               if(response.status === 200 && response.data.success){
-                this.account.id = new Date().getTime()
-                this.account.blockchains.map((item) => {
+
+                this.accounts[this.key_account].id = new Date().getTime()
+
+                this.blockchains.map((item) => {
                   if(item.value === this.model_currency.value){
                     let countWallets = item.wallets.length
                     item.wallets.push({
                       wallet: response.data.wallet,
                       value: response.data.wallet,
-                      label: `Accoucnt ${countWallets + 1}_`,
-                      name: `Accoucnt ${countWallets + 1}_`
+                      label: `Account ${countWallets + 1}`,
+                      name: `Account ${countWallets + 1}`
                     })
                   }
                 })
 
-                this.accounts.push(this.account)
+                this.accounts[this.key_account].blockchains = this.blockchains
+
+                // this.accounts.push(this.account)
 
                 localStorage.setItem('accounts', JSON.stringify(this.accounts))
 
@@ -94,6 +98,16 @@
           return string
         },
 
+    },
+    mounted(){
+      let key_account = localStorage.getItem('key_account')
+      if(key_account){
+        this.key_account = key_account
+      }
+      let accounts = JSON.parse(localStorage.getItem('accounts'))
+      if(accounts){
+        this.accounts = accounts
+      }
     }
   }
 </script>

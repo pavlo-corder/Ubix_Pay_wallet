@@ -13,93 +13,48 @@
                   <!-- import__grid--left -->
                   <div class="import__grid--left">
                     <!-- import__inputWrap -->
-                    <div class="import__inputWrap">
-                      <label for="">1</label>
-                      <q-input v-model="text1" class="import__input" dense borderless/>
+                    <div v-for="(tg1, key) in text_group_1" :key="key" class="import__inputWrap">
+                      <label for="">{{key+1}}</label>
+                      <q-input v-model="tg1.value" class="import__input" dense borderless/>
                     </div>
-                    <!-- import__inputWrap -->
-                    <div class="import__inputWrap">
-                      <label for="">2</label>
-                      <q-input v-model="text2" class="import__input" dense borderless/>
-                    </div>
-                    <!-- import__inputWrap -->
-                    <div class="import__inputWrap">
-                      <label for="">3</label>
-                      <q-input v-model="text3" class="import__input" dense borderless/>
-                    </div>
-                    <!-- import__inputWrap -->
-                    <div class="import__inputWrap">
-                      <label for="">4</label>
-                      <q-input v-model="text4" class="import__input" dense borderless/>
-                    </div>
-                    <!-- import__inputWrap -->
-                    <div class="import__inputWrap">
-                      <label for="">5</label>
-                      <q-input v-model="text5" class="import__input" dense borderless/>
-                    </div>
-                    <!-- import__inputWrap -->
-                    <div class="import__inputWrap">
-                      <label for="">6</label>
-                      <q-input v-model="text6" class="import__input" dense borderless/>
-                    </div>
-                    <!-- import__inputWrap -->
                   </div>
                   <!-- import__grid--left -->
                   <div class="import__grid--right">
-                      <!-- import__inputWrap -->
-                    <div class="import__inputWrap">
-                      <label for="">7</label>
-                      <q-input v-model="text7" class="import__input" dense borderless/>
+                    <div v-for="(tg2, key) in text_group_2" :key="key" class="import__inputWrap">
+                      <label for="">{{key+7}}</label>
+                      <q-input v-model="tg2.value" class="import__input" dense borderless/>
                     </div>
-                    <!-- import__inputWrap -->
-                    <div class="import__inputWrap">
-                      <label for="">8</label>
-                      <q-input v-model="text8" class="import__input" dense borderless/>
-                    </div>
-                    <!-- import__inputWrap -->
-                    <div class="import__inputWrap">
-                      <label for="">9</label>
-                      <q-input v-model="text9" class="import__input" dense borderless/>
-                    </div>
-                    <!-- import__inputWrap -->
-                    <div class="import__inputWrap">
-                      <label for="">10</label>
-                      <q-input v-model="text10" class="import__input" dense borderless/>
-                    </div>
-                    <!-- import__inputWrap -->
-                    <div class="import__inputWrap">
-                      <label for="">11</label>
-                      <q-input v-model="text11" class="import__input" dense borderless/>
-                    </div>
-                    <!-- import__inputWrap -->
-                    <div class="import__inputWrap">
-                      <label for="">12</label>
-                      <q-input v-model="text12" class="import__input" dense borderless/>
-                    </div>
-                    <!-- import__inputWrap -->
                   </div>
                 </div>
                 <!-- import__grid -->
                   <q-input
-                    v-model="password"
+                    v-model="model_password"
                     lazy-rules
-                    :rules="Required"
-                    ref="fldPasswordChange"
-                    class="input input--borderDark"
-                    filled :type="isPwd2 ? 'password' : 'text'"
+                    :rules="[
+                          val => val !== null && val !== '' || 'The required field',
+                          val => val.length >= 8 || 'Please use maximum 8 characters'
+                        ]"
+                    class="input-password"
+                    filled :type="isPwd ? 'password' : 'text'"
                     label="New password"
                     />
                   <q-input
-                    v-model="confirmPassword"
-                    lazy-rules ref="fldPasswordChangeConfirm"
-                    :rules="ConfirmPWD"
+                    v-model="model_confirmpassword"
+                    lazy-rules
+                    :rules="[
+                          val => val !== null && val !== '' || 'The required field',
+                          val => val.length >= 8 || 'Please use maximum 8 characters',
+                          val => val == model_password || 'Different passwords'
+                        ]"
                     label="Confirm password"
                     filled
-                    class="input input--borderDark"
-                    :type="isPwd3 ? 'password' : 'text'"
+                    class="input-password"
+                    :type="isPwd2 ? 'password' : 'text'"
                     />
 
-                 <a href="/#/createwalletstep1" class="btn btn--primary import__btn">Import</a>
+                <button class="btn btn--primary import__btn">Import</button>
+
+<!--                 <a href="/accounts" class="btn btn&#45;&#45;primary import__btn">Import</a>-->
             </q-form>
 
           </div>
@@ -110,72 +65,180 @@
 <script>
 import { useQuasar } from 'quasar'
 import { ref } from 'vue'
+import axios from "axios";
 
 export default {
   name: "Import",
-  computed: {
-  ConfirmPWD() {
-    return [
-        (v) => !!v || "The required field",
-        (v) => v == this.$refs.fldPasswordChange.value || "Different passwords"
-        ]
-    },
-    Required() {
-        return [(v) => !!v || 'The required field']
+  data(){
+    return{
+      account: {
+        id: 0,
+        phrase: [],
+        confirmPhrase: false,
+        password: "",
+        name: "",
+        details: "",
+        blockchains: []
+      },
+      blockchains: [
+        {
+          label:'ETH',
+          value: 60,
+          wallets: []
+        }
+      ],
+      mnemonicPhrase: [],
+      count_phrase: 12,
+      text_group_1: [
+        {value: 'trouble'},
+        {value: 'segment'},
+        {value: 'nice'},
+        {value: 'patrol'},
+        {value: 'say'},
+        {value: 'laundry'}
+      ],
+      text_group_2: [
+        {value: 'lunch'},
+        {value: 'weasel'},
+        {value: 'royal'},
+        {value: 'motor'},
+        {value: 'midnight'},
+        {value: 'royal'}
+      ],
+      model_password: '12345678',
+      model_confirmpassword: '12345678',
+      isPwd: true,
+      isPwd2: true
     }
   },
-  setup () {
-    const $q = useQuasar()
+  methods: {
+    onSubmit(){
 
-    const name = ref(null)
-    const age = ref(null)
-    const accept = ref(false)
-    return {
-      text1: ref(''),
-      text2: ref(''),
-      text3: ref(''),
-      text4: ref(''),
-      text5: ref(''),
-      text6: ref(''),
-      text7: ref(''),
-      text8: ref(''),
-      text9: ref(''),
-      text10: ref(''),
-      text11: ref(''),
-      text12: ref(''),
-      password: ref(''),
-      confirmPassword: ref(''),
+      this.mnemonicPhrase = []
 
-      name,
-      age,
-      accept,
+      this.text_group_1.map((item) => {
+        this.mnemonicPhrase.push(item.value)
+      })
+      this.text_group_2.map((item) => {
+        this.mnemonicPhrase.push(item.value)
+      })
+      console.log('this.validationPhrase()',this.validationPhrase())
 
-      onSubmit () {
-        if (accept.value !== true) {
-          $q.notify({
-            color: 'red-5',
-            textColor: 'white',
-            icon: 'warning',
-            message: 'You need to accept the license and terms first'
-          })
-        }
-        else {
-          $q.notify({
-            color: 'green-4',
-            textColor: 'white',
-            icon: 'cloud_done',
-            message: 'Submitted'
-          })
-        }
-      },
+      if(this.validationPhrase()){
 
-      onReset () {
-        name.value = null
-        age.value = null
-        accept.value = false
+        console.log('Phrase valid')
+
+        this.account.phrase = this.mnemonicPhrase
+        this.account.password = this.model_password
+        this.account.confirmPhrase = true
+
+        console.log(this.account)
+
+        //Получение кошелька
+       this.createWallet()
+
+
+
+
+
+
+
       }
+      // let accounts = []
+      // let key_account = 0
+      // this.account.password = this.model_password
+      // accounts.push(this.account)
+      // localStorage.setItem('accounts', JSON.stringify(accounts))
+      // localStorage.setItem('key_account', key_account)
+      // this.$router.push('/accounts')
+    },
+    onReset () {
+
+    },
+    createWallet(){
+
+
+        axios.post(`${process.env. API}/create_wallet`, {
+          mnemonic: this.phraseToString(this.mnemonicPhrase),
+          blockchain: this.blockchains[0],
+          wallet_number: 0
+        })
+          .then((response) => {
+            //
+            if(response.status === 200 && response.data.success){
+
+              this.account.id = new Date().getTime()
+
+              this.blockchains.map((item) => {
+                if(item.label === 'ETH'){
+                  let countWallets = item.wallets.length
+                  item.wallets.push({
+                    wallet: response.data.wallet,
+                    value: response.data.wallet,
+                    label: `Account ${countWallets + 1}`,
+                    name: `Account ${countWallets + 1}`
+                  })
+
+                }
+              })
+
+              this.account.blockchains = this.blockchains
+              let accounts = []
+              accounts.push(this.account)
+              localStorage.setItem('accounts', JSON.stringify(accounts))
+              this.$router.push('/setupperson')
+            }
+
+
+          })
+          .catch((error) => {
+            console.error(error);
+            return false
+          })
+
+    },
+    validationPhrase(){
+
+      const resultValidate = async () => {
+
+        await axios.post(`${process.env. API}/validation_phrase`, {
+          'mnemonic': this.phraseToString(this.mnemonicPhrase)
+        })
+          .then((response) => {
+            if(response.data.success){
+              return response.data.success
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+          })
+      }
+      return resultValidate()
+    },
+    //TODO: Обязательно вынести в миксин
+    phraseToString(phrase){
+      let string = ''
+      phrase.map((item, key) => {
+        if(key === 0){
+          string += `${item}`
+        }else{
+          string += ` ${item}`
+        }
+      })
+      return string
     }
-    }
+  },
+  computed: {
+
+
+
+  },
+
+  mounted(){
+    // let first = 1
+    // console.log('submit', (`${this.texts.text+first}`))
   }
+}
+
 
 </script>

@@ -3,18 +3,19 @@
     <q-header class="z-top">
       <q-toolbar class="header">
         <!-- back btn -->
-        <div v-if="false" class="header__back">
+        <a v-show="btnBack" @click="backRoute" class="header__back">
           <div class="header__backIcon"/>
           <div class="header__backText">Back</div>
-        </div>
+        </a>
+
         <!-- logo -->
-        <a href="/" class="header__logo">
+        <a v-show="!btnBack" href="/" class="header__logo">
           <img src="~/assets/images/logo.svg" alt="UbixPay">
         </a>
-        <a href="/" class="header__invite">+ Invite a friend</a>
+        <a v-show="!btnBack" href="/" class="header__invite">+ Invite a friend</a>
         <!-- menu -->
 
-          <div :class="`burger ${drawer ? 'burger--close' : ''}`"
+          <div v-show="!btnBack" :class="`burger ${drawer ? 'burger--close' : ''}`"
                @click="toggleDrawer">
             <div class="burger__line"></div>
             <div class="burger__line"></div>
@@ -78,21 +79,53 @@
 <script>
 
 import {ref} from 'vue'
+import { useQuasar } from 'quasar'
+import { useRoute } from 'vue-router'
 
 export default ({
   name: 'MainLayout',
-
+  data(){
+    return{
+      btnBack: false,
+      btnBackRoute: '/'
+    }
+  },
+  methods:{
+    backRoute(){
+      console.log('clickRouteBack')
+      let routBack = this.btnBackRoute
+      console.log('routBack', routBack)
+      this.btnBack = false
+      this.$router.push({ path: '/' })
+      // this.$router.push(routBack)
+    }
+  },
   setup () {
+    const $q = useQuasar()
     const drawer = ref(false)
+    // const router = useRouter()
 
     function toggleDrawer() {
       drawer.value = !drawer.value;
     }
 
+
     return {
       drawer,
       toggleDrawer,
     }
+  },
+  mounted(){
+    this.$global.$on('BTN_BACK', (data) => {
+      console.log(data)
+      if(data.btn_back){
+        this.btnBack = true
+      }
+      if(data.route){
+        this.btnBackRoute = data.route
+      }
+
+    })
   }
 })
 </script>

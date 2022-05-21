@@ -99,7 +99,7 @@
         <!-- Tokens list -->
         <q-list class="q-pb-md">
 
-          <q-item v-for="token in tokens" :key="token.label" class="q-pl-none">
+          <q-item v-for="token in tokens" v-show="token.wallet" :key="token.label" class="q-pl-none">
             <q-item-section side>
               <q-avatar rounded size="56px" color="blue-transparent" text-color="blue-light">
                 <q-icon v-show="token.label === 'ETH'" name="img:https://cdn.cdnlogo.com/logos/e/39/ethereum.svg"/>
@@ -220,7 +220,7 @@
 
       return {
         currency: ref('ETH'),
-        carousel: ref(0),
+        carousel: 0,
         carouselOptions: [],
         account: ref(''),
 
@@ -324,10 +324,13 @@
         this.accounts = JSON.parse(localStorage.getItem('accounts'))
         // console.log(this.accounts)
         this.accounts.map(( item, key ) => {
-          this.carouselOptions.push({
-            label: '',
-            value: key
-          })
+          if(this.accounts.length > 1){
+            this.carouselOptions.push({
+              label: '',
+              value: key
+            })
+          }
+
 
           item.blockchains.map((blockchain) => {
             this.currencyOptions.push({

@@ -50,6 +50,8 @@ export default({
   name: "CreateWalletStep2",
   data(){
     return{
+      accounts: [],
+      key_account: 0,
       countwords: 12,
       mnemonicPhrase: [],
       password: ''
@@ -65,7 +67,9 @@ export default({
       const mnemonic = bip39.generateMnemonic(strength, null, wordList)
       console.log('phrase', mnemonic)
       this.mnemonicPhrase = mnemonic.split(' ')
-      localStorage.setItem('phrase', JSON.stringify(this.mnemonicPhrase))
+
+      this.accounts[this.key_account].phrase = this.mnemonicPhrase
+
       const seedHex = bip39.mnemonicToSeedHex(mnemonic, null);
       console.log('seedHex', seedHex)
       const seed = bip39.mnemonicToSeed(mnemonic, null);
@@ -83,12 +87,15 @@ export default({
       const hdwallet = hdkey.fromMasterSeed(seed);
       const privateExtendedKey= hdwallet.privateExtendedKey();
       const publicExtendedKey= hdwallet.publicExtendedKey();
-      console.log('privateExtendedKey', privateExtendedKey)
-      console.log('publicExtendedKey', publicExtendedKey)
+      // console.log('privateExtendedKey', privateExtendedKey)
+      // console.log('publicExtendedKey', publicExtendedKey)
+
+      this.accounts[this.key_account].privateExtendedKey = privateExtendedKey
+      this.accounts[this.key_account].publicExtendedKey = publicExtendedKey
+
+      localStorage.setItem('accounts', JSON.stringify(this.accounts))
       localStorage.setItem('privateExtendedKey', JSON.stringify(privateExtendedKey))
       localStorage.setItem('publicExtendedKey', JSON.stringify(publicExtendedKey))
-
-
 
       if(false){
         //TODO: вынести в env
@@ -106,7 +113,8 @@ export default({
     },
     savePhrase(){
       if(this.validationPhrase()){
-        localStorage.setItem('phrase', JSON.stringify(this.mnemonicPhrase))
+        this.accounts[this.key_account].phrase = this.mnemonicPhrase
+        localStorage.setItem('accounts', JSON.stringify(this.accounts))
         this.$router.push('/createwalletstep3')
       }
     },
@@ -144,8 +152,17 @@ export default({
     }
   },
   mounted(){
-    this.password = localStorage.getItem('password')
-    console.log('this.password', this.password)
+    let key_account = localStorage.getItem('key_account')
+    if(key_account){
+      this.key_account = key_account
+    }
+    let accounts = JSON.parse(localStorage.getItem('accounts'))
+    if(accounts){
+      this.accounts = accounts
+    }
+    //TODO:Нужно прояснить ситуацию с паролем, он должен принимать участие в root
+    // this.password = localStorage.getItem('password')
+    // console.log('this.password', this.password)
     //TODO: отрефакторить и вынести в отдельный модуль
     this.generateRandomPhrase()
   }

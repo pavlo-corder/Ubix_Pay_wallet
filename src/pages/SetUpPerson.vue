@@ -3,11 +3,11 @@
     <div class="container">
       <h1>Set up your person</h1>
       <q-form
-        @submit="onSubmit"
-        @reset="onReset"
+
         class="q-gutter-md q-mb-md q-mt-md">
         <q-input
           v-model="name"
+          @keyup="changeInput"
           class="input input--borderDark"
           filled
           label="Enter your name"
@@ -15,6 +15,7 @@
         />
         <q-input
           v-model="details"
+          @keyup="changeInput"
           class="input input--borderDark"
           filled
           label="Any details you'd like to share"
@@ -57,6 +58,14 @@
 
   export default {
     name: "SetUpPerson",
+    data(){
+      return{
+        accounts: [],
+        key_account: 0,
+        name: ref(''),
+        details: ref(''),
+      }
+    },
     setup() {
       const $q = useQuasar()
 
@@ -73,8 +82,6 @@
       }
 
       return {
-        name: ref(''),
-        details: ref(''),
         identifiers: [
           {
             socialNetwork: 'telegram',
@@ -91,6 +98,35 @@
         ],
         chooseIdentityProvider
       }
+    },
+    methods: {
+      changeInput() {
+        this.accounts[this.key_account].name = this.name
+        this.accounts[this.key_account].details = this.details
+        localStorage.setItem('accounts', JSON.stringify(this.accounts))
+        console.log(this.accounts)
+      },
+      setBtnBack(){
+        this.$global.$emit('BTN_BACK', {
+          btn_back: true,
+          route: '/accounts'
+        })
+      }
+    },
+    mounted(){
+
+      let key_account = localStorage.getItem('key_account')
+      if(key_account){
+        this.key_account = key_account
+      }
+      let accounts = JSON.parse(localStorage.getItem('accounts'))
+      if(accounts){
+        this.accounts = accounts
+      }
+      setTimeout(()=>{
+        this.setBtnBack()
+      }, 0)
+
     }
   }
 </script>

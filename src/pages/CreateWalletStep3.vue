@@ -65,6 +65,8 @@ export default({
   name: "CreateWalletStep3",
   data(){
     return{
+      accounts: [],
+      key_account: 0,
       mnemonicPhraseCheck: [],
       mnemonicPhraseStore: [],
       mnemonicPhraseRandom: [],
@@ -81,6 +83,7 @@ export default({
         })
         this.mnemonicPhraseCheck.push(item.word)
       }
+      console.log('this.mnemonicPhraseCheck', this.mnemonicPhraseCheck)
       this.nextStep()
     },
     clearTable(){
@@ -98,11 +101,13 @@ export default({
 
         if(this.validation()){
           this.dasableNextStep = false
-          localStorage.setItem('confirmPhrase', 'true')
+          this.accounts[this.key_account].confirmPhrase = true
         }else{
           console.error('Not walid phrase')
-          localStorage.setItem('confirmPhrase', 'false')
+          this.accounts[this.key_account].confirmPhrase = false
         }
+
+        localStorage.setItem('accounts', JSON.stringify(this.accounts))
 
       }
     },
@@ -121,11 +126,25 @@ export default({
     }
   },
   mounted(){
-    let phraseStore = localStorage.getItem('phrase');
+    // let phraseStore = localStorage.getItem('phrase');
+    let key_account = localStorage.getItem('key_account')
+    if(key_account){
+      this.key_account = key_account
+    }
+    let accounts = JSON.parse(localStorage.getItem('accounts'))
+    if(accounts){
+      this.accounts = accounts
+    }
+
+    let phraseStore = accounts[key_account].phrase
+
     if(phraseStore){
-      console.log('phraseStore  ',phraseStore)
-      this.mnemonicPhraseStore = JSON.parse(phraseStore)
-      let randomPhrase = JSON.parse(phraseStore).sort(() => Math.random() - 0.5)
+
+      this.mnemonicPhraseStore = phraseStore
+      console.log('phraseStore  ', this.mnemonicPhraseStore)
+
+      let phraseStoreRandom = [...phraseStore]
+      let randomPhrase = phraseStoreRandom.sort(() => Math.random() - 0.5)
       randomPhrase.map((word) => {
         this.mnemonicPhraseRandom.push({
           'word': word,

@@ -24,16 +24,19 @@
                 </div>
                 <!-- stepper end -->
                 <q-form
-                    @submit="onSubmit"
-                    @reset="onReset"
-                    class="q-gutter-md q-mb-md"
+                  @submit="onSubmit"
+                  @reset="onReset"
+                  class="q-gutter-md q-mb-md"
                 >
                     <q-input
                         v-model="model_password"
                         lazy-rules
-                        :rules="Required"
+                        :rules="[
+                          val => val !== null && val !== '' || 'The required field',
+                          val => val.length >= 8 || 'Please use maximum 8 characters'
+                        ]"
                         ref="fldPasswordChange"
-                        class="input input--borderDark"
+
                         filled
                         :type="isPwd2 ? 'password' : 'text'"
                         label="New password"
@@ -43,17 +46,22 @@
                         v-model="model_confirmpassword"
                         lazy-rules
                         ref="fldPasswordChangeConfirm"
-                        :rules="ConfirmPWD"
+                        :rules="[
+                          val => val !== null && val !== '' || 'The required field',
+                          val => val.length >= 8 || 'Please use maximum 8 characters',
+                          val => val == model_password || 'Different passwords'
+                        ]"
                         label="Confirm password"
                         filled
-                        class="input input--borderDark"
                         :type="isPwd3 ? 'password' : 'text'"
                         />
+
+                  <button
+
+                    class="btn btn--primary create-wallet__btn"
+                  >Create new wallet</button>
                 </q-form>
-              <button
-                @click="createWallet"
-                class="btn btn--primary create-wallet__btn"
-              >Create new wallet</button>
+
 
             </div>
         </main>
@@ -67,6 +75,14 @@ export default({
   name: "CreateWalletStep1",
   data(){
     return{
+      account: {
+        phrase: [],
+        confirmPhrase: false,
+        password: "",
+        name: "",
+        details: "",
+        blockchains: []
+      },
       isPwd2: true,
       isPwd3: true,
       model_password: '',
@@ -74,29 +90,24 @@ export default({
     }
   },
   methods: {
-    createWallet(){
-      if(this.model_password === this.model_confirmpassword){
-        localStorage.setItem('password', JSON.stringify(this.model_password))
-        this.$router.push('/createwalletstep2')
-      }
-    }
-  },
-  computed: {
-  ConfirmPWD() {
-    return [
-        (v) => !!v || "The required field",
-        (v) => v == this.$refs.fldPasswordChange.value || "Different passwords"
-        ]
-    },
-    Required() {
-        return [(v) => !!v || 'The required field']
-    }
-  },
-  setup () {
-    return {
-      password: ref(''),
-      confirmPassword: ref(''),
+    onSubmit(){
+      let accounts = []
+      let key_account = 0
+      this.account.password = this.model_password
+      accounts.push(this.account)
+      localStorage.setItem('accounts', JSON.stringify(accounts))
+      localStorage.setItem('key_account', key_account)
+      this.$router.push('/createwalletstep2')
     }
   }
 });
 </script>
+
+<style>
+.q-field--filled .q-field__control:before,
+.q-field--filled.q-field--highlighted .q-field__control:before {
+  opacity: 1;
+  background: rgb(255 255 255);
+  border: 1px solid rgb(204 204 204);
+}
+</style>
