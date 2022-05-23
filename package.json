@@ -25,7 +25,8 @@
     "vue": "^3.0.0",
     "vue-draggable-next": "^2.1.1",
     "vue-router": "^4.0.0",
-    "vuedraggable": "^4.1.0"
+    "vuedraggable": "^4.1.0",
+    "vuex": "^4.0.2"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.13.14",

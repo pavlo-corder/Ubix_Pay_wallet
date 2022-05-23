@@ -42,12 +42,21 @@
 <script>
 import { ref } from 'vue'
 import axios from 'axios'
+import {useStore} from "vuex";
 
 import bip39 from '../assets/libs/bip39.min.js'
 import hdkey from '../assets/libs/hdkey.min.js'
 
 export default({
   name: "CreateWalletStep2",
+  setup () {
+    const $store = useStore()
+
+    return {
+      account: $store.state.account.account,
+      updateAccount: (val) => $store.commit('account/update', val)
+    }
+  },
   data(){
     return{
       accounts: [],
@@ -61,54 +70,41 @@ export default({
 
     generateRandomPhrase() {
 
+      let account = {...this.account}
+
       const strength = 128;
       const wordList = eval(bip39.wordlists.english)
 
       const mnemonic = bip39.generateMnemonic(strength, null, wordList)
-      console.log('phrase', mnemonic)
+      // console.log('phrase', mnemonic)
       this.mnemonicPhrase = mnemonic.split(' ')
 
-      this.accounts[this.key_account].phrase = this.mnemonicPhrase
+      account.phrase = this.mnemonicPhrase
 
-      const seedHex = bip39.mnemonicToSeedHex(mnemonic, null);
-      console.log('seedHex', seedHex)
+      // const seedHex = bip39.mnemonicToSeedHex(mnemonic, null);
+      // console.log('seedHex', seedHex)
       const seed = bip39.mnemonicToSeed(mnemonic, null);
-      console.log('seed', seedHex)
+      // console.log('seed', seedHex)
 
-      const randomNumber = bip39.mnemonicToEntropy(mnemonic, wordList);
-      console.log('randomNumber', randomNumber)
+      // const randomNumber = bip39.mnemonicToEntropy(mnemonic, wordList);
+      // console.log('randomNumber', randomNumber)
 
-      const isMnemonicValid = bip39.validateMnemonic(mnemonic, wordList);
-      console.log('isMnemonicValid', isMnemonicValid)
+      // const isMnemonicValid = bip39.validateMnemonic(mnemonic, wordList);
+      // console.log('isMnemonicValid', isMnemonicValid)
 
-      const numberOfWords = (parseInt(strength) + (strength / 32)) / 11;
-      console.log('numberOfWords', numberOfWords)
+      // const numberOfWords = (parseInt(strength) + (strength / 32)) / 11;
+      // console.log('numberOfWords', numberOfWords)
 
       const hdwallet = hdkey.fromMasterSeed(seed);
       const privateExtendedKey= hdwallet.privateExtendedKey();
       const publicExtendedKey= hdwallet.publicExtendedKey();
-      // console.log('privateExtendedKey', privateExtendedKey)
-      // console.log('publicExtendedKey', publicExtendedKey)
 
-      this.accounts[this.key_account].privateExtendedKey = privateExtendedKey
-      this.accounts[this.key_account].publicExtendedKey = publicExtendedKey
+      account.privateExtendedKey = privateExtendedKey
+      account.publicExtendedKey = publicExtendedKey
+      account.confirmPhrase = false
 
-      localStorage.setItem('accounts', JSON.stringify(this.accounts))
-      localStorage.setItem('privateExtendedKey', JSON.stringify(privateExtendedKey))
-      localStorage.setItem('publicExtendedKey', JSON.stringify(publicExtendedKey))
+      this.updateAccount(account)
 
-      if(false){
-        //TODO: вынести в env
-        axios.get(`${process.env. API}/mnemonic`)
-          .then((response) => {
-            if(response.data){
-              this.mnemonicPhrase = response.data
-            }
-          })
-          .catch((error) => {
-            console.error(error);
-          });
-      }
 
     },
     savePhrase(){

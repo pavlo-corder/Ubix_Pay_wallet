@@ -95,6 +95,7 @@ module.exports = configure(function (ctx) {
           classes: 'notification'
         }
       },
+      components: ['QToggle'],
 
       // iconSet: 'material-icons', // Quasar icon set
       // lang: 'en-US', // Quasar language pack

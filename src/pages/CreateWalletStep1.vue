@@ -8,6 +8,7 @@
                 .stepper__step--active - active step (blue dot)
                 .stepper__step--complete -- complete step (green dot & check icon)
                 -->
+
                 <div class="stepper create-wallet__stepper flex-desktop-left">
                 <div class="stepper__step stepper__step--active">
                     <div class="stepper__circle"></div>
@@ -68,21 +69,14 @@
     </div>
 </template>
 <script>
-import { ref } from 'vue'
+import {computed, ref} from 'vue'
+import {useStore} from "vuex";
 
 
 export default({
   name: "CreateWalletStep1",
   data(){
     return{
-      account: {
-        phrase: [],
-        confirmPhrase: false,
-        password: "",
-        name: "",
-        details: "",
-        blockchains: []
-      },
       isPwd2: true,
       isPwd3: true,
       model_password: '',
@@ -90,15 +84,29 @@ export default({
     }
   },
   methods: {
+    modelPassword(){
+      return this.model_password
+    },
     onSubmit(){
-      let accounts = []
-      let key_account = 0
-      this.account.password = this.model_password
-      accounts.push(this.account)
-      localStorage.setItem('accounts', JSON.stringify(accounts))
-      localStorage.setItem('key_account', key_account)
+
+      let account = {...this.account}
+      account.password = this.model_password
+
+      this.updateAccount(account)
+
       this.$router.push('/createwalletstep2')
     }
+  },
+  setup () {
+    const $store = useStore()
+
+    return {
+      account: $store.state.account.account,
+      updateAccount: (val) => $store.commit('account/update', val)
+    }
+  },
+  mounted(){
+
   }
 });
 </script>

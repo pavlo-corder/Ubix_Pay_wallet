@@ -61,8 +61,18 @@
 </template>
 <script>
 
+import {useStore} from "vuex";
+
 export default({
   name: "CreateWalletStep3",
+  setup () {
+    const $store = useStore()
+
+    return {
+      account: $store.state.account.account,
+      updateAccount: (val) => $store.commit('account/update', val)
+    }
+  },
   data(){
     return{
       accounts: [],
@@ -93,21 +103,15 @@ export default({
       })
     },
     nextStep(){
-      // console.log('mnemonicPhraseCheck',this.mnemonicPhraseCheck)
-      // console.log('mnemonicPhraseStore',JSON.parse(localStorage.getItem('phrase')))
-      //
 
       if(this.mnemonicPhraseCheck.length === this.mnemonicPhraseStore.length){
 
         if(this.validation()){
           this.dasableNextStep = false
-          this.accounts[this.key_account].confirmPhrase = true
+
         }else{
           console.error('Not walid phrase')
-          this.accounts[this.key_account].confirmPhrase = false
         }
-
-        localStorage.setItem('accounts', JSON.stringify(this.accounts))
 
       }
     },
@@ -121,27 +125,26 @@ export default({
     },
     buttonNextStep(){
       if(!this.dasableNextStep){
+
+        let account = {...this.account}
+        account.confirmPhrase = true
+        this.updateAccount(account)
+
         this.$router.push('/startscreen')
+
       }
     }
   },
   mounted(){
-    // let phraseStore = localStorage.getItem('phrase');
-    let key_account = localStorage.getItem('key_account')
-    if(key_account){
-      this.key_account = key_account
-    }
-    let accounts = JSON.parse(localStorage.getItem('accounts'))
-    if(accounts){
-      this.accounts = accounts
-    }
 
-    let phraseStore = accounts[key_account].phrase
+    let account = {...this.account}
+
+    let phraseStore = account.phrase
 
     if(phraseStore){
 
       this.mnemonicPhraseStore = phraseStore
-      console.log('phraseStore  ', this.mnemonicPhraseStore)
+      // console.log('phraseStore  ', this.mnemonicPhraseStore)
 
       let phraseStoreRandom = [...phraseStore]
       let randomPhrase = phraseStoreRandom.sort(() => Math.random() - 0.5)

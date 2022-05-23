@@ -40,14 +40,17 @@
 
 <script>
   import { ref } from 'vue'
-
+  import {useStore} from "vuex";
 
   export default {
       name: "CreatePersonality",
       setup() {
+        const $store = useStore()
         return {
           name: ref(''),
-          details: ref('')
+          details: ref(''),
+          account: {...$store.state.account.account},
+          updateAccount: (val) => $store.commit('account/update', val)
         }
       },
     data(){
@@ -59,9 +62,10 @@
         onSubmit(e){
           e.preventDefault()
          if(this.name.length > 2){
-           this.accounts[0].name = this.name
-           this.accounts[0].details = this.details
-           localStorage.setItem('accounts', JSON.stringify(this.accounts))
+           this.account.name = this.name
+           this.account.details = this.details
+           // localStorage.setItem('accounts', JSON.stringify(this.accounts))
+           this.updateAccount(this.account)
            this.$router.push('/accounts')
          }
         },
