@@ -154,9 +154,9 @@ module.exports = configure(function (ctx) {
       },
 
       manifest: {
-        name: `Quasar App`,
-        short_name: `Quasar App`,
-        description: `A Quasar Framework app`,
+        name: `Ubixpay`,
+        short_name: `Ubixpay`,
+        description: `Ubixpay`,
         display: "standalone",
         orientation: "portrait",
         background_color: "#ffffff",

@@ -64,7 +64,7 @@
                     :type="isPwd2 ? 'password' : 'text'"
                     />
 
-                <button class="btn btn--primary import__btn">Import</button>
+                <button style="width: calc(100% - 16px);" class="btn btn--primary import__btn">Import</button>
 
             </q-form>
 
