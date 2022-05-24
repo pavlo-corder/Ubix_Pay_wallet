@@ -182,8 +182,8 @@ export default {
                 wallet: {
                   wallet: response.data.wallet,
                   value: response.data.wallet,
-                  label: `Account ${blockchain.wallets.length + 1}`,
-                  name: `Account ${blockchain.wallets.length + 1}`
+                  label: `Wallet ${blockchain.wallets.length + 1}`,
+                  name: `Wallet ${blockchain.wallets.length + 1}`
                 }
               })
             }

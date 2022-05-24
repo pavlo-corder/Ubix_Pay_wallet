@@ -47,6 +47,8 @@
           </q-item-section>
         </q-item>
       </q-list>
+
+<!--      <button class="btn q-mb-md" >Lock account</button>-->
     </div>
   </main>
 </template>

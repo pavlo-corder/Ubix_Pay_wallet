@@ -71,8 +71,8 @@ import {computed, ref} from 'vue'
                       wallet: {
                         wallet: response.data.wallet,
                         value: response.data.wallet,
-                        label: `Account ${item.wallets.length + 1}`,
-                        name: `Account ${item.wallets.length + 1}`
+                        label: `Wallet ${item.wallets.length + 1}`,
+                        name: `Wallet ${item.wallets.length + 1}`
                       }
                     })
 

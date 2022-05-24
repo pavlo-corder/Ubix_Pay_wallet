@@ -54,14 +54,29 @@
                    class="btn btn--primary create-wallet__btn"
                   :class="{disabled: dasableNextStep}"
                 >Next</button>
-                <a href="/" class="btn btn--transparent create-wallet__btn">Skip for now</a>
+                <button @click="confirm = true" href="/" class="btn btn--transparent create-wallet__btn">Skip for now</button>
+
             </div>
+
         </main>
+      <q-dialog v-model="confirm" persistent>
+        <q-card>
+          <q-card-section class="row items-center">
+            <span class="q-ml-sm">Are you sure you want to continue?</span>
+          </q-card-section>
+
+          <q-card-actions align="right">
+            <q-btn flat label="Cancel" color="primary" v-close-popup />
+            <q-btn @click="nextConfirm" flat label="Yes" color="primary" v-close-popup />
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
     </div>
 </template>
 <script>
 
 import {useStore} from "vuex";
+import { useQuasar } from 'quasar'
 
 export default({
   name: "CreateWalletStep3",
@@ -75,6 +90,7 @@ export default({
   },
   data(){
     return{
+      confirm: false,
       accounts: [],
       key_account: 0,
       mnemonicPhraseCheck: [],
@@ -108,9 +124,10 @@ export default({
 
         if(this.validation()){
           this.dasableNextStep = false
-
+          this.showAlertSuccess()
         }else{
           console.error('Not walid phrase')
+          this.showAlertFail()
         }
 
       }
@@ -133,7 +150,28 @@ export default({
         this.$router.push('/startscreen')
 
       }
-    }
+    },
+    nextConfirm(){
+      let account = {...this.account}
+      account.confirmPhrase = false
+      this.updateAccount(account)
+
+      this.$router.push('/startscreen')
+    },
+    showAlertSuccess() {
+      this.$q.notify({
+        //needs sanitizing!!!
+        message: '<span class="notification__msg notification__msg--positive">SUCCESS</span> Your secret seedphrase confirmed',
+        html: true
+      })
+    },
+    showAlertFail() {
+      this.$q.notify({
+        //needs sanitizing!!!
+        message: '<span class="notification__msg notification__msg--negative">FAIL</span> Not confirm your secret seedphrase',
+        html: true
+      })
+    },
   },
   mounted(){
 

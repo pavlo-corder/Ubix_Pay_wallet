@@ -34,8 +34,9 @@
 
                 <button @click="savePhrase" class="btn btn--primary create-wallet__btn">Next</button>
 <!--                <router-link to="/createwalletstep3" class="btn btn&#45;&#45;primary create-wallet__btn">Next</router-link>-->
-                <a href="/" class="btn btn--transparent create-wallet__btn">Skip for now</a>
+<!--                <button @click="showAlertSkip" class="btn btn&#45;&#45;transparent create-wallet__btn">Skip for now</button>-->
             </div>
+
         </main>
     </div>
 </template>
@@ -43,6 +44,7 @@
 import { ref } from 'vue'
 import axios from 'axios'
 import {useStore} from "vuex";
+import { useQuasar } from 'quasar'
 
 import bip39 from '../assets/libs/bip39.min.js'
 import hdkey from '../assets/libs/hdkey.min.js'
@@ -51,6 +53,7 @@ export default({
   name: "CreateWalletStep2",
   setup () {
     const $store = useStore()
+    const $q = useQuasar()
 
     return {
       account: $store.state.account.account,
@@ -145,7 +148,14 @@ export default({
         }
       })
       return string
-    }
+    },
+    showAlertSkip() {
+      this.$q.notify({
+        //needs sanitizing!!!
+        message: 'Transaction status: <span class="notification__msg notification__msg--positive">success</span>',
+        html: true
+      })
+    },
   },
   mounted(){
     let key_account = localStorage.getItem('key_account')
