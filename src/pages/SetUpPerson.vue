@@ -55,19 +55,19 @@
   import {ref} from 'vue'
   import {useQuasar} from 'quasar'
   import ChooseIdentityProvider from "components/ChooseIdentityProvider";
+  import {useStore} from "vuex";
 
   export default {
     name: "SetUpPerson",
     data(){
       return{
-        accounts: [],
-        key_account: 0,
         name: ref(''),
         details: ref(''),
       }
     },
     setup() {
       const $q = useQuasar()
+      const $store = useStore()
 
       function chooseIdentityProvider() {
         $q.dialog({
@@ -96,15 +96,21 @@
             id: '@twitter_acc'
           }
         ],
-        chooseIdentityProvider
+        chooseIdentityProvider,
+        account: $store.state.account.account,
+        updateAccount: (val) => $store.commit('account/update', val)
       }
     },
     methods: {
       changeInput() {
-        this.accounts[this.key_account].name = this.name
-        this.accounts[this.key_account].details = this.details
-        localStorage.setItem('accounts', JSON.stringify(this.accounts))
-        console.log(this.accounts)
+
+        let account = {...this.account}
+
+        account.name = this.name
+        account.details = this.details
+        // localStorage.setItem('accounts', JSON.stringify(this.accounts))
+        console.log(account)
+        this.updateAccount(account)
       },
       setBtnBack(){
         this.$global.$emit('BTN_BACK', {
@@ -115,14 +121,20 @@
     },
     mounted(){
 
-      let key_account = localStorage.getItem('key_account')
-      if(key_account){
-        this.key_account = key_account
-      }
-      let accounts = JSON.parse(localStorage.getItem('accounts'))
-      if(accounts){
-        this.accounts = accounts
-      }
+      this.name = this.account.name
+      this.details = this.account.details
+
+
+      console.log('account mounted  ', this.account)
+
+      // let key_account = localStorage.getItem('key_account')
+      // if(key_account){
+      //   this.key_account = key_account
+      // }
+      // let accounts = JSON.parse(localStorage.getItem('accounts'))
+      // if(accounts){
+      //   this.accounts = accounts
+      // }
       setTimeout(()=>{
         this.setBtnBack()
       }, 0)

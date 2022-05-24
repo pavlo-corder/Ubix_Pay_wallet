@@ -5,11 +5,13 @@
 // }
 export default function () {
 
-
-  let keyAccount = localStorage.getItem('key_account')
+  let keyAccount = 0
+  keyAccount = localStorage.getItem('key_account')
   let accounts = JSON.parse(localStorage.getItem('accounts'))
 
-  if(!keyAccount || !accounts || accounts.length === 0){
+
+
+  if(keyAccount === null || keyAccount === '' || !keyAccount){
     keyAccount = 0
   }
 
@@ -32,7 +34,9 @@ export default function () {
     ]
   }
 
-  if(keyAccount && accounts && accounts.length > 0){
+
+
+  if(keyAccount >= 0 && accounts && accounts.length > 0){
     account = accounts[keyAccount]
   }
 

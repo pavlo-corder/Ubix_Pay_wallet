@@ -21,7 +21,7 @@
                   <q-item-label caption>Social networks linked:</q-item-label>
                   <q-item-label class="text-body2">{{key}}</q-item-label>
                   <q-item-label>
-                    <a @click="editAccount(key)" class="link--big cursor-pointer">Setup your person</a>
+                    <router-link to="/setupperson" class="link--big cursor-pointer">Setup your person</router-link>
                   </q-item-label>
                 </q-item-section>
               </q-item>
@@ -148,18 +148,19 @@
 
       function editAccount (key) {
         console.log(key)
-        $q.dialog({
-          componentProps: {
-            idAccount: key
-          },
-          component: EditAccount
-        }).onOk(() => {
-          // console.log('OK')
-        }).onCancel(() => {
-          // console.log('Cancel')
-        }).onDismiss(() => {
-          // console.log('I am triggered on both OK and Cancel')
-        })
+        this.$router.push('/setupperson')
+        // $q.dialog({
+        //   componentProps: {
+        //     idAccount: key
+        //   },
+        //   component: EditAccount
+        // }).onOk(() => {
+        //   // console.log('OK')
+        // }).onCancel(() => {
+        //   // console.log('Cancel')
+        // }).onDismiss(() => {
+        //   // console.log('I am triggered on both OK and Cancel')
+        // })
       }
 
       function createAccount () {

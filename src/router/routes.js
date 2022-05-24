@@ -101,7 +101,7 @@ const routes = [
     path: "/setupperson",
     component: () => import("layouts/MainLayout.vue"),
     children: [
-      { path: "", component: () => import("pages/SetUpPerson.vue") },
+      { path: "", name: 'setupperson', component: () => import("pages/SetUpPerson.vue") },
     ],
   },
   {
