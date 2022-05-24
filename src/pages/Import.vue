@@ -14,15 +14,27 @@
                   <div class="import__grid--left">
                     <!-- import__inputWrap -->
                     <div v-for="(tg1, key) in text_group_1" :key="key" class="import__inputWrap">
-                      <label for="">{{key+1}}</label>
-                      <q-input v-model="tg1.value" class="import__input" dense borderless/>
+                      <input-phrase
+                        :number="key"
+                        :phrase="tg1.value"
+                        :isPassword="true"
+                        @phrase="phraseFromInput"
+                      ></input-phrase>
+<!--                      <label for="">{{key+1}}</label>-->
+<!--                      <q-input v-model="tg1.value" class="import__input" dense borderless/>-->
                     </div>
                   </div>
                   <!-- import__grid--left -->
                   <div class="import__grid--right">
                     <div v-for="(tg2, key) in text_group_2" :key="key" class="import__inputWrap">
-                      <label for="">{{key+7}}</label>
-                      <q-input v-model="tg2.value" class="import__input" dense borderless/>
+                      <input-phrase
+                        :number="(key+6)"
+                        :phrase="tg2.value"
+                        :isPassword="true"
+                        @phrase="phraseFromInput"
+                      ></input-phrase>
+<!--                      <label for="">{{key+7}}</label>-->
+<!--                      <q-input v-model="tg2.value" class="import__input" dense borderless/>-->
                     </div>
                   </div>
                 </div>
@@ -54,7 +66,6 @@
 
                 <button class="btn btn--primary import__btn">Import</button>
 
-<!--                 <a href="/accounts" class="btn btn&#45;&#45;primary import__btn">Import</a>-->
             </q-form>
 
           </div>
@@ -66,27 +77,25 @@
 import { useQuasar } from 'quasar'
 import { ref } from 'vue'
 import axios from "axios";
+import {useStore} from "vuex";
+import InputPhrase from "components/InputPhrase";
 
 export default {
   name: "Import",
+  components: {
+    InputPhrase
+  },
+  setup () {
+    const $store = useStore()
+
+    return {
+      account: $store.state.account.account,
+      updateAccount: (val) => $store.commit('account/update', val),
+      updateWallets: (val) => $store.commit('account/updateWallets', val)
+    }
+  },
   data(){
     return{
-      account: {
-        id: 0,
-        phrase: [],
-        confirmPhrase: false,
-        password: "",
-        name: "",
-        details: "",
-        blockchains: []
-      },
-      blockchains: [
-        {
-          label:'ETH',
-          value: 60,
-          wallets: []
-        }
-      ],
       mnemonicPhrase: [],
       count_phrase: 12,
       text_group_1: [
@@ -112,6 +121,15 @@ export default {
     }
   },
   methods: {
+    phraseFromInput(data){
+      console.log(data)
+      if(data.number <= 5){
+        this.text_group_1[data.number].value = data.phrase
+      }
+      if(data.number >= 6 && data.number <= 11 ){
+        this.text_group_2[data.number - 6].value = data.phrase
+      }
+    },
     onSubmit(){
 
       this.mnemonicPhrase = []
@@ -119,82 +137,63 @@ export default {
       this.text_group_1.map((item) => {
         this.mnemonicPhrase.push(item.value)
       })
+
       this.text_group_2.map((item) => {
         this.mnemonicPhrase.push(item.value)
       })
-      console.log('this.validationPhrase()',this.validationPhrase())
 
       if(this.validationPhrase()){
 
-        console.log('Phrase valid')
+        let account = {...this.account}
 
-        this.account.phrase = this.mnemonicPhrase
-        this.account.password = this.model_password
-        this.account.confirmPhrase = true
+        account.phrase = this.mnemonicPhrase
+        account.password = this.model_password
+        account.confirmPhrase = true
 
-        console.log(this.account)
+        //Обновление аккаунта
+        this.updateAccount(account)
 
-        //Получение кошелька
-       this.createWallet()
-
-
-
-
-
-
+        //Создание кошелька
+        this.createWallet()
 
       }
-      // let accounts = []
-      // let key_account = 0
-      // this.account.password = this.model_password
-      // accounts.push(this.account)
-      // localStorage.setItem('accounts', JSON.stringify(accounts))
-      // localStorage.setItem('key_account', key_account)
-      // this.$router.push('/accounts')
+
+      this.$router.push('/setupperson')
+
     },
     onReset () {
 
     },
     createWallet(){
 
+      let account = {...this.account}
 
+      account.blockchains.map((blockchain) => {
         axios.post(`${process.env. API}/create_wallet`, {
-          mnemonic: this.phraseToString(this.mnemonicPhrase),
-          blockchain: this.blockchains[0],
+          mnemonic: this.phraseToString(account.phrase),
+          blockchain: blockchain,
           wallet_number: 0
         })
-          .then((response) => {
+        .then((response) => {
             //
             if(response.status === 200 && response.data.success){
-
-              this.account.id = new Date().getTime()
-
-              this.blockchains.map((item) => {
-                if(item.label === 'ETH'){
-                  let countWallets = item.wallets.length
-                  item.wallets.push({
-                    wallet: response.data.wallet,
-                    value: response.data.wallet,
-                    label: `Account ${countWallets + 1}`,
-                    name: `Account ${countWallets + 1}`
-                  })
-
+              this.updateWallets({
+                blockchain: blockchain,
+                wallet: {
+                  wallet: response.data.wallet,
+                  value: response.data.wallet,
+                  label: `Account ${blockchain.wallets.length + 1}`,
+                  name: `Account ${blockchain.wallets.length + 1}`
                 }
               })
-
-              this.account.blockchains = this.blockchains
-              let accounts = []
-              accounts.push(this.account)
-              localStorage.setItem('accounts', JSON.stringify(accounts))
-              this.$router.push('/setupperson')
             }
 
-
           })
-          .catch((error) => {
+        .catch((error) => {
             console.error(error);
             return false
           })
+      })
 
     },
     validationPhrase(){
@@ -227,16 +226,6 @@ export default {
       })
       return string
     }
-  },
-  computed: {
-
-
-
-  },
-
-  mounted(){
-    // let first = 1
-    // console.log('submit', (`${this.texts.text+first}`))
   }
 }
 

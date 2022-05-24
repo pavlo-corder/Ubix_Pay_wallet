@@ -80,7 +80,7 @@ import {computed, ref} from 'vue'
 
                 })
 
-                this.$router.push('/createpersonality')
+                this.$router.push('/setupperson')
               }
             })
             .catch((error) => {
