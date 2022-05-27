@@ -1,9 +1,9 @@
 {
   "name": "ubix",
   "version": "0.0.1",
-  "description": "A Quasar Framework app",
-  "productName": "Quasar App",
-  "author": "irina <iblagodarova@gmail.com>",
+  "description": "Ubix.Pay wallet is one of the most innovative crypto storage applications available on the market. Besides others, it offers a unique feature for sending and receiving payments via social ID. For instance, by nickname on Twitter.",
+  "productName": "Ubixpay",
+  "author": "Gromsam <gromsam@gmail.com>",
   "private": true,
   "scripts": {
     "lint": "eslint --ext .js,.vue ./",
