@@ -116,7 +116,7 @@
               <q-item-label class="text-subtitle2 text-bold">{{token.balance}} {{token.label}}</q-item-label>
             </q-item-section>
             <q-item-section side>
-              <q-btn round unelevated color="grey-gradient" text-color="dark" :icon="matChevronRight"/>
+              <q-btn round unelevated color="grey-gradient" @click="showWallet(token, model_account)" text-color="dark" :icon="matChevronRight"/>
             </q-item-section>
           </q-item>
         </q-list>
@@ -166,10 +166,10 @@
       function createAccount () {
         $q.dialog({
           component: AddAccount
-        }).onOk(() => {
-          // console.log('OK')
+        }).onOk((data) => {
+          console.log('OK', data)
         }).onCancel(() => {
-          // console.log('Cancel')
+          console.log('Cancel')
         }).onDismiss(() => {
           // console.log('I am triggered on both OK and Cancel')
         })
@@ -264,42 +264,42 @@
         // this.accounts.
 
         console.log(this.model_blockchain)
-
-        let wallet_number = (this.model_blockchain.wallets.length)
-
-        axios.post(`${process.env. API}/create_wallet`, {
-          mnemonic: this.phraseToString(JSON.parse(localStorage.getItem('phrase'))),
-          blockchain: {
-            label: this.model_blockchain.label,
-            value: this.model_blockchain.value
-          },
-          wallet_number: wallet_number
-        })
-          .then((response) => {
-            console.log(response)
-            if(response.status === 200 && response.data.success){
-              this.accounts[0].blockchains.map((blockchain) => {
-                if(blockchain.value === this.model_blockchain.value){
-
-                  console.log('blockchain.wallets', blockchain.wallets)
-
-
-                  blockchain.wallets.push({
-                    wallet: response.data.wallet,
-                    value: response.data.wallet,
-                    label: `Account ${wallet_number + 1}_`,
-                    name: `Account ${wallet_number + 1}_`
-                  })
-
-                }
-              })
-              localStorage.setItem('accounts', JSON.stringify(this.accounts))
-              this.setData()
-            }
-          })
-          .catch((error) => {
-            console.error(error);
-          })
+        //
+        // let wallet_number = (this.model_blockchain.wallets.length)
+        //
+        // axios.post(`${process.env. API}/create_wallet`, {
+        //   mnemonic: this.phraseToString(JSON.parse(localStorage.getItem('phrase'))),
+        //   blockchain: {
+        //     label: this.model_blockchain.label,
+        //     value: this.model_blockchain.value
+        //   },
+        //   wallet_number: wallet_number
+        // })
+        //   .then((response) => {
+        //     console.log(response)
+        //     if(response.status === 200 && response.data.success){
+        //       // this.accounts[0].blockchains.map((blockchain) => {
+        //       //   if(blockchain.value === this.model_blockchain.value){
+        //       //
+        //       //     console.log('blockchain.wallets', blockchain.wallets)
+        //       //
+        //       //
+        //       //     blockchain.wallets.push({
+        //       //       wallet: response.data.wallet,
+        //       //       value: response.data.wallet,
+        //       //       label: `Account ${wallet_number + 1}_`,
+        //       //       name: `Account ${wallet_number + 1}_`
+        //       //     })
+        //       //
+        //       //   }
+        //       // })
+        //       // localStorage.setItem('accounts', JSON.stringify(this.accounts))
+        //       // this.setData()
+        //     }
+        //   })
+        //   .catch((error) => {
+        //     console.error(error);
+        //   })
       },
       changeWallet(){
         console.log('this.model_account', this.model_account)
@@ -325,13 +325,13 @@
         this.accounts = JSON.parse(localStorage.getItem('accounts'))
         // console.log(this.accounts)
         this.accounts.map(( item, key ) => {
+
           if(this.accounts.length > 1){
             this.carouselOptions.push({
               label: '',
               value: key
             })
           }
-
 
           item.blockchains.map((blockchain) => {
             this.currencyOptions.push({
@@ -351,6 +351,19 @@
             //
           })
 
+        })
+      },
+      showWallet(token, model_account){
+        console.log(token, model_account)
+        this.$global.$emit(('WALLET_SHOW'), {
+          'wallet': token.wallet
+        })
+        this.$router.push({
+          path: '/shareaddress',
+          query: {
+            'wallet': token.wallet,
+            'account': model_account.label
+          }
         })
       }
     },

@@ -31,10 +31,13 @@ export default function () {
         value: 60,
         wallets: []
       }
+    ],
+    socials: [
+      {
+        label: ''
+      }
     ]
   }
-
-
 
   if(keyAccount >= 0 && accounts && accounts.length > 0){
     account = accounts[keyAccount]
