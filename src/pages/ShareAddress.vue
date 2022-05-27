@@ -71,8 +71,14 @@
     },
     mounted(){
       console.log(this.$route.query)
-      this.account = this.$route.query.account
-      this.wallet = this.$route.query.wallet
+      if(this.$route.query.account && this.$route.query.wallet){
+        this.account = this.$route.query.account
+        this.wallet = this.$route.query.wallet
+      }else{
+        this.$router.push({
+          path: '/accounts'
+        })
+      }
     }
   }
 </script>
