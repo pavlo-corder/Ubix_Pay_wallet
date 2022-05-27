@@ -29,7 +29,7 @@
                 </div>
 
                 <div class="seed-phrase create-wallet__seed-phrase">
-                    <div v-for="(phrase, key) in mnemonicPhrase" :key="key" class="seed-phrase__word">{{phrase}}</div>
+                    <div v-for="(phrase, key) in mnemonicPhrase" :key="key" class="seed-phrase__word">{{key+1}}. {{phrase}}</div>
                 </div>
 
                 <button @click="savePhrase" class="btn btn--primary create-wallet__btn">Next</button>
