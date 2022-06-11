@@ -1,7 +1,12 @@
 const HDWallet = require('ethereum-hdwallet')
 
-const mnemonic = 'tag volcano eight thank tide danger coast health above argue embrace heavy'
+// const mnemonic = 'tag volcano eight thank tide danger coast health above argue embrace heavy'
+const mnemonic = 'trouble segment nice patrol say laundry lunch weasel royal motor midnight royal';
 const hdwallet = HDWallet.fromMnemonic(mnemonic)
+
+console.log(hdwallet.derive(`m/44'/60'/0'/0/0`).getPrivateKey().toString('hex'))
+console.log(hdwallet.derive(`m/44'/60'/0'/0/1`).getPrivateKey().toString('hex'))
+
 // console.log(`0x${hdwallet.derive(`m/44'/0'/0'/0/0`).getAddress().toString('hex')}`)
 // BTH 0x718e0c266ad6e50a8111ca17a13a20479fe77c46
 

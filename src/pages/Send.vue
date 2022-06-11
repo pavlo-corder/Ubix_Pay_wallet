@@ -1,15 +1,16 @@
 <template>
     <main class="q-pt-md">
       <div class="container">
-        <q-form>
+
           <p class="text-subtitle2 q-mb-sm">From</p>
+
           <q-select
             v-model="wallet"
-            :label="wallet.name"
+            :label="current_wallet.name"
             filled
             :options="walletOptions"
             behavior="menu"
-            :display-value="`Balance: ${wallet.balance}`"
+            :display-value="`Balance: ${current_wallet.balance}`"
             class="input input--borderDark q-mb-md">
             <template v-slot:option="scope">
               <q-item
@@ -30,17 +31,52 @@
             </template>
           </q-select>
           <p class="text-subtitle2 q-mb-sm">To</p>
+
           <q-input
-            v-model="address"
+            v-model="name"
+            ref="address"
+            :disable="dasableInput"
             class="input input--borderDark q-mb-sm"
+            placeholder="Set this name"
             filled
-            label="Address"
+            :label="address"
+            @keyup="changeAddressName"
+            @change="changeAddressName"
             type="text"/>
-          <template v-if="address">
-            <a class="btn btn--transparent q-mb-lg">Add this address</a>
-          </template>
+
+            <button
+              v-show="button_set_name"
+              @click="addAddressName"
+              class="btn btn--transparent q-mb-lg">
+              Add this address
+            </button>
+
+            <button
+              v-show="button_cancel_name"
+              @click="cancelAddressName"
+              class="btn btn--transparent q-mb-lg">
+              Cancel
+            </button>
+
+            <button
+              v-show="button_save_name"
+              @click="savelAddressName"
+              class="btn btn--transparent q-mb-lg">
+              Save this address
+            </button>
+
+            <button
+              v-show="button_edit_name"
+              @click="editAddressName"
+              class="btn btn--transparent q-mb-lg">
+              Edit this address
+            </button>
+
+
+
+
           <a class="btn btn--primary">Next</a>
-        </q-form>
+
 
         <q-select
           v-model="searchAddress"
@@ -91,28 +127,18 @@
 
 <script>
   import {ref} from 'vue'
+  import {useStore} from "vuex";
+  import axios from "axios";
+  // import {getBalance} from "src/store/wallet/mutations";
+
   export default {
       name: "Send",
       setup() {
+
+        const $store = useStore()
+
         return {
-          wallet: ref({
-            name: 'Wallet1',
-            balance: '45,256 UBX',
-            icon: null
-          }),
-          walletOptions: [
-            {
-              name: 'Wallet1',
-              balance: '45,256 UBX',
-              icon: null
-            },
-            {
-              name: 'Wallet2',
-              balance: '65,256 UBX',
-              icon: "img:https://cdn.cdnlogo.com/logos/e/39/ethereum.svg"
-            }
-          ],
-          address: ref(''),
+
           searchAddress: ref(null),
           addresses: [
             {
@@ -131,8 +157,233 @@
               socialNetwork: 'twitter'
             }
           ],
-          searchAddressMenuWidth: 0
+          searchAddressMenuWidth: 0,
+          account: $store.state.account.account,
+          nicknames: $store.state.nicknames.nicknames,
+          // current_wallet: $store.state.wallet.current_wallet,
+          current_wallet: $store.state.wallet.current_wallet,
+          updateNicknames: (val) => $store.commit('nicknames/updateNicknames', val),
+          getBalance: () => $store.dispatch('wallet/getBalance')
+
         }
+      },
+      data(){
+        return{
+          name: '',
+          address: 'Address',
+
+          dasableInput: true,
+
+          button_set_name: true,
+          button_cancel_name: false,
+          button_save_name: false,
+          button_edit_name: false,
+
+          // current_wallet: {},
+          current_blockchain: {},
+          wallet: this.current_wallet,
+          walletOptions: [
+            {
+              name: 'Wallet1',
+              balance: '45,256 UBX',
+              icon: null
+            },
+            {
+              name: 'Wallet2',
+              balance: '65,256 UBX',
+              icon: "img:https://cdn.cdnlogo.com/logos/e/39/ethereum.svg"
+            }
+          ],
+
+        }
+      },
+      methods: {
+
+        // getBalance(wallet){
+        //
+        //   axios.post(`${process.env. API}/blockchain/get_balance`, {
+        //     wallet: wallet,
+        //     blockchain: 'ETH'
+        //   })
+        //   .then((response) => {
+        //     if(response.data.success){
+        //       console.log('response.data.value.balance', response.data.value.balance)
+        //       this.wallet.balance = `${response.data.value.balance} ${response.data.value.label}`
+        //     }
+        //   })
+        //   .catch((error) => {
+        //     console.error(error);
+        //   })
+        //
+        // },
+        getBalances(wallets){
+
+          axios.post(`${process.env. API}/blockchain/get_balances`, {
+            wallets: wallets,
+            blockchain: 'ETH'
+          })
+            .then((response) => {
+              // if(response.data.success){
+              //   console.log('response.data.value.balance', response.data.value.balance)
+              //   this.wallet.balance = `${response.data.value.balance} ${response.data.value.label}`
+              // }
+            })
+            .catch((error) => {
+              console.error(error);
+            })
+
+        },
+        addAddressName(){
+          this.button_set_name = false
+          this.button_cancel_name = true
+          this.dasableInput = false
+          setTimeout(() => {
+            this.$refs.address.focus()
+          }, 200)
+        },
+        cancelAddressName(){
+          this.button_set_name = true
+          this.button_cancel_name = false
+          this.dasableInput = true
+        },
+          savelAddressName(){
+          this.button_set_name = false
+          this.button_cancel_name = false
+          this.button_save_name = false
+          this.button_edit_name = true
+          this.dasableInput = true
+          this.updateNicknames({
+            blockchain: 'ETH',
+            address: this.address,
+            name: this.name,
+            socialNetwork: false
+          })
+        },
+        editAddressName(){
+          this.button_set_name = false
+          this.button_cancel_name = false
+          this.button_save_name = true
+          this.button_edit_name = false
+          this.dasableInput = false
+          setTimeout(() => {
+            this.$refs.address.focus()
+          }, 200)
+        },
+        changeAddressName(){
+          if(this.address !== '') {
+            this.button_save_name = true
+            this.button_set_name = false
+            this.button_cancel_name = false
+          }else{
+            this.button_save_name = false
+            this.button_set_name = false
+            this.button_cancel_name = true
+          }
+        },
+        setBtnBack(){
+          this.$global.$emit('BTN_BACK', {
+            btn_back: true,
+            route: '/accounts'
+          })
+        },
+        getNickName(){
+          this.nicknames.map((nickname) => {
+            if(nickname.address === this.address){
+              this.name = nickname.name
+            }
+          })
+        },
+        nextStep(){
+
+        }
+      },
+
+      mounted(){
+
+        this.getBalance()
+
+        let account = {...this.account}
+        let blockchains = [...account.blockchains]
+
+
+        let current_blockchain = {...account.current_blockchain}
+
+
+        console.log('current_wallet', this.current_wallet)
+
+        // this.wallet = {...this.current_wallet}
+
+        let wallets = []
+
+        blockchains.map((blockchain) => {
+          if(blockchain.label === current_blockchain.label){
+            wallets = [...blockchain.wallets]
+
+
+            let wal = []
+        //
+            wallets.map(({...wallet}) => {
+              console.log(wallet)
+              // wallet.balance = `0.0000 ${current_blockchain.label}`
+              wal.push(wallet)
+            })
+
+            console.log(wal)
+        //
+            this.walletOptions = wal
+            // this.getBalances(wal)
+        //
+          }
+        })
+
+
+        // let wallets = [...current_blockchain.wallets]
+
+        // let walletOptions = []
+
+        // wallets.map((wallet) => {
+        //   walletOptions.push({
+        //     name: wallet.label,
+        //     balance: `0.00 ${current_blockchain.label}`,
+        //     icon: null
+        //   })
+        // })
+        //
+        // this.walletOptions = wallets
+        //
+
+        if(this.$route.query.to){
+          this.address = this.$route.query.to
+          // this.getBalance(this.current_wallet.wallet)
+        }
+
+
+
+        this.getNickName()
+
+
+        //
+        // this.wallet = {
+        //   name: current_wallet.label,
+        //   balance: `0.00 ${current_blockchain.label}`,
+        //   icon: null
+        // }
+        //
+
+        // let balance = async () => {
+        //   await this.getBalance(this.current_wallet.wallet)
+        // }
+
+
+
+        setTimeout(()=>{
+          // this.getBalance(this.wallet.wallet)
+          // this.wallet = this.current_wallet
+
+
+          this.setBtnBack()
+        }, 0)
+
       }
   }
 </script>

@@ -3,6 +3,6 @@ export function someGetter (state) {
 }
 */
 
-// export function updateAccount (state) {
-//   return state.account
+// export function ACCOUNTS (state) {
+//   return state.accounts
 // }

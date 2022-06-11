@@ -84,7 +84,7 @@ const routes = [
     path: "/send",
     component: () => import("layouts/MainLayout.vue"),
     children: [
-      { path: "", component: () => import("pages/Send.vue") },
+      { path: "", name: 'send', component: () => import("pages/Send.vue") },
       { path: "selected", component: () => import("pages/SendSelected.vue") },
       { path: "amount", component: () => import("pages/SendAmount.vue") },
       { path: "final", component: () => import("pages/SendFinal.vue") },

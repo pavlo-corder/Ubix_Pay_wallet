@@ -53,14 +53,15 @@
           <q-select
             v-model="model_blockchain"
             filled
-            :options="currencyOptions"
+            :options="blockchainsList"
+            @update:model-value="changeBlockchain"
             behavior="menu"
             class="input input--borderDark col-auto"/>
 
           <q-select
-            v-model="model_account"
+            v-model="model_wallet"
             filled
-            :options="accountsWallets"
+            :options="walletsList"
             @update:model-value="changeWallet"
             behavior="menu"
             class="input input--borderDark col-grow"/>
@@ -78,27 +79,42 @@
 
         <!-- Wallet -->
         <p class="text-subtitle2 text-bold q-mb-sm">Walletubix-1</p>
-        <q-field
-          class="input input--borderDark full-width"
+        <q-input
+          v-model="model_wallet_to"
+          lazy-rules
+
+          label="Wallet"
           filled
-          :icon-right="matIosShare">
+
+        >
           <template v-slot:append>
+
             <q-icon :name="matIosShare"/>
           </template>
-          <template v-slot:control>
-            Address
-          </template>
-        </q-field>
+        </q-input>
+
+
+<!--        <q-field-->
+<!--          class="input input&#45;&#45;borderDark full-width"-->
+<!--          filled-->
+<!--          :icon-right="matIosShare">-->
+
+<!--          <template v-slot:append>-->
+
+<!--            <q-icon :name="matIosShare"/>-->
+<!--          </template>-->
+
+<!--        </q-field>-->
 
         <div class="row q-my-sm q-gutter-sm">
-          <a class="btn col" @click="showNotifPositive">Send</a>
+          <a class="btn col" @click="sendTransaction">Send</a>
+          <a :href="`/send?to=${model_wallet_to}`">Send2</a>
           <a class="btn col" @click="showNotifNegative">Receive</a>
           <a class="btn col" @click="showNotifInfo">Link</a>
         </div>
 
         <!-- Tokens list -->
         <q-list class="q-pb-md">
-
           <q-item v-for="token in tokens" v-show="token.wallet" :key="token.label" class="q-pl-none">
             <q-item-section side>
               <q-avatar rounded size="56px" color="blue-transparent" text-color="blue-light">
@@ -116,7 +132,7 @@
               <q-item-label class="text-subtitle2 text-bold">{{token.balance}} {{token.label}}</q-item-label>
             </q-item-section>
             <q-item-section side>
-              <q-btn round unelevated color="grey-gradient" @click="showWallet(token, model_account)" text-color="dark" :icon="matChevronRight"/>
+              <q-btn round unelevated color="grey-gradient" @click="showWallet(token, model_wallet)" text-color="dark" :icon="matChevronRight"/>
             </q-item-section>
           </q-item>
         </q-list>
@@ -135,6 +151,8 @@
   import ImportToken from "components/ImportToken";
   import AddAccount from "components/AddAccount";
   import EditAccount from "components/EditAccount";
+  import {useStore} from "vuex";
+  import {updateWallets} from "src/store/account/mutations";
 
   export default {
     name: "Accounts",
@@ -145,6 +163,8 @@
     },
     setup() {
       const $q = useQuasar()
+
+      const $store = useStore()
 
       function editAccount (key) {
         console.log(key)
@@ -223,7 +243,6 @@
         currency: ref('ETH'),
         carousel: 0,
         carouselOptions: [],
-        account: ref(''),
 
         editAccount,
         createAccount,
@@ -231,27 +250,59 @@
         showNotifPositive,
         showNotifNegative,
         showNotifWarning,
-        showNotifInfo
+        showNotifInfo,
+
+        account: $store.state.account.account,
+        updateAccount: (val) => $store.commit('account/update', val),
+        updateCurrentWallet: (val) => $store.commit('account/updateCurrentWallet', val),
+        updateCurrentBlockchain: (val) => $store.commit('account/updateCurrentBlockchain', val),
+        updateWallets: (val) => $store.commit('account/updateWallets', val)
+
       }
     },
     data(){
       return{
         accounts: [],
         model_blockchain: {},
-        model_account: {},
-        tokens: [],
-        currencyOptions: [],
-        accountsWallets: [],
+        model_wallet: {},
+        tokens: [
+          {
+            label: 'ETH',
+            balance: '0.000000000000000',
+            wallet: true
+          },
+          {
+            label: 'BTC',
+            balance: 0,
+            wallet: false
+          },
+          {
+            label: 'UBX',
+            balance: 0,
+            wallet: false
+          }
+        ],
+        blockchainsList: [],
+        walletsList: [],
+        model_wallet_to: ''
       }
     },
     methods:{
       getBalance(){
-        axios.post(`${process.env. API}/get_balance`, {
-          wallet: this.model_account.value
+        axios.post(`${process.env. API}/blockchain/get_balance`, {
+          wallet: this.model_wallet.value,
+          blockchain: 'ETH'
         })
         .then((response) => {
-          if(response.status === 200 && response.data.success){
-            this.tokens = response.data.tokens
+          console.log(response.data.success)
+          // this.tokens = response.data.tokens
+          if(response.data.success){
+            this.tokens.map((item) => {
+              if(item.label === response.data.value.label ){
+                item.balance = response.data.value.balance
+                item.wallet = response.data.value.wallet
+              }
+            })
           }
         })
         .catch((error) => {
@@ -265,45 +316,112 @@
 
         console.log(this.model_blockchain)
         //
-        // let wallet_number = (this.model_blockchain.wallets.length)
+        let count_wallets = (this.model_blockchain.wallets.length)
+
+        console.log('count_wallets', count_wallets)
+
+
+        let mnemonic = this.phraseToString(this.account.phrase)
+
         //
-        // axios.post(`${process.env. API}/create_wallet`, {
-        //   mnemonic: this.phraseToString(JSON.parse(localStorage.getItem('phrase'))),
-        //   blockchain: {
-        //     label: this.model_blockchain.label,
-        //     value: this.model_blockchain.value
-        //   },
-        //   wallet_number: wallet_number
-        // })
-        //   .then((response) => {
-        //     console.log(response)
-        //     if(response.status === 200 && response.data.success){
-        //       // this.accounts[0].blockchains.map((blockchain) => {
-        //       //   if(blockchain.value === this.model_blockchain.value){
-        //       //
-        //       //     console.log('blockchain.wallets', blockchain.wallets)
-        //       //
-        //       //
-        //       //     blockchain.wallets.push({
-        //       //       wallet: response.data.wallet,
-        //       //       value: response.data.wallet,
-        //       //       label: `Account ${wallet_number + 1}_`,
-        //       //       name: `Account ${wallet_number + 1}_`
-        //       //     })
-        //       //
-        //       //   }
-        //       // })
-        //       // localStorage.setItem('accounts', JSON.stringify(this.accounts))
-        //       // this.setData()
-        //     }
-        //   })
-        //   .catch((error) => {
-        //     console.error(error);
-        //   })
+        axios.post(`${process.env. API}/blockchain/create_wallet`, {
+          mnemonic: mnemonic,
+          blockchain: {
+            label: this.model_blockchain.label,
+            value: this.model_blockchain.value
+          },
+          count_wallets: count_wallets,
+          create_number_wallet: count_wallets
+        })
+          .then((response) => {
+            console.log(response)
+            if(response.status === 200 && response.data.success){
+
+              let account = {...this.account}
+
+              let name_wallet = `Wallet ${count_wallets + 1}`
+
+              let new_wallet = {
+                label: name_wallet,
+                name: name_wallet,
+                balance: 0,
+                numberWallet: count_wallets,
+                value: response.data.wallet,
+                wallet: response.data.wallet
+              }
+
+              //
+              // console.log('new_wallet', new_wallet, account.blockchains)
+              //
+              let blockchains = [...this.account.blockchains]
+              //
+              console.log('blockchains', blockchains)
+
+              blockchains.map((item) => {
+
+                if(item.label === this.model_blockchain.label){
+                  console.log('new_wallet', new_wallet)
+                  // let itemBlockchain = {...item}
+                  // console.log('itemBlockchain', itemBlockchain)
+                  // let wallets = [...itemBlockchain.wallets]
+                  // console.log('wallets', wallets)
+                  // wallets.push(new_wallet)
+                  // console.log('wallets.push', wallets)
+                  // item.wallets = wallets
+                  // blockchains[key].wallets = wallets
+                  // console.log('added new wallet')
+
+                  this.updateWallets(new_wallet)
+
+                }
+
+              })
+              //
+              // console.log('blockchains', blockchains)
+              //
+              // // account.blockchains = blockchains
+              //
+              // console.log('account update wallets', account)
+
+              this.updateAccount(account)
+              this.updateCurrentWallet(new_wallet)
+              this.setData()
+              this.model_wallet = new_wallet
+              this.getBalance()
+
+              // this.accounts[0].blockchains.map((blockchain) => {
+              //   if(blockchain.value === this.model_blockchain.value){
+              //
+              //     console.log('blockchain.wallets', blockchain.wallets)
+              //     blockchain.wallets.push({
+              //       wallet: response.data.wallet,
+              //       value: response.data.wallet,
+              //       label: `Account ${wallet_number + 1}_`,
+              //       name: `Account ${wallet_number + 1}_`
+              //     })
+              //
+              //   }
+              // })
+              // localStorage.setItem('accounts', JSON.stringify(this.accounts))
+              // this.setData()
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+          })
       },
-      changeWallet(){
-        console.log('this.model_account', this.model_account)
+      changeWallet(wallet){
+        this.model_wallet = wallet
+        this.updateCurrentWallet(wallet)
+        console.log('this.model_wallet', this.model_wallet)
         this.getBalance()
+      },
+      changeBlockchain(blockchain){
+        this.model_blockchain = blockchain
+        this.updateCurrentBlockchain(blockchain)
+        this.setData()
+        this.getBalance()
+
       },
       phraseToString(phrase){
         let string = ''
@@ -318,11 +436,17 @@
       },
       setData(){
         this.accounts = []
+
         this.carouselOptions = []
-        this.accountsWallets = []
-        this.model_blockchain = []
-        this.model_account = {}
+        this.walletsList = []
+
+        this.model_blockchain = {}
+        this.model_wallet = {}
+
         this.accounts = JSON.parse(localStorage.getItem('accounts'))
+
+        let account = {...this.account}
+
         // console.log(this.accounts)
         this.accounts.map(( item, key ) => {
 
@@ -333,28 +457,52 @@
             })
           }
 
-          item.blockchains.map((blockchain) => {
-            this.currencyOptions.push({
-              label: blockchain.label,
-              value: blockchain.value,
-            })
-
-            this.model_blockchain = item.blockchains[0]
-            this.model_blockchain.wallets.map((wallet) => {
-              this.accountsWallets.push({
-                label: wallet.name,
-                value: wallet.wallet
-              })
-            })
-
-            this.model_account = blockchain.wallets[0]
-            //
-          })
-
         })
+
+        this.blockchainsList = account.blockchains
+        this.model_blockchain = account.blockchains[0]
+
+        // let current_blockchain = {...account.current_blockchain}
+        // this.model_blockchain = {
+        //   label: current_blockchain.label,
+        //   name: current_blockchain.name,
+        //   wallets: [...current_blockchain.wallets]
+        // }
+
+
+        this.walletsList = this.model_blockchain.wallets
+        this.model_wallet = this.model_blockchain.wallets[0]
+
+
+        console.log('current_blockchain', {...account.current_blockchain})
+
+        // item.blockchains.map((blockchain) => {
+        //
+        //   if(blockchain.label === this.model_blockchain.label){
+        //
+        //   }
+        //   this.blockchainsList.push({
+        //     label: blockchain.label,
+        //     value: blockchain.value,
+        //   })
+        //
+        //   this.model_blockchain = item.blockchains[0]
+        //   this.model_blockchain.wallets.map((wallet) => {
+        //     this.walletsList.push({
+        //       label: wallet.name,
+        //       value: wallet.wallet,
+        //       numberWallet: wallet.numberWallet
+        //     })
+        //   })
+        //
+        //   //
+        // })
+        //
+        this.model_wallet = this.account.current_wallet
+        //
       },
-      showWallet(token, model_account){
-        console.log(token, model_account)
+      showWallet(token, model_wallet){
+        console.log(token, model_wallet)
         this.$global.$emit(('WALLET_SHOW'), {
           'wallet': token.wallet
         })
@@ -362,9 +510,40 @@
           path: '/shareaddress',
           query: {
             'wallet': token.wallet,
-            'account': model_account.label
+            'account': model_wallet.label
           }
         })
+      },
+      sendTransaction(){
+
+        console.log(this.model_blockchain)
+        console.log(this.model_wallet)
+        this.$router.push({
+          path: '/send',
+          query: { to: this.model_wallet_to }
+        })
+
+        // POST TRANSACTION
+        // axios.post(`${process.env. API}/blockchain/send_transaction`, {
+        //   wallet_provider: this.model_blockchain.value,
+        //   wallet_number: this.model_wallet.numberWallet,
+        //   wallet_to: this.model_wallet_to
+        // })
+        //   .then((response) => {
+        //     console.log(response.data.success)
+        //     if(response.data.success){
+        //       this.showNotifPositive()
+        //
+        //     }
+        //   })
+        //   .catch((error) => {
+        //     console.error(error);
+        //   })
+      },
+      setTransactionNumberWallet(){
+        let account = {...this.account}
+        this.updateAccount(account)
+        // this.model_wallet_to
       }
     },
     mounted(){
@@ -378,7 +557,7 @@
       // })
       this.setData()
       this.getBalance()
-      console.log(this.accountsWallets)
+      // console.log(this.walletsList)
     }
   }
 </script>

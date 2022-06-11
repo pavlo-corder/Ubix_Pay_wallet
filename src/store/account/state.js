@@ -30,24 +30,49 @@ export default function () {
         label:'ETH',
         value: 60,
         wallets: []
-      }
+      },
+      // {
+      //   label:'BTC',
+      //   value: 0,
+      //   wallets: []
+      // },
+      // {
+      //   label:'UBX',
+      //   value: 713,
+      //   wallets: []
+      // }
     ],
-    socials: [
-      {
-        label: ''
-      }
-    ]
+    current_wallet: {
+      label: '',
+      name: '',
+      numberWallet: 0,
+      wallet: '',
+      value: ''
+    },
+    current_blockchain: {
+      label:'ETH',
+      value: 60,
+      wallets: []
+    },
+    transaction: {
+      blockchain_id: 0,
+      number_wallet: 0,
+      to: ''
+    }
   }
 
   if(keyAccount >= 0 && accounts && accounts.length > 0){
     account = accounts[keyAccount]
   }
 
-  console.log('account state', account)
+  let current_wallet = {...account.current_wallet}
+
+  // console.log('account state', account)
 
   return {
     key_account: keyAccount,
-    account: account,
-    accounts: accounts
+    account,
+    accounts,
+    current_wallet
   }
 }

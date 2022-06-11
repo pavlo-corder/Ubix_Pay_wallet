@@ -79,6 +79,7 @@ import { ref } from 'vue'
 import axios from "axios";
 import {useStore} from "vuex";
 import InputPhrase from "components/InputPhrase";
+import {updateCurrentWallet} from "src/store/account/mutations";
 
 export default {
   name: "Import",
@@ -91,7 +92,9 @@ export default {
     return {
       account: $store.state.account.account,
       updateAccount: (val) => $store.commit('account/update', val),
-      updateWallets: (val) => $store.commit('account/updateWallets', val)
+      updateWallets: (val) => $store.commit('account/updateWallets', val),
+      updateCurrentWallet: (val) => $store.commit('account/updateCurrentWallet', val),
+      updateCurrentBlockchain: (val) => $store.commit('account/updateCurrentBlockchain', val)
     }
   },
   data(){
@@ -99,20 +102,36 @@ export default {
       mnemonicPhrase: [],
       count_phrase: 12,
       text_group_1: [
+
         {value: 'trouble'},
         {value: 'segment'},
         {value: 'nice'},
         {value: 'patrol'},
         {value: 'say'},
         {value: 'laundry'}
+
+        // {value: 'tag'},
+        // {value: 'volcano'},
+        // {value: 'eight'},
+        // {value: 'thank'},
+        // {value: 'tide'},
+        // {value: 'danger'}
       ],
       text_group_2: [
+
         {value: 'lunch'},
         {value: 'weasel'},
         {value: 'royal'},
         {value: 'motor'},
         {value: 'midnight'},
         {value: 'royal'}
+
+        // {value: 'coast'},
+        // {value: 'health'},
+        // {value: 'above'},
+        // {value: 'argue'},
+        // {value: 'embrace'},
+        // {value: 'heavy'}
       ],
       model_password: '12345678',
       model_confirmpassword: '12345678',
@@ -150,8 +169,12 @@ export default {
         account.password = this.model_password
         account.confirmPhrase = true
 
+
+
         //Обновление аккаунта
         this.updateAccount(account)
+
+        this.updateCurrentBlockchain(account.blockchains[0])
 
         //Создание кошелька
         this.createWallet()
@@ -169,30 +192,38 @@ export default {
       let account = {...this.account}
 
       account.blockchains.map((blockchain) => {
-        axios.post(`${process.env. API}/create_wallet`, {
-          mnemonic: this.phraseToString(account.phrase),
-          blockchain: blockchain,
-          wallet_number: 0
-        })
-        .then((response) => {
-            //
-            if(response.status === 200 && response.data.success){
-              this.updateWallets({
-                blockchain: blockchain,
-                wallet: {
+        if(blockchain.label === account.current_blockchain.label){
+          axios.post(`${process.env. API}/blockchain/create_wallet`, {
+            mnemonic: this.phraseToString(account.phrase),
+            blockchain: blockchain,
+            create_number_wallet: 0
+          })
+            .then((response) => {
+              //
+              if(response.status === 200 && response.data.success){
+
+                let wallet = {
                   wallet: response.data.wallet,
                   value: response.data.wallet,
+                  balance: 0,
+                  numberWallet: 0,
                   label: `Wallet ${blockchain.wallets.length + 1}`,
                   name: `Wallet ${blockchain.wallets.length + 1}`
                 }
-              })
-            }
 
-          })
-        .catch((error) => {
-            console.error(error);
-            return false
-          })
+                this.updateWallets( wallet )
+
+                this.updateCurrentWallet(wallet)
+
+              }
+
+            })
+            .catch((error) => {
+              console.error(error);
+              return false
+            })
+        }
+
       })
 
     },

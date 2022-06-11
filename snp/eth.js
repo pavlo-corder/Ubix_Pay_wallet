@@ -1,16 +1,19 @@
 //Запуск узла эфира в терминале
 // geth --ropsten --syncmode "light"
 
-const rpcURL = 'https://cloudflare-eth.com/'
+// const rpcURL = 'https://cloudflare-eth.com/'
 // const rpcURL = 'https://mainnet.infura.io/v3/0e1c8d1f7b2d43f2842192eb6ec17567'
-const rpcWsURL = 'wss://mainnet.infura.io/ws/v3/0e1c8d1f7b2d43f2842192eb6ec17567'
+const mntWsURL = 'wss://mainnet.infura.io/ws/v3/0e1c8d1f7b2d43f2842192eb6ec17567'
+const mntURL = 'https://mainnet.infura.io/v3/0e1c8d1f7b2d43f2842192eb6ec17567'
+const rpcWsURL = 'wss://ropsten.infura.io/ws/v3/0e1c8d1f7b2d43f2842192eb6ec17567'
+const rpcURL = 'https://ropsten.infura.io/v3/0e1c8d1f7b2d43f2842192eb6ec17567'
 const crypto = require('crypto')
 const Bip39 = require("bip39");
 let net = require('net');
 
 const Web3EthPersonal = require('web3-eth-personal')
-let personal = new Web3EthPersonal('ws://localhost:8546')
-// let personal = new Web3EthPersonal(rpcWsURL);
+// let personal = new Web3EthPersonal('ws://localhost:8546')
+let personal = new Web3EthPersonal(mntWsURL);
 
 // console.log('personal', personal)
 
@@ -22,7 +25,8 @@ const Web3 = require('web3')
 // web3.setProvider('ws://localhost:8546')
 
 
-let web3 = new Web3(new Web3.providers.HttpProvider(rpcURL));
+let web3 = new Web3(new Web3.providers.HttpProvider(mntURL));
+// let web3 = new Web3(new Web3.providers.HttpProvider(rpcURL));
 // let web3 = new Web3( '/Users/g/Library/Ethereum/ropsten/geth.ipc', net);
 
 // console.log('web3.currentProvider', web3.currentProvider)
@@ -65,13 +69,13 @@ web3.eth.getBalance(address, (err, wei) => {
 const phrase='trouble segment nice patrol say laundry lunch weasel royal motor midnight royal';
 
 const seed = Bip39.mnemonicToSeedSync(phrase);
-// console.log('seed', seed)
+console.log('seed', seed)
 //<Buffer 54 b1 9f a4 65 ad d6 98 3a 54 d9 b1 27 ff bb ed 88 53 19 81 fa 82 7b 4f 2e dc 52 2f 62 94 2a c7 10 ae 25 bc 6e d3 ba 75 63 e5 37 7d 16 25 23 a7 ff d1 ... 14 more bytes>
 
 const rand = web3.utils.randomHex(16)
 let randomBytes = crypto.randomBytes(16)
 
-// console.log('rand', rand)
+console.log('rand', rand)
 // console.log('randomBytes', randomBytes.toString('hex'))
 //
 // // let mnemonic = bip39.entropyToMnemonic(rand)
@@ -129,11 +133,11 @@ let randomBytes = crypto.randomBytes(16)
 //   console.log('data',data)
 // })
 // web3.eth.getAccounts().then(console.log);
-web3.eth.personal.newAccount('!@superpassword')
-  .then(console.log);
+// web3.eth.personal.newAccount('!@superpassword')
+//   .then(console.log);
 
-web3.eth.getAccounts()
-  .then(console.log)
+// web3.eth.getAccounts()
+//   .then(console.log)
 
 
 // try {
