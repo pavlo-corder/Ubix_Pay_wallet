@@ -12,7 +12,7 @@
           transition-prev="jump-right"
           transition-next="jump-left"
           class="start-screen__carousel">
-          <q-carousel-slide v-for="(account, key) in accounts" :key="key" :name="0" class="start-screen__slide">
+          <q-carousel-slide v-for="(account, key) in accounts" :key="key" :name="0" class="start-screen__slide" @click="selectAccount">
             <q-card flat class="start-screen__person">
               <q-item class="q-pa-none">
                 <q-item-section>
@@ -152,6 +152,7 @@
   import EditAccount from "components/EditAccount";
   import {useStore} from "vuex";
   import {updateWallets} from "src/store/account/mutations";
+  import SelectAccount from "components/SelectAccount";
 
   export default {
     name: "Accounts",
@@ -238,6 +239,18 @@
         })
       }
 
+      function selectAccount () {
+        $q.dialog({
+          component: SelectAccount
+        }).onOk(() => {
+          // console.log('OK')
+        }).onCancel(() => {
+          // console.log('Cancel')
+        }).onDismiss(() => {
+          // console.log('I am triggered on both OK and Cancel')
+        })
+      }
+
       return {
         currency: ref('ETH'),
         carousel: 0,
@@ -250,6 +263,7 @@
         showNotifNegative,
         showNotifWarning,
         showNotifInfo,
+        selectAccount,
 
         account: $store.state.account.account,
         updateAccount: (val) => $store.commit('account/update', val),
