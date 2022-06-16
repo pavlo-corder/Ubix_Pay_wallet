@@ -131,7 +131,7 @@
               <q-item-label class="text-subtitle2 text-bold">{{token.balance}} {{token.label}}</q-item-label>
             </q-item-section>
             <q-item-section side>
-              <q-btn round unelevated color="grey-gradient" @click="showWallet(token, model_wallet)" text-color="dark" :icon="matChevronRight"/>
+              <q-btn round unelevated color="grey-gradient" @click="showWallet" text-color="dark" :icon="matChevronRight"/>
             </q-item-section>
           </q-item>
         </q-list>
@@ -514,16 +514,16 @@
         this.model_wallet = this.account.current_wallet
         //
       },
-      showWallet(token, model_wallet){
-        console.log(token, model_wallet)
+      showWallet(){
+        console.log(this.model_wallet)
         this.$global.$emit(('WALLET_SHOW'), {
-          'wallet': token.wallet
+          // 'wallet': token.wallet
         })
         this.$router.push({
           path: '/shareaddress',
           query: {
-            'wallet': token.wallet,
-            'account': model_wallet.label
+            'wallet': this.model_wallet.value.wallet,
+            'account': this.model_wallet.label
           }
         })
       },
