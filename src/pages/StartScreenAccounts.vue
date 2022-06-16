@@ -108,7 +108,6 @@
 
         <div class="row q-my-sm q-gutter-sm">
           <a class="btn col" @click="sendTransaction">Send</a>
-          <a :href="`/send?to=${model_wallet_to}`">Send2</a>
           <a class="btn col" @click="showNotifNegative">Receive</a>
           <a class="btn col" @click="showNotifInfo">Link</a>
         </div>

@@ -1,16 +1,17 @@
 <template>
     <main class="q-pt-md">
       <div class="container">
+        {{common}}
 
           <p class="text-subtitle2 q-mb-sm">From</p>
 
           <q-select
-            v-model="wallet"
-            :label="current_wallet.name"
+            v-model="model_wallet"
+            :label="model_wallet.name"
             filled
             :options="walletOptions"
             behavior="menu"
-            :display-value="`Balance: ${current_wallet.balance}`"
+            :display-value="`Balance: ${model_wallet.balance}`"
             class="input input--borderDark q-mb-md">
             <template v-slot:option="scope">
               <q-item
@@ -133,6 +134,7 @@
 
   export default {
       name: "Send",
+      props: ['account'],
       setup() {
 
         const $store = useStore()
@@ -158,12 +160,11 @@
             }
           ],
           searchAddressMenuWidth: 0,
-          account: $store.state.account.account,
+          // account: $store.state.account.account,
           nicknames: $store.state.nicknames.nicknames,
           // current_wallet: $store.state.wallet.current_wallet,
-          current_wallet: $store.state.wallet.current_wallet,
           updateNicknames: (val) => $store.commit('nicknames/updateNicknames', val),
-          getBalance: () => $store.dispatch('wallet/getBalance')
+          getBalance: (val) => $store.dispatch('wallet/getBalance', val)
 
         }
       },
@@ -179,9 +180,9 @@
           button_save_name: false,
           button_edit_name: false,
 
-          // current_wallet: {},
+          current_wallet: {},
           current_blockchain: {},
-          wallet: this.current_wallet,
+          model_wallet: {},
           walletOptions: [
             {
               name: 'Wallet1',
@@ -216,23 +217,23 @@
         //   })
         //
         // },
-        getBalances(wallets){
-
-          axios.post(`${process.env. API}/blockchain/get_balances`, {
-            wallets: wallets,
-            blockchain: 'ETH'
-          })
-            .then((response) => {
-              // if(response.data.success){
-              //   console.log('response.data.value.balance', response.data.value.balance)
-              //   this.wallet.balance = `${response.data.value.balance} ${response.data.value.label}`
-              // }
-            })
-            .catch((error) => {
-              console.error(error);
-            })
-
-        },
+        // getBalances(wallets){
+        //
+        //   axios.post(`${process.env. API}/blockchain/get_balances`, {
+        //     wallets: wallets,
+        //     blockchain: 'ETH'
+        //   })
+        //     .then((response) => {
+        //       if(response.data.success){
+        //         console.log('response.data.value.balance', response.data.value.balance)
+        //         this.wallet.balance = `${response.data.value.balance} ${response.data.value.label}`
+        //       }
+        //     })
+        //     .catch((error) => {
+        //       console.error(error);
+        //     })
+        //
+        // },
         addAddressName(){
           this.button_set_name = false
           this.button_cancel_name = true
@@ -293,6 +294,43 @@
             }
           })
         },
+        setData(){
+
+            let account = {...this.account}
+            let blockchains = [...account.blockchains]
+
+            let current_blockchain = {...account.current_blockchain}
+
+            console.log('account.current_wallet', {...account.current_wallet} )
+
+            this.model_wallet = {...account.current_wallet}
+
+            // this.getBalance(this.model_wallet.wallet)
+
+            let wallets = []
+
+            blockchains.map((blockchain) => {
+              if(blockchain.label === current_blockchain.label){
+                wallets = [...blockchain.wallets]
+
+                let wal = []
+                //
+                wallets.map(({...wallet}) => {
+                  console.log(wallet)
+                  // wallet.balance = `0.0000 ${current_blockchain.label}`
+                  wal.push(wallet)
+                })
+
+                console.log(wal)
+                //
+                this.walletOptions = wal
+                // this.getBalances(wal)
+                //
+              }
+            })
+
+
+        },
         nextStep(){
 
         }
@@ -300,42 +338,7 @@
 
       mounted(){
 
-        this.getBalance()
-
-        let account = {...this.account}
-        let blockchains = [...account.blockchains]
-
-
-        let current_blockchain = {...account.current_blockchain}
-
-
-        console.log('current_wallet', this.current_wallet)
-
-        // this.wallet = {...this.current_wallet}
-
-        let wallets = []
-
-        blockchains.map((blockchain) => {
-          if(blockchain.label === current_blockchain.label){
-            wallets = [...blockchain.wallets]
-
-
-            let wal = []
-        //
-            wallets.map(({...wallet}) => {
-              console.log(wallet)
-              // wallet.balance = `0.0000 ${current_blockchain.label}`
-              wal.push(wallet)
-            })
-
-            console.log(wal)
-        //
-            this.walletOptions = wal
-            // this.getBalances(wal)
-        //
-          }
-        })
-
+        this.setData()
 
         // let wallets = [...current_blockchain.wallets]
 

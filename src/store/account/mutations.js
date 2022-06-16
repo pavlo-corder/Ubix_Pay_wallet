@@ -79,9 +79,9 @@ export const update = (state, payload) => {
 
   // let key_account = accounts.state().key_account
 
-  console.log('payload', payload )
+  // console.log('payload', payload )
 
-  Object.assign(state.account, payload)
+
 
   let accounts = state.accounts
 
@@ -98,6 +98,7 @@ export const update = (state, payload) => {
   localStorage.setItem('accounts', JSON.stringify(accounts))
   localStorage.setItem('key_account', state.key_account)
 
+  Object.assign(state.account, payload)
 
 
 }

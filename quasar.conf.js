@@ -93,6 +93,14 @@ module.exports = configure(function (ctx) {
           textColor: 'black',
           closeBtn: true,
           classes: 'notification'
+        },
+        capacitor: {
+          // Quasar handles app exit on mobile phone back button.
+          backButtonExit: true/false/'*'/['/send', '/accounts', '/my-page'],
+
+          // On the other hand, the following completely
+          // disables Quasar's back button management.
+          backButton: true/false
         }
       },
       components: ['QToggle'],

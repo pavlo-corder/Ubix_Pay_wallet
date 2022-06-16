@@ -64,7 +64,10 @@
       </q-drawer>
 
     <q-page-container class="layout__main">
-      <router-view />
+      <router-view
+        :account="account"
+        :accounts="accounts"
+      />
     </q-page-container>
     <!-- footer -->
     <footer class="footer footer--terms">
@@ -81,6 +84,7 @@
 import {ref} from 'vue'
 import { useQuasar } from 'quasar'
 import { useRoute } from 'vue-router'
+import {useStore} from "vuex";
 
 export default ({
   name: 'MainLayout',
@@ -103,6 +107,7 @@ export default ({
   setup () {
     const $q = useQuasar()
     const drawer = ref(false)
+    const $store = useStore()
     // const router = useRouter()
 
     function toggleDrawer() {
@@ -111,6 +116,9 @@ export default ({
 
 
     return {
+      account: $store.state.account.account,
+      accounts: $store.state.account.accounts,
+      current_wallet: $store.state.wallet.current_wallet,
       drawer,
       toggleDrawer,
     }

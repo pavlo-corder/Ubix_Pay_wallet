@@ -41,7 +41,7 @@ exports.get_balance = async (req, res, next) => {
 
   if(blockchain === 'ETH'){
 
-    const balance = await provider.getBalance(wallet)
+    const balance = await provider.getBalance(wallet.wallet)
 
     res.json({
       success: true,
@@ -178,8 +178,22 @@ exports.create_wallet = function(req, res, next) {
   // console.log(childkey.privateExtendedKey)
   // console.log(HDKey.fromExtendedKey(childkey.privateExtendedKey))
 
+  let name_wallet = `Wallet ${create_number_wallet + 1}`
+
+  let new_wallet = {
+    label: name_wallet,
+    name: name_wallet,
+    balance: 0,
+    numberWallet: create_number_wallet,
+    value: wallet,
+    wallet: wallet
+  }
+
   if(wallet){
-    res.json({'success': true, wallet: wallet})
+    res.json({
+      'success': true,
+      wallet: new_wallet
+    })
   }else{
     res.json({'success': false})
   }
