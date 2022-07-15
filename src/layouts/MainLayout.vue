@@ -125,7 +125,7 @@ export default ({
   },
   mounted(){
     this.$global.$on('BTN_BACK', (data) => {
-      console.log(data)
+      // console.log(data)
       if(data.btn_back){
         this.btnBack = true
       }

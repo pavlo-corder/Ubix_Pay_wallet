@@ -5,38 +5,37 @@ export function someAction (context) {
 
 import axios from "axios";
 
-export const getBalance = ({ commit, store, rootState }) => {
+export const getBalance = ({ commit, store, rootState }, data) => {
   //
-  let account = {...rootState.account.account}
-
-  let current_wallet = {...account.current_wallet}
-  let current_blockchain = {...account.current_blockchain}
+  // let account = {...rootState.account.account}
   //
-  //
-  console.log('account action', account)
-  //
-  //
-  axios.post(`${process.env.API}/blockchain/get_balance`, {
-    wallet: current_wallet.wallet,
-    blockchain: current_blockchain.label
-  }).then((response) => {
-    if (response.data.success) {
+  // let current_wallet = {...account.current_wallet}
+  // let current_blockchain = {...account.current_blockchain}
 
-      current_wallet.balance = response.data.value.balance
-
-      account.current_wallet = current_wallet
-      console.log(account)
-
-      commit('account/update', account, {root: true})
-
-      // Object.assign(rootState.account.account.current_wallet, current_wallet)
-      // Object.assign(state.current_wallet, current_wallet)
-      // console.log('state.current_wallet.balance', response.data.value.balance, state.current_wallet)
-
-    }
-  }).catch((error) => {
-    console.error(error);
+  return axios.post(`${process.env.API}/blockchain/get_balance`, {
+    // wallet: current_wallet.wallet,
+    wallet: data.wallet,
+    // blockchain: current_blockchain.label
+    blockchain: data.blockchain
   })
+  // .then((response) => {
+  //   if (response.data.success) {
+  //
+  //     current_wallet.balance = response.data.value.balance
+  //
+  //     account.current_wallet = current_wallet
+  //     // console.log(account)
+  //
+  //     commit('account/update', account, {root: true})
+  //
+  //     // Object.assign(rootState.account.account.current_wallet, current_wallet)
+  //     // Object.assign(state.current_wallet, current_wallet)
+  //     // console.log('state.current_wallet.balance', response.data.value.balance, state.current_wallet)
+  //
+  //   }
+  // }).catch((error) => {
+  //   console.error(error);
+  // })
 
   // commit('wallet/getBalance', payload)
 
@@ -73,7 +72,7 @@ export const createWallet = ({ commit, state, rootState }, dataCreateWallet) => 
 
   // console.log('dataCreateWallet', dataCreateWallet)
 
-  axios.post(`${process.env. API}/blockchain/create_wallet`, dataCreateWallet)
+  axios.post(`${process.env.API}/blockchain/create_wallet`, dataCreateWallet)
     .then((response) => {
       // console.log(response)
       if(response.status === 200 && response.data.success){

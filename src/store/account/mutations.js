@@ -85,9 +85,9 @@ export const update = (state, payload) => {
 
   let accounts = state.accounts
 
-  console.log('state.key_account', state.key_account)
-  console.log('state.accounts', state.accounts)
-  console.log('state.account', accounts[state.key_account])
+  // console.log('state.key_account', state.key_account)
+  // console.log('state.accounts', state.accounts)
+  // console.log('state.account', accounts[state.key_account])
 
   if(!payload.id){
     payload.id = new Date().getTime()

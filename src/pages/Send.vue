@@ -26,7 +26,7 @@
                 </q-item-section>
                 <q-item-section>
                   <q-item-label caption>{{scope.opt.name}}</q-item-label>
-                  <q-item-label class="text-subtitle2 text-bold">{{scope.opt.balance}}</q-item-label>
+                  <q-item-label class="text-subtitle2 text-bold">{{textPriceAndBlockchain(scope.opt.balance)}}</q-item-label>
                 </q-item-section>
               </q-item>
             </template>
@@ -299,9 +299,9 @@
             let account = {...this.account}
             let blockchains = [...account.blockchains]
 
-            let current_blockchain = {...account.current_blockchain}
+            this.current_blockchain = {...account.current_blockchain}
 
-            console.log('account.current_wallet', {...account.current_wallet} )
+            // console.log('account.current_wallet', {...account.current_wallet} )
 
             this.model_wallet = {...account.current_wallet}
 
@@ -310,16 +310,34 @@
             let wallets = []
 
             blockchains.map((blockchain) => {
-              if(blockchain.label === current_blockchain.label){
+              if(blockchain.label === this.current_blockchain.label){
+
                 wallets = [...blockchain.wallets]
 
                 let wal = []
                 //
                 wallets.map(({...wallet}) => {
-                  console.log(wallet)
+
+                  console.log('current_blockchain.label', this.current_blockchain.label)
+                  // console.log({...wallet.wallet})
                   // wallet.balance = `0.0000 ${current_blockchain.label}`
+
+
+                  this.getBalance({
+                      blockchain: this.current_blockchain.label,
+                      wallet: {...wallet.wallet}
+                    }).then((response) => {
+                      console.log('response balance', response)
+
+                    if(response.data.success){
+                      wallet.balance = response.data.value.balance
+                    }
+                  })
+
                   wal.push(wallet)
+
                 })
+
 
                 console.log(wal)
                 //
@@ -333,57 +351,26 @@
         },
         nextStep(){
 
+        },
+        textPriceAndBlockchain(price){
+          return `${price} ${this.current_blockchain.label}`
         }
       },
 
       mounted(){
+        //
+        // console.log('{...account.current_blockchain}', {...this.account.current_blockchain})
 
         this.setData()
-
-        // let wallets = [...current_blockchain.wallets]
-
-        // let walletOptions = []
-
-        // wallets.map((wallet) => {
-        //   walletOptions.push({
-        //     name: wallet.label,
-        //     balance: `0.00 ${current_blockchain.label}`,
-        //     icon: null
-        //   })
-        // })
-        //
-        // this.walletOptions = wallets
-        //
 
         if(this.$route.query.to){
           this.address = this.$route.query.to
           // this.getBalance(this.current_wallet.wallet)
         }
 
-
-
         this.getNickName()
 
-
-        //
-        // this.wallet = {
-        //   name: current_wallet.label,
-        //   balance: `0.00 ${current_blockchain.label}`,
-        //   icon: null
-        // }
-        //
-
-        // let balance = async () => {
-        //   await this.getBalance(this.current_wallet.wallet)
-        // }
-
-
-
         setTimeout(()=>{
-          // this.getBalance(this.wallet.wallet)
-          // this.wallet = this.current_wallet
-
-
           this.setBtnBack()
         }, 0)
 

@@ -529,8 +529,6 @@
       },
       sendTransaction(){
 
-        console.log(this.model_blockchain)
-        console.log(this.model_wallet)
         this.$router.push({
           path: '/send',
           query: { to: this.model_wallet_to }
