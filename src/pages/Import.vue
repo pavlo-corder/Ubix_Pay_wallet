@@ -2,7 +2,7 @@
     <div>
         <main class="import">
           <div class="container">
-            <h1>You can import wallet by posting your secret set phrase:</h1>
+            <h1>You can import wallet by posting your secret seed phrase:</h1>
             <q-form
                 @submit="onSubmit"
                 @reset="onReset"

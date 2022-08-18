@@ -25,7 +25,7 @@
                 <!-- stepper end -->
 
                 <div class="warning create-wallet__warning">
-                     Save your secret seedphase in a safe place and don't share it with anyone!
+                     Save your secret seed phrase in a safe place and don't share it with anyone!
                 </div>
 
                 <div class="seed-phrase create-wallet__seed-phrase">

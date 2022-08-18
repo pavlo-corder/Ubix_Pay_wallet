@@ -25,7 +25,7 @@
                 <!-- stepper end -->
 
                 <div class="create-wallet__info">
-                    Confirm your secret seedphrase by choosing words in a correct order:
+                    Confirm your secret seed phrase by choosing words in a correct order:
                 </div>
 
                 <div class="seed-phrase create-wallet__seed-phrase">
@@ -161,14 +161,14 @@ export default({
     showAlertSuccess() {
       this.$q.notify({
         //needs sanitizing!!!
-        message: '<span class="notification__msg notification__msg--positive">SUCCESS</span> Your secret seedphrase confirmed',
+        message: '<span class="notification__msg notification__msg--positive">SUCCESS</span> Your secret seed phrase confirmed',
         html: true
       })
     },
     showAlertFail() {
       this.$q.notify({
         //needs sanitizing!!!
-        message: '<span class="notification__msg notification__msg--negative">FAIL</span> Not confirm your secret seedphrase',
+        message: '<span class="notification__msg notification__msg--negative">FAIL</span> Not confirm your secret seed phrase',
         html: true
       })
     },
