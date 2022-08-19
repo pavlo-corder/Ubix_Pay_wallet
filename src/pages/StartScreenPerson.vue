@@ -13,7 +13,7 @@
       </q-card>
 
       <p class="start-screen__subtitle">
-        <a href="#" class="link--big">Setup your person</a>
+        <a href="#" class="link--big">Set-up your person</a>
       </p>
 
 <!--      <div class="select start-screen__select">-->

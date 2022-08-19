@@ -9,7 +9,7 @@
 
       <a class="btn btn--primary q-mb-lg" @click="chooseIdentifier">Link identifier</a>
 
-      <p class="text-subtitle2 text-bold q-mb-sm">Identifiers, linked to the account:</p>
+      <p class="text-subtitle2 text-bold q-mb-sm">Identifiers linked to the account:</p>
 
       <q-list class="input input--borderDark q-mb-md" separator>
         <q-item

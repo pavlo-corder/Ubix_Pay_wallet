@@ -53,7 +53,7 @@ import {computed, ref} from 'vue'
         //TODO: Обязательно вынести в миксин
         createWallet(){
 
-          axios.post(`${process.env. API}/create_wallet`, {
+          axios.post(`${process.env. API}/blockchain/create_wallet`, {
             mnemonic: this.phraseToString(this.account.phrase),
             blockchain: this.model_currency,
             wallet_number: 0
