@@ -193,9 +193,7 @@ export default {
     return {
       name: "",
       address: "Address",
-
       dasableInput: true,
-
       button_set_name: true,
       button_cancel_name: false,
       button_save_name: false,
@@ -219,7 +217,7 @@ export default {
     };
   },
   methods: {
-   addAddressName() {
+    addAddressName() {
       this.button_set_name = false;
       this.button_cancel_name = true;
       this.dasableInput = false;

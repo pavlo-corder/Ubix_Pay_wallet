@@ -9,7 +9,8 @@
               filled
               :options="currencyOptions"
               behavior="menu"
-              class="input input--borderDark"/>
+              class="input input--borderDark"
+            />
           </div>
           <div class="col-auto">
             <a class="link link--big">Use max</a>
@@ -21,7 +22,8 @@
             <q-input
               v-model="amountCoins"
               filled
-              class="input input--borderDark"/>
+              class="input input--borderDark"
+            />
           </div>
           <div class="col-auto">
             <q-icon name="swap_horiz" size="20px"></q-icon>
@@ -31,13 +33,14 @@
               v-model="amountDollars"
               filled
               prefix="$"
-              class="input input--borderDark"/>
+              class="input input--borderDark"
+            />
           </div>
         </div>
 
         <p class="row items-center q-mb-lg">
           <span class="text-caption text-grey-dark">Balance:&nbsp;</span>
-          <span class="text-bold text-h6">{{balance}}</span>
+          <span class="text-bold text-h6">{{ balance }}</span>
         </p>
         <a class="btn btn--primary">Next</a>
       </q-form>
@@ -46,18 +49,18 @@
 </template>
 
 <script>
-  import {ref} from 'vue'
+import { ref } from "vue";
 
-  export default {
-    name: "SendAmount",
-    setup() {
-      return {
-        currency: ref('ETH'),
-        currencyOptions: ['ETH', 'UBX'],
-        amountCoins: ref(.5),
-        amountDollars: ref(130),
-        balance: 456
-      }
-    }
-  }
+export default {
+  name: "SendAmount",
+  setup() {
+    return {
+      currency: ref("ETH"),
+      currencyOptions: ["ETH", "UBX"],
+      amountCoins: ref(0.5),
+      amountDollars: ref(130),
+      balance: 456,
+    };
+  },
+};
 </script>

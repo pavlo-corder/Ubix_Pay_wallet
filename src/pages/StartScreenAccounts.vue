@@ -115,18 +115,6 @@
           </template>
         </q-input>
 
-        <!--        <q-field-->
-        <!--          class="input input&#45;&#45;borderDark full-width"-->
-        <!--          filled-->
-        <!--          :icon-right="matIosShare">-->
-
-        <!--          <template v-slot:append>-->
-
-        <!--            <q-icon :name="matIosShare"/>-->
-        <!--          </template>-->
-
-        <!--        </q-field>-->
-
         <div class="row q-my-sm q-gutter-sm">
           <a class="btn col" @click="sendTransaction">Send</a>
           <a class="btn col" @click="showNotifNegative">Receive</a>
@@ -363,7 +351,7 @@ export default {
       tokens: [
         {
           label: "ETH",
-          balance: "0.000000",
+          balance: "0.0",
           wallet: true,
         },
         // {
@@ -385,13 +373,13 @@ export default {
   methods: {
     async fetchBalance() {
       const balance = await getEtherBalance(this.model_wallet.value);
-      //(this.tokens);
-      // this.tokens.map((item) => {
-      //   if (item.label === response.data.value.label) {
-      //     item.balance = response.data.value.balance;
-      //     item.wallet = response.data.value.wallet;
-      //   }
-      // });
+      // console.log(this.tokens, balance);
+      this.tokens.map((item) => {
+        if (item.label === "ETH") {
+          item.balance = balance;
+          item.wallet = this.model_wallet.value;
+        }
+      });
     },
     //TODO: Обязательно вынести в миксин
     createWallet() {
@@ -440,7 +428,7 @@ export default {
     changeWallet(wallet) {
       this.model_wallet = wallet;
       this.updateCurrentWallet(wallet);
-      //("this.model_wallet", this.model_wallet);
+      // console.log("this.model_wallet", this.model_wallet);
       this.fetchBalance();
     },
     changeBlockchain(blockchain) {

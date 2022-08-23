@@ -8,7 +8,7 @@ import axios from "axios";
 export const getBalance = (state) => {
   let current_wallet = { ...state.current_wallet }
 
-  console.log('current_wallet mutation start', current_wallet)
+  // console.log('current_wallet mutation start', current_wallet)
   console.log('state.current_wallet mutation start', state.current_wallet)
 
   getEtherBalance(state.current_wallet.wallet).then(balance => {
