@@ -1,10 +1,10 @@
 
-import {auth, account} from './middlewares'
+import { auth, account } from './middlewares'
 const routes = [
   {
     path: "/",
     meta: {
-      middlewares: [ account ]
+      middlewares: [account]
     },
     component: () => import("layouts/MainLayout.vue"),
     children: [{ path: "", component: () => import("pages/Index.vue") }],
@@ -17,7 +17,7 @@ const routes = [
   {
     path: "/createwalletstep1",
     meta: {
-      middlewares: [ account ]
+      middlewares: [account]
     },
     component: () => import("layouts/MainLayout.vue"),
     children: [
@@ -27,7 +27,7 @@ const routes = [
   {
     path: "/createwalletstep2",
     meta: {
-      middlewares: [ account ]
+      middlewares: [account]
     },
     component: () => import("layouts/MainLayout.vue"),
     children: [
@@ -37,7 +37,7 @@ const routes = [
   {
     path: "/createwalletstep3",
     meta: {
-      middlewares: [ account ]
+      middlewares: [account]
     },
     component: () => import("layouts/MainLayout.vue"),
     children: [
@@ -47,7 +47,7 @@ const routes = [
   {
     path: "/startscreen",
     meta: {
-      middlewares: [ account ]
+      middlewares: [account]
     },
     component: () => import("layouts/MainLayout.vue"),
     children: [
@@ -73,7 +73,7 @@ const routes = [
   {
     path: "/accounts",
     meta: {
-      middlewares: [ auth ]
+      middlewares: [auth]
     },
     component: () => import("layouts/MainLayout.vue"),
     children: [

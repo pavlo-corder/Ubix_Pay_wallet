@@ -2,7 +2,7 @@ const bip39 = require("bip39");
 const { ethers } = require("ethers");
 const HDWallet = require("ethereum-hdwallet");
 const HDKey = require('hdkey')
-const {entropyToMnemonic} = require("bip39");
+const { entropyToMnemonic } = require("bip39");
 
 const INFURA_ID = '0e1c8d1f7b2d43f2842192eb6ec17567'
 // const provider = new ethers.providers.JsonRpcProvider(`https://mainnet.infura.io/v3/${INFURA_ID}`)
@@ -16,7 +16,7 @@ const account2 = '0x8230645aC28A4EdD1b0B53E7Cd8019744E9dD559' // Your account ad
 const privateKey = '63e21d10fd50155dbba0e7d3f7431a400b84b4c2ac1ee38872f82448fe3ecfb9' // Private key of account 1
 
 
-exports.index = function(req, res, next) {
+exports.index = function (req, res, next) {
   res.send("It's route index")
 }
 
@@ -25,8 +25,6 @@ exports.get_balance = async (req, res, next) => {
   let wallet = ''
   let blockchain = ''
 
-  console.log(req.body.wallet)
-  console.log(req.body.blockchain)
 
   if (req.body.wallet) {
     wallet = req.body.wallet
@@ -35,22 +33,24 @@ exports.get_balance = async (req, res, next) => {
     wallet = account1
   }
 
+  // console.log(wallet);
+  // return;
   if (req.body.blockchain) {
     blockchain = req.body.blockchain
   }
 
-  if(blockchain === 'ETH'){
+  if (blockchain === 'ETH') {
 
-    const balance = await provider.getBalance(wallet.wallet)
+    const balance = await provider.getBalance(wallet)
 
     res.json({
       success: true,
       value:
-        {
-          label: 'ETH',
-          balance: ethers.utils.formatEther(balance),
-          wallet: wallet
-        }
+      {
+        label: 'ETH',
+        balance: ethers.utils.formatEther(balance),
+        wallet: wallet
+      }
     })
 
   }
@@ -76,7 +76,7 @@ exports.get_balances = async (req, res, next) => {
   let wallets = async () => {
 
     let wal = []
-    walletsBody.map( async(wallet) => {
+    walletsBody.map(async (wallet) => {
 
       let balance = await provider.getBalance(wallet.wallet)
 
@@ -144,12 +144,12 @@ exports.send_transaction = async (req, res, next) => {
   await tx.wait()
   console.log(tx)
 
-  if(tx){
+  if (tx) {
     res.json({
       success: true,
       tx: tx
     })
-  }else{
+  } else {
     res.json({
       success: false
     })
@@ -158,7 +158,7 @@ exports.send_transaction = async (req, res, next) => {
 
 }
 
-exports.create_wallet = function(req, res, next) {
+exports.create_wallet = function (req, res, next) {
 
   // res.json({'success': true, body: req.body})
   const mnemonic = req.body.mnemonic
@@ -167,7 +167,9 @@ exports.create_wallet = function(req, res, next) {
 
   const hdwallet = HDWallet.fromMnemonic(mnemonic)
 
+
   const HD = `m/44'/${blockchain.value}'/0'/0/${create_number_wallet}`
+  // console.log(blockchain.value, HD);
 
   const wallet = `0x${hdwallet.derive(HD).getAddress().toString('hex')}`
 
@@ -189,23 +191,23 @@ exports.create_wallet = function(req, res, next) {
     wallet: wallet
   }
 
-  if(wallet){
+  if (wallet) {
     res.json({
       'success': true,
       wallet: new_wallet
     })
-  }else{
-    res.json({'success': false})
+  } else {
+    res.json({ 'success': false })
   }
 
 }
 
-exports.get_keys = function(req, res, next) {
+exports.get_keys = function (req, res, next) {
 
   // const mnemonic = req.body.mnemonic
 
   // const mnemonic = 'tag volcano eight thank tide danger coast health above argue embrace heavy'
-    const mnemonic2 = 'trouble segment nice patrol say laundry lunch weasel royal motor midnight royal';
+  const mnemonic2 = 'trouble segment nice patrol say laundry lunch weasel royal motor midnight royal';
 
   // const seed_b_1 = bip39.mnemonicToSeedSync(mnemonic);
   const seed_b_2 = bip39.mnemonicToSeedSync(mnemonic2);

@@ -8,7 +8,7 @@
 
       <div class="row justify-center q-mb-md">
         <a class="col btn btn--primary btn--autoWidth btn--justify-start">
-          <q-icon name="north_east"/>
+          <q-icon name="north_east" />
           Send
         </a>
         <a class="col btn btn--autoWidth">Receive</a>
@@ -18,31 +18,29 @@
       <div
         class="q-mb-lg"
         v-for="transactionsPerDay in transactions"
-        v-bind:key="transactionsPerDay.timestamp">
+        v-bind:key="transactionsPerDay.timestamp"
+      >
         <p class="text-caption text-grey-dark q-mb-sm">
-          {{moment(timestamp).format('D MMM YYYY')}}
+          {{ moment(timestamp).format("D MMM YYYY") }}
         </p>
         <q-list class="input input--borderDark q-mb-md" separator>
-          <q-item
-            v-for="tx in transactionsPerDay.txns"
-            v-bind:key="tx">
+          <q-item v-for="tx in transactionsPerDay.txns" v-bind:key="tx">
             <q-item-section>
               <q-item-label>
-                {{tx.type === 'received' ? 'Received' : 'Sent'}}&nbsp;
-                {{tx.coin}}&nbsp;
-                {{tx.confirmed ? 'Confirmed' : 'Not confirmed'}}
+                {{ tx.type === "received" ? "Received" : "Sent" }}&nbsp;
+                {{ tx.coin }}&nbsp;
+                {{ tx.confirmed ? "Confirmed" : "Not confirmed" }}
               </q-item-label>
               <q-item-label caption>
-                {{tx.confirmed ? 'Confirmed' : 'Not confirmed'}}
+                {{ tx.confirmed ? "Confirmed" : "Not confirmed" }}
               </q-item-label>
             </q-item-section>
             <q-item-section side top>
-              <q-item-label>{{tx.amount}}&nbsp;{{tx.coin}}</q-item-label>
+              <q-item-label>{{ tx.amount }}&nbsp;{{ tx.coin }}</q-item-label>
             </q-item-section>
           </q-item>
         </q-list>
       </div>
-
 
       <a class="btn q-mb-sm">Full info on block explorer</a>
       <a class="btn btn--transparent q-mb-lg">Close</a>
@@ -51,73 +49,73 @@
 </template>
 
 <script>
-  import moment from 'moment'
+import moment from "moment";
 
-  export default {
-    name: "AccountDetails",
-    setup() {
-      return {
-        transactions: [
-          {
-            timestamp: '2022-03-30T14:21:23+00:00',
-            txns: [
-              {
-                type: 'sent',
-                confirmed: true,
-                amount: 0.5,
-                coin: 'ETH'
-              },
-              {
-                type: 'received',
-                confirmed: true,
-                amount: 0.5,
-                coin: 'ETH'
-              },
-              {
-                type: 'received',
-                confirmed: false,
-                amount: 0.5,
-                coin: 'ETH'
-              }
-            ]
-          },
-          {
-            timestamp: '2022-03-30T14:21:23+00:00',
-            txns: [
-              {
-                type: 'sent',
-                confirmed: true,
-                amount: 0.5,
-                coin: 'ETH'
-              },
-              {
-                type: 'received',
-                confirmed: true,
-                amount: 0.5,
-                coin: 'ETH'
-              }
-            ]
-          },
-          {
-            timestamp: '2022-03-30T14:21:23+00:00',
-            txns: [
-              {
-                type: 'sent',
-                confirmed: true,
-                amount: 0.5,
-                coin: 'ETH'
-              },
-              {
-                type: 'received',
-                confirmed: true,
-                amount: 0.5,
-                coin: 'ETH'
-              }
-            ]
-          }
-        ],
-        moment
-      }
-    }
-  }
+export default {
+  name: "AccountDetails",
+  setup() {
+    return {
+      transactions: [
+        {
+          timestamp: "2022-03-30T14:21:23+00:00",
+          txns: [
+            {
+              type: "sent",
+              confirmed: true,
+              amount: 0.5,
+              coin: "ETH",
+            },
+            {
+              type: "received",
+              confirmed: true,
+              amount: 0.5,
+              coin: "ETH",
+            },
+            {
+              type: "received",
+              confirmed: false,
+              amount: 0.5,
+              coin: "ETH",
+            },
+          ],
+        },
+        {
+          timestamp: "2022-03-30T14:21:23+00:00",
+          txns: [
+            {
+              type: "sent",
+              confirmed: true,
+              amount: 0.5,
+              coin: "ETH",
+            },
+            {
+              type: "received",
+              confirmed: true,
+              amount: 0.5,
+              coin: "ETH",
+            },
+          ],
+        },
+        {
+          timestamp: "2022-03-30T14:21:23+00:00",
+          txns: [
+            {
+              type: "sent",
+              confirmed: true,
+              amount: 0.5,
+              coin: "ETH",
+            },
+            {
+              type: "received",
+              confirmed: true,
+              amount: 0.5,
+              coin: "ETH",
+            },
+          ],
+        },
+      ],
+      moment,
+    };
+  },
+};
 </script>

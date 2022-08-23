@@ -17,6 +17,7 @@
     "core-js": "^3.6.5",
     "crypto": "^1.0.1",
     "dotenv": "^16.0.0",
+    "ethers": "^5.7.0",
     "moment": "^2.29.1",
     "qrcode.vue": "^3.3.3",
     "quasar": "^2.0.0",

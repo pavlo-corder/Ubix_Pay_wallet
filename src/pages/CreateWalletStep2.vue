@@ -1,88 +1,95 @@
 <template>
-    <div>
-        <main class="create-wallet">
-            <div class="container">
-                <h1 class="text-center text-desktop-left">Create wallet</h1>
+  <div>
+    <main class="create-wallet">
+      <div class="container">
+        <h1 class="text-center text-desktop-left">Create wallet</h1>
 
-                <!-- start stepper
+        <!-- start stepper
                 .stepper__step--active - active step (blue dot)
                 .stepper__step--complete -- complete step (green dot & check icon)
                 -->
-                <div class="stepper create-wallet__stepper flex-desktop-left">
-                    <div class="stepper__step stepper__step--complete">
-                        <div class="stepper__circle"></div>
-                        <span class="stepper__text">Step 1</span>
-                    </div>
-                    <div class="stepper__step stepper__step--active">
-                        <div class="stepper__circle"></div>
-                        <span class="stepper__text">Step 2</span>
-                    </div>
-                    <div class="stepper__step">
-                        <div class="stepper__circle"></div>
-                        <span class="stepper__text">Step 3</span>
-                    </div>
-                </div>
-                <!-- stepper end -->
+        <div class="stepper create-wallet__stepper flex-desktop-left">
+          <div class="stepper__step stepper__step--complete">
+            <div class="stepper__circle"></div>
+            <span class="stepper__text">Step 1</span>
+          </div>
+          <div class="stepper__step stepper__step--active">
+            <div class="stepper__circle"></div>
+            <span class="stepper__text">Step 2</span>
+          </div>
+          <div class="stepper__step">
+            <div class="stepper__circle"></div>
+            <span class="stepper__text">Step 3</span>
+          </div>
+        </div>
+        <!-- stepper end -->
 
-                <div class="warning create-wallet__warning">
-                     Save your secret seed phrase in a safe place and don't share it with anyone!
-                </div>
+        <div class="warning create-wallet__warning">
+          Save your secret seed phrase in a safe place and don't share it with
+          anyone!
+        </div>
 
-                <div class="seed-phrase create-wallet__seed-phrase">
-                    <div v-for="(phrase, key) in mnemonicPhrase" :key="key" class="seed-phrase__word">{{key+1}}. {{phrase}}</div>
-                </div>
+        <div class="seed-phrase create-wallet__seed-phrase">
+          <div
+            v-for="(phrase, key) in mnemonicPhrase"
+            :key="key"
+            class="seed-phrase__word"
+          >
+            {{ key + 1 }}. {{ phrase }}
+          </div>
+        </div>
 
-                <button @click="savePhrase" class="btn btn--primary create-wallet__btn">Next</button>
-<!--                <router-link to="/createwalletstep3" class="btn btn&#45;&#45;primary create-wallet__btn">Next</router-link>-->
-<!--                <button @click="showAlertSkip" class="btn btn&#45;&#45;transparent create-wallet__btn">Skip for now</button>-->
-            </div>
-
-        </main>
-    </div>
+        <button @click="savePhrase" class="btn btn--primary create-wallet__btn">
+          Next
+        </button>
+        <!--                <router-link to="/createwalletstep3" class="btn btn&#45;&#45;primary create-wallet__btn">Next</router-link>-->
+        <!--                <button @click="showAlertSkip" class="btn btn&#45;&#45;transparent create-wallet__btn">Skip for now</button>-->
+      </div>
+    </main>
+  </div>
 </template>
 <script>
-import { ref } from 'vue'
-import axios from 'axios'
-import {useStore} from "vuex";
-import { useQuasar } from 'quasar'
+import { ref } from "vue";
+import axios from "axios";
+import { useStore } from "vuex";
+import { useQuasar } from "quasar";
 
-import bip39 from '../assets/libs/bip39.min.js'
-import hdkey from '../assets/libs/hdkey.min.js'
+import bip39 from "../assets/libs/bip39.min.js";
+import hdkey from "../assets/libs/hdkey.min.js";
+import { validationPhrase } from "src/helper/ethers-interact";
 
-export default({
+export default {
   name: "CreateWalletStep2",
-  setup () {
-    const $store = useStore()
-    const $q = useQuasar()
+  setup() {
+    const $store = useStore();
+    const $q = useQuasar();
 
     return {
       account: $store.state.account.account,
-      updateAccount: (val) => $store.commit('account/update', val)
-    }
+      updateAccount: (val) => $store.commit("account/update", val),
+    };
   },
-  data(){
-    return{
+  data() {
+    return {
       accounts: [],
       key_account: 0,
       countwords: 12,
       mnemonicPhrase: [],
-      password: ''
-    }
+      password: "",
+    };
   },
   methods: {
-
     generateRandomPhrase() {
-
-      let account = {...this.account}
+      let account = { ...this.account };
 
       const strength = 128;
-      const wordList = eval(bip39.wordlists.english)
+      const wordList = eval(bip39.wordlists.english);
 
-      const mnemonic = bip39.generateMnemonic(strength, null, wordList)
+      const mnemonic = bip39.generateMnemonic(strength, null, wordList);
       // console.log('phrase', mnemonic)
-      this.mnemonicPhrase = mnemonic.split(' ')
+      this.mnemonicPhrase = mnemonic.split(" ");
 
-      account.phrase = this.mnemonicPhrase
+      account.phrase = this.mnemonicPhrase;
 
       // const seedHex = bip39.mnemonicToSeedHex(mnemonic, null);
       // console.log('seedHex', seedHex)
@@ -99,78 +106,57 @@ export default({
       // console.log('numberOfWords', numberOfWords)
 
       const hdwallet = hdkey.fromMasterSeed(seed);
-      const privateExtendedKey= hdwallet.privateExtendedKey();
-      const publicExtendedKey= hdwallet.publicExtendedKey();
+      const privateExtendedKey = hdwallet.privateExtendedKey();
+      const publicExtendedKey = hdwallet.publicExtendedKey();
 
-      account.privateExtendedKey = privateExtendedKey
-      account.publicExtendedKey = publicExtendedKey
-      account.confirmPhrase = false
+      account.privateExtendedKey = privateExtendedKey;
+      account.publicExtendedKey = publicExtendedKey;
+      account.confirmPhrase = false;
 
-      this.updateAccount(account)
-
-
+      this.updateAccount(account);
     },
-    savePhrase(){
-      if(this.validationPhrase()){
-        this.accounts[this.key_account].phrase = this.mnemonicPhrase
-        localStorage.setItem('accounts', JSON.stringify(this.accounts))
-        this.$router.push('/createwalletstep3')
+    savePhrase() {
+      if (validationPhrase(this.mnemonicPhrase)) {
+        this.accounts[this.key_account].phrase = this.mnemonicPhrase;
+        localStorage.setItem("accounts", JSON.stringify(this.accounts));
+        this.$router.push("/createwalletstep3");
       }
-    },
-    validationPhrase(){
-
-      const resultValidate = async () => {
-
-        await axios.post(`${process.env. API}/validation_phrase`, {
-          'mnemonic': this.phraseToString(this.mnemonicPhrase)
-        })
-          .then((response) => {
-            if(response.data.success){
-              return response.data.success
-            }
-          })
-          .catch((error) => {
-            console.error(error);
-          })
-      }
-
-      return resultValidate()
-
     },
     //TODO: Обязательно вынести в миксин
-    phraseToString(phrase){
-      let string = ''
+    phraseToString(phrase) {
+      let string = "";
       phrase.map((item, key) => {
-        if(key === 0){
-          string += `${item}`
-        }else{
-          string += ` ${item}`
+        if (key === 0) {
+          string += `${item}`;
+        } else {
+          string += ` ${item}`;
         }
-      })
-      return string
+      });
+      return string;
     },
     showAlertSkip() {
       this.$q.notify({
         //needs sanitizing!!!
-        message: 'Transaction status: <span class="notification__msg notification__msg--positive">success</span>',
-        html: true
-      })
+        message:
+          'Transaction status: <span class="notification__msg notification__msg--positive">success</span>',
+        html: true,
+      });
     },
   },
-  mounted(){
-    let key_account = localStorage.getItem('key_account')
-    if(key_account){
-      this.key_account = key_account
+  mounted() {
+    let key_account = localStorage.getItem("key_account");
+    if (key_account) {
+      this.key_account = key_account;
     }
-    let accounts = JSON.parse(localStorage.getItem('accounts'))
-    if(accounts){
-      this.accounts = accounts
+    let accounts = JSON.parse(localStorage.getItem("accounts"));
+    if (accounts) {
+      this.accounts = accounts;
     }
     //TODO:Нужно прояснить ситуацию с паролем, он должен принимать участие в root
     // this.password = localStorage.getItem('password')
     // console.log('this.password', this.password)
     //TODO: отрефакторить и вынести в отдельный модуль
-    this.generateRandomPhrase()
-  }
-});
+    this.generateRandomPhrase();
+  },
+};
 </script>

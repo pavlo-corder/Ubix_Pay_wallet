@@ -7,16 +7,16 @@ export function someMutation (state) {
 export const updateWallets = (state, payload) => {
 
   let accounts = state.accounts
-  let account = {...accounts[state.key_account]}
+  let account = { ...accounts[state.key_account] }
 
   account.blockchains.map((item) => {
     // console.log(item.label)
-  //
-  //     if(item.label === item.current_blockchain.label){
-        console.log('payload.wallets', payload)
-          item.wallets.push(payload)
-      // }
-  //
+    //
+    //     if(item.label === item.current_blockchain.label){
+    item.wallets.push(payload)
+    console.log('payload.wallets', payload)
+    // }
+    //
   })
 
   console.log(account)
@@ -24,6 +24,7 @@ export const updateWallets = (state, payload) => {
   Object.assign(state.account, account)
   accounts[state.key_account] = account
   //
+  console.log(accounts)
   localStorage.setItem('accounts', JSON.stringify(accounts))
 
 }
@@ -31,7 +32,7 @@ export const updateWallets = (state, payload) => {
 export const updateCurrentWallet = (state, payload) => {
 
   let accounts = state.accounts
-  let account = {...accounts[state.key_account]}
+  let account = { ...accounts[state.key_account] }
 
   account.current_wallet = payload
 
@@ -45,14 +46,14 @@ export const updateCurrentWallet = (state, payload) => {
 export const updateCurrentBlockchain = (state, payload) => {
 
   let accounts = state.accounts
-  let account = {...accounts[state.key_account]}
+  let account = { ...accounts[state.key_account] }
 
   account.current_blockchain = payload
 
   account.blockchains.map((item) => {
-    if(item.label === payload.label && item.wallets[0] ){
+    if (item.label === payload.label && item.wallets[0]) {
       account.current_wallet = item.wallets[0]
-    }else{
+    } else {
       account.current_wallet = false
     }
   })
@@ -89,7 +90,7 @@ export const update = (state, payload) => {
   // console.log('state.accounts', state.accounts)
   // console.log('state.account', accounts[state.key_account])
 
-  if(!payload.id){
+  if (!payload.id) {
     payload.id = new Date().getTime()
   }
 
