@@ -6,11 +6,8 @@
           You can import your wallet by filling in your secret seed-phrase:
         </h1>
         <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-md">
-          <!-- import__grid -->
           <div class="import__grid">
-            <!-- import__grid--left -->
             <div class="import__grid--left">
-              <!-- import__inputWrap -->
               <div
                 v-for="(tg1, key) in text_group_1"
                 :key="key"
@@ -22,11 +19,8 @@
                   :isPassword="true"
                   @phrase="phraseFromInput"
                 ></input-phrase>
-                <!--                      <label for="">{{key+1}}</label>-->
-                <!--                      <q-input v-model="tg1.value" class="import__input" dense borderless/>-->
               </div>
             </div>
-            <!-- import__grid--left -->
             <div class="import__grid--right">
               <div
                 v-for="(tg2, key) in text_group_2"
@@ -39,12 +33,9 @@
                   :isPassword="true"
                   @phrase="phraseFromInput"
                 ></input-phrase>
-                <!--                      <label for="">{{key+7}}</label>-->
-                <!--                      <q-input v-model="tg2.value" class="import__input" dense borderless/>-->
               </div>
             </div>
           </div>
-          <!-- import__grid -->
           <q-input
             v-model="model_password"
             lazy-rules
@@ -83,12 +74,8 @@
   </div>
 </template>
 <script>
-import { useQuasar } from "quasar";
-import { ref } from "vue";
-import axios from "axios";
 import { useStore } from "vuex";
 import InputPhrase from "components/InputPhrase";
-import { updateCurrentWallet } from "src/store/account/mutations";
 
 import {
   createWalletFromMnenomic,
@@ -200,18 +187,6 @@ export default {
           this.updateCurrentWallet(wallet);
         }
       });
-    },
-    //TODO: Обязательно вынести в миксин
-    phraseToString(phrase) {
-      let string = "";
-      phrase.map((item, key) => {
-        if (key === 0) {
-          string += `${item}`;
-        } else {
-          string += ` ${item}`;
-        }
-      });
-      return string;
     },
   },
 };

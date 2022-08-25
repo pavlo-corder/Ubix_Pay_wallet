@@ -52,27 +52,26 @@
           </div>
         </div>
 
-        <button
+        <q-btn
           @click="clearTable"
           class="btn btn--transparent create-wallet__btn"
         >
           Clear
-        </button>
+        </q-btn>
 
-        <button
+        <q-btn
           @click="buttonNextStep"
           class="btn btn--primary create-wallet__btn"
           :class="{ disabled: dasableNextStep }"
         >
           Next
-        </button>
-        <button
+        </q-btn>
+        <q-btn
           @click="confirm = true"
-          href="/"
           class="btn btn--transparent create-wallet__btn"
         >
           Skip for now
-        </button>
+        </q-btn>
       </div>
     </main>
     <q-dialog v-model="confirm" persistent>
@@ -97,7 +96,6 @@
 </template>
 <script>
 import { useStore } from "vuex";
-import { useQuasar } from "quasar";
 
 export default {
   name: "CreateWalletStep3",
@@ -175,7 +173,6 @@ export default {
     },
     showAlertSuccess() {
       this.$q.notify({
-        //needs sanitizing!!!
         message:
           '<span class="notification__msg notification__msg--positive">SUCCESS</span> Your secret seed phrase confirmed',
         html: true,
@@ -183,7 +180,6 @@ export default {
     },
     showAlertFail() {
       this.$q.notify({
-        //needs sanitizing!!!
         message:
           '<span class="notification__msg notification__msg--negative">FAIL</span> Not confirm your secret seed phrase',
         html: true,
@@ -197,7 +193,6 @@ export default {
 
     if (phraseStore) {
       this.mnemonicPhraseStore = phraseStore;
-      // console.log('phraseStore  ', this.mnemonicPhraseStore)
 
       let phraseStoreRandom = [...phraseStore];
       let randomPhrase = phraseStoreRandom.sort(() => Math.random() - 0.5);

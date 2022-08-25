@@ -9,10 +9,6 @@
       <p class="start-screen__subtitle">
         <a href="#" class="link--big">What is it?</a>
       </p>
-
-      <!--      <div class="select start-screen__select">-->
-      <!--        <div class="select__current">ETH</div>-->
-      <!--      </div>-->
       <div class="q-mb-md">
         <q-select
           v-model="model_currency"
@@ -22,19 +18,16 @@
           class="input input--borderDark"
         />
       </div>
-      <button @click="createWallet" class="btn btn--primary">
+      <q-btn @click="createWallet" class="btn btn--primary">
         Create new wallet
-      </button>
+      </q-btn>
     </div>
   </main>
 </template>
 
 <script>
-import { computed, ref } from "vue";
-import axios from "axios";
 import { useStore, mapState } from "vuex";
 import { createWalletFromMnenomic } from "src/helper/ethers-interact";
-// import {updateWallets} from "src/store/account/mutations";
 
 export default {
   name: "StartScreen",
@@ -43,7 +36,6 @@ export default {
     return {
       blockchains: [...$store.state.account.account.blockchains],
       model_currency: { ...$store.state.account.account.blockchains[0] },
-      // account: {...$store.state.account.account},
       updateAccount: (val) => $store.commit("account/update", val),
       updateWallets: (val) => $store.commit("account/updateWallets", val),
     };
@@ -53,7 +45,6 @@ export default {
     ...mapState({ account: (state) => state.account.account }),
   },
   methods: {
-    //TODO: Обязательно вынести в миксин
     createWallet() {
       const createdWallet = createWalletFromMnenomic(this.account.phrase);
 
@@ -71,32 +62,8 @@ export default {
         }
       });
       this.$router.push("/setupperson");
-      // axios
-      //   .post(`${process.env.API}/blockchain/create_wallet`, {
-      //     mnemonic,
-      //     blockchain: this.model_currency,
-      //     create_number_wallet: 0,
-      //   })
-      //   .then((response) => {
-      //     if (response.status === 200 && response.data.success) {
-
-      //       this.$router.push("/setupperson");
-      //     }
-      //   })
-      //   .catch((error) => {
-      //     console.error(error);
-      //   });
     },
   },
-  mounted() {
-    // let key_account = localStorage.getItem('key_account')
-    // if(key_account){
-    //   this.key_account = key_account
-    // }
-    // let accounts = JSON.parse(localStorage.getItem('accounts'))
-    // if(accounts){
-    //   this.accounts = accounts
-    // }
-  },
+  mounted() {},
 };
 </script>

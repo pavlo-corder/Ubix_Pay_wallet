@@ -46,16 +46,15 @@
             :type="isPwd3 ? 'password' : 'text'"
           />
 
-          <button class="btn btn--primary create-wallet__btn">
-            Create new wallet
-          </button>
+          <q-btn type="submit" class="btn btn--primary create-wallet__btn">
+            create new wallet
+          </q-btn>
         </q-form>
       </div>
     </main>
   </div>
 </template>
 <script>
-import { computed, ref } from "vue";
 import { useStore } from "vuex";
 
 export default {

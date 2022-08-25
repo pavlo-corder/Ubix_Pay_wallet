@@ -23,18 +23,21 @@
             <q-card flat class="start-screen__person">
               <q-item class="q-pa-none">
                 <q-item-section>
-                  <q-item-label caption>{{ account.details }}</q-item-label>
-                  <q-item-label class="text-h6 text-bold q-mb-sm">{{
-                    account.name
-                  }}</q-item-label>
+                  <q-item-label caption>
+                    {{ account.details }}
+                  </q-item-label>
+                  <q-item-label class="text-h6 text-bold q-mb-sm"
+                    >{{ account.name }}
+                  </q-item-label>
                   <q-item-label caption>Social networks linked:</q-item-label>
                   <q-item-label class="text-body2">{{ key }}</q-item-label>
                   <q-item-label>
                     <router-link
                       to="/setupperson"
                       class="link--big cursor-pointer"
-                      >Setup your person</router-link
                     >
+                      Setup your person
+                    </router-link>
                   </q-item-label>
                 </q-item-section>
               </q-item>
@@ -49,7 +52,6 @@
             />
           </div>
         </q-carousel>
-        <!-- Persons carousel navigation -->
         <div class="row justify-center q-my-md">
           <q-option-group
             v-model="carousel"
@@ -63,7 +65,6 @@
       </div>
 
       <div>
-        <!-- Account controls -->
         <div class="row items-center q-mb-md q-gutter-sm">
           <q-select
             v-model="model_blockchain"
@@ -221,20 +222,7 @@ export default {
     const $store = useStore();
 
     function editAccount(key) {
-      //(key);
       this.$router.push("/setupperson");
-      // $q.dialog({
-      //   componentProps: {
-      //     idAccount: key
-      //   },
-      //   component: EditAccount
-      // }).onOk(() => {
-      //   // console.log('OK')
-      // }).onCancel(() => {
-      //   // console.log('Cancel')
-      // }).onDismiss(() => {
-      //   // console.log('I am triggered on both OK and Cancel')
-      // })
     }
 
     function createAccount() {
@@ -247,29 +235,20 @@ export default {
         .onCancel(() => {
           console.log("Cancel");
         })
-        .onDismiss(() => {
-          // console.log('I am triggered on both OK and Cancel')
-        });
+        .onDismiss(() => {});
     }
 
     function importToken() {
       $q.dialog({
         component: ImportToken,
       })
-        .onOk(() => {
-          // console.log('OK')
-        })
-        .onCancel(() => {
-          // console.log('Cancel')
-        })
-        .onDismiss(() => {
-          // console.log('I am triggered on both OK and Cancel')
-        });
+        .onOk(() => {})
+        .onCancel(() => {})
+        .onDismiss(() => {});
     }
 
     function showNotifPositive() {
       $q.notify({
-        //needs sanitizing!!!
         message:
           'Transaction status: <span class="notification__msg notification__msg--positive">success</span>',
         html: true,
@@ -278,7 +257,6 @@ export default {
 
     function showNotifNegative() {
       $q.notify({
-        //needs sanitizing!!!
         message:
           'Transaction status: <span class="notification__msg notification__msg--negative">fail</span>',
         html: true,
@@ -287,7 +265,6 @@ export default {
 
     function showNotifWarning() {
       $q.notify({
-        //needs sanitizing!!!
         message:
           'Transaction status: <span class="notification__msg notification__msg--warning">warning</span>',
         html: true,
@@ -296,7 +273,6 @@ export default {
 
     function showNotifInfo() {
       $q.notify({
-        //needs sanitizing!!!
         message:
           'Transaction status: <span class="notification__msg notification__msg--info">info</span>',
         html: true,
@@ -307,15 +283,9 @@ export default {
       $q.dialog({
         component: SelectAccount,
       })
-        .onOk(() => {
-          // console.log('OK')
-        })
-        .onCancel(() => {
-          // console.log('Cancel')
-        })
-        .onDismiss(() => {
-          // console.log('I am triggered on both OK and Cancel')
-        });
+        .onOk(() => {})
+        .onCancel(() => {})
+        .onDismiss(() => {});
     }
 
     return {
@@ -373,7 +343,6 @@ export default {
   methods: {
     async fetchBalance() {
       const balance = await getEtherBalance(this.model_wallet.value);
-      // console.log(this.tokens, balance);
       this.tokens.map((item) => {
         if (item.label === "ETH") {
           item.balance = balance;
@@ -381,12 +350,8 @@ export default {
         }
       });
     },
-    //TODO: Обязательно вынести в миксин
     createWallet() {
-      // this.accounts.
-
       console.log(this.account.phrase);
-      //
       let count_wallets = this.model_blockchain.wallets.length;
 
       console.log("count_wallets", this.account.phrase);
@@ -410,7 +375,6 @@ export default {
       };
 
       let blockchains = [...this.account.blockchains];
-      //
       console.log("blockchains", blockchains);
 
       blockchains.map((item) => {
@@ -428,7 +392,6 @@ export default {
     changeWallet(wallet) {
       this.model_wallet = wallet;
       this.updateCurrentWallet(wallet);
-      // console.log("this.model_wallet", this.model_wallet);
       this.fetchBalance();
     },
     changeBlockchain(blockchain) {
@@ -461,7 +424,6 @@ export default {
 
       let account = { ...this.account };
 
-      // (this.accounts)
       this.accounts.map((item, key) => {
         if (this.accounts.length > 1) {
           this.carouselOptions.push({
@@ -474,48 +436,13 @@ export default {
       this.blockchainsList = account.blockchains;
       this.model_blockchain = account.blockchains[0];
 
-      // let current_blockchain = {...account.current_blockchain}
-      // this.model_blockchain = {
-      //   label: current_blockchain.label,
-      //   name: current_blockchain.name,
-      //   wallets: [...current_blockchain.wallets]
-      // }
-
       this.walletsList = this.model_blockchain.wallets;
       this.model_wallet = this.model_blockchain.wallets[0];
 
-      //("current_blockchain", { ...account.current_blockchain });
-
-      // item.blockchains.map((blockchain) => {
-      //
-      //   if(blockchain.label === this.model_blockchain.label){
-      //
-      //   }
-      //   this.blockchainsList.push({
-      //     label: blockchain.label,
-      //     value: blockchain.value,
-      //   })
-      //
-      //   this.model_blockchain = item.blockchains[0]
-      //   this.model_blockchain.wallets.map((wallet) => {
-      //     this.walletsList.push({
-      //       label: wallet.name,
-      //       value: wallet.wallet,
-      //       numberWallet: wallet.numberWallet
-      //     })
-      //   })
-      //
-      //   //
-      // })
-      //
       this.model_wallet = this.account.current_wallet;
-      //
     },
     showWallet() {
-      //(this.model_wallet);
-      this.$global.$emit("WALLET_SHOW", {
-        // 'wallet': token.wallet
-      });
+      this.$global.$emit("WALLET_SHOW", {});
       this.$router.push({
         path: "/shareaddress",
         query: {
@@ -529,28 +456,10 @@ export default {
         path: "/send",
         query: { to: this.model_wallet_to },
       });
-
-      // POST TRANSACTION
-      // axios.post(`${process.env. API}/blockchain/send_transaction`, {
-      //   wallet_provider: this.model_blockchain.value,
-      //   wallet_number: this.model_wallet.numberWallet,
-      //   wallet_to: this.model_wallet_to
-      // })
-      //   .then((response) => {
-      //     console.log(response.data.success)
-      //     if(response.data.success){
-      //       this.showNotifPositive()
-      //
-      //     }
-      //   })
-      //   .catch((error) => {
-      //     console.error(error);
-      //   })
     },
     setTransactionNumberWallet() {
       let account = { ...this.account };
       this.updateAccount(account);
-      // this.model_wallet_to
     },
   },
   mounted() {
@@ -559,12 +468,8 @@ export default {
         this.setData();
       }
     });
-    // useQuasar.$on('UPDATE_ACCOUNT', (data) => {
-    //   console.log(data)
-    // })
     this.setData();
     this.fetchBalance();
-    // console.log(this.walletsList)
   },
 };
 </script>

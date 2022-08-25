@@ -4,10 +4,6 @@
       <div class="container">
         <h1 class="text-center text-desktop-left">Create wallet</h1>
 
-        <!-- start stepper
-                .stepper__step--active - active step (blue dot)
-                .stepper__step--complete -- complete step (green dot & check icon)
-                -->
         <div class="stepper create-wallet__stepper flex-desktop-left">
           <div class="stepper__step stepper__step--complete">
             <div class="stepper__circle"></div>
@@ -22,7 +18,6 @@
             <span class="stepper__text">Step 3</span>
           </div>
         </div>
-        <!-- stepper end -->
 
         <div class="warning create-wallet__warning">
           Save your secret seed phrase in a safe place and don't share it with
@@ -39,18 +34,14 @@
           </div>
         </div>
 
-        <button @click="savePhrase" class="btn btn--primary create-wallet__btn">
+        <q-btn @click="savePhrase" class="btn btn--primary create-wallet__btn">
           Next
-        </button>
-        <!--                <router-link to="/createwalletstep3" class="btn btn&#45;&#45;primary create-wallet__btn">Next</router-link>-->
-        <!--                <button @click="showAlertSkip" class="btn btn&#45;&#45;transparent create-wallet__btn">Skip for now</button>-->
+        </q-btn>
       </div>
     </main>
   </div>
 </template>
 <script>
-import { ref } from "vue";
-import axios from "axios";
 import { useStore } from "vuex";
 import { useQuasar } from "quasar";
 
@@ -86,24 +77,11 @@ export default {
       const wordList = eval(bip39.wordlists.english);
 
       const mnemonic = bip39.generateMnemonic(strength, null, wordList);
-      // console.log('phrase', mnemonic)
       this.mnemonicPhrase = mnemonic.split(" ");
 
       account.phrase = this.mnemonicPhrase;
 
-      // const seedHex = bip39.mnemonicToSeedHex(mnemonic, null);
-      // console.log('seedHex', seedHex)
       const seed = bip39.mnemonicToSeed(mnemonic, null);
-      // console.log('seed', seedHex)
-
-      // const randomNumber = bip39.mnemonicToEntropy(mnemonic, wordList);
-      // console.log('randomNumber', randomNumber)
-
-      // const isMnemonicValid = bip39.validateMnemonic(mnemonic, wordList);
-      // console.log('isMnemonicValid', isMnemonicValid)
-
-      // const numberOfWords = (parseInt(strength) + (strength / 32)) / 11;
-      // console.log('numberOfWords', numberOfWords)
 
       const hdwallet = hdkey.fromMasterSeed(seed);
       const privateExtendedKey = hdwallet.privateExtendedKey();
@@ -122,21 +100,8 @@ export default {
         this.$router.push("/createwalletstep3");
       }
     },
-    //TODO: Обязательно вынести в миксин
-    phraseToString(phrase) {
-      let string = "";
-      phrase.map((item, key) => {
-        if (key === 0) {
-          string += `${item}`;
-        } else {
-          string += ` ${item}`;
-        }
-      });
-      return string;
-    },
     showAlertSkip() {
       this.$q.notify({
-        //needs sanitizing!!!
         message:
           'Transaction status: <span class="notification__msg notification__msg--positive">success</span>',
         html: true,
@@ -152,10 +117,6 @@ export default {
     if (accounts) {
       this.accounts = accounts;
     }
-    //TODO:Нужно прояснить ситуацию с паролем, он должен принимать участие в root
-    // this.password = localStorage.getItem('password')
-    // console.log('this.password', this.password)
-    //TODO: отрефакторить и вынести в отдельный модуль
     this.generateRandomPhrase();
   },
 };

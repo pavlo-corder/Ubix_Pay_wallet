@@ -5,7 +5,9 @@
         <q-item class="q-pa-none">
           <q-item-section>
             <q-item-label caption>name</q-item-label>
-            <q-item-label class="text-h6 text-bold q-mb-sm">Mr. John Doe</q-item-label>
+            <q-item-label class="text-h6 text-bold q-mb-sm"
+              >Mr. John Doe</q-item-label
+            >
             <q-item-label caption>Social networks linked:</q-item-label>
             <q-item-label class="text-body2">2</q-item-label>
           </q-item-section>
@@ -16,9 +18,6 @@
         <a href="#" class="link--big">Set-up your person</a>
       </p>
 
-<!--      <div class="select start-screen__select">-->
-<!--        <div class="select__current">ETH</div>-->
-<!--      </div>-->
       <div class="q-mb-md">
         <q-select
           v-model="currency"
@@ -29,22 +28,21 @@
         />
       </div>
 
-
       <a href="/" class="btn btn--primary">Create new wallet</a>
     </div>
   </main>
 </template>
 
 <script>
-  import { ref } from 'vue'
+import { ref } from "vue";
 
-  export default {
-      name: "StartScreen",
-      setup() {
-        return {
-          currency: ref('ETH'),
-          currencyOptions: ['ETH', 'ETH1', 'ETH2']
-        }
-      }
-  }
+export default {
+  name: "StartScreen",
+  setup() {
+    return {
+      currency: ref("ETH"),
+      currencyOptions: ["ETH", "ETH1", "ETH2"],
+    };
+  },
+};
 </script>
