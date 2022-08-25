@@ -385,11 +385,11 @@ export default {
     createWallet() {
       // this.accounts.
 
-      console.log(this.model_blockchain);
+      console.log(this.account.phrase);
       //
       let count_wallets = this.model_blockchain.wallets.length;
 
-      console.log("count_wallets", count_wallets);
+      console.log("count_wallets", this.account.phrase);
       const createdWallet = createWalletFromMnenomic(
         this.account.phrase,
         count_wallets

@@ -10,9 +10,6 @@
         <a href="#" class="link--big">What is it?</a>
       </p>
 
-      <!--      <div class="select start-screen__select">-->
-      <!--        <div class="select__current">ETH</div>-->
-      <!--      </div>-->
       <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-md q-mb-md">
         <q-input
           v-model="name"

@@ -187,14 +187,6 @@ export default {
 
       account.blockchains.map((blockchain) => {
         if (blockchain.label === account.current_blockchain.label) {
-          // let wallet = {
-          //   wallet: response.data.wallet,
-          //   value: response.data.wallet,
-          //   balance: 0,
-          //   numberWallet: 0,
-          //   label: `Wallet ${blockchain.wallets.length + 1}`,
-          //   name: `Wallet ${blockchain.wallets.length + 1}`,
-          // };
           const wallet = {
             wallet: createdWallet.wallet,
             value: createdWallet.wallet,

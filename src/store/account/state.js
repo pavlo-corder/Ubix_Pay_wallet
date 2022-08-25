@@ -2,20 +2,20 @@
 //   return {
 //     //
 //   }
+
+import { decryptListWithAES, encryptListWithAES } from "src/helper/text-crypt"
+
 // }
 export default function () {
-
   let keyAccount = 0
   keyAccount = localStorage.getItem('key_account')
   let accounts = JSON.parse(localStorage.getItem('accounts'))
 
-
-
-  if(keyAccount === null || keyAccount === '' || !keyAccount){
+  if (keyAccount === null || keyAccount === '' || !keyAccount) {
     keyAccount = 0
   }
 
-  if(!accounts){
+  if (!accounts) {
     accounts = []
   }
 
@@ -27,7 +27,7 @@ export default function () {
     details: "",
     blockchains: [
       {
-        label:'ETH',
+        label: 'ETH',
         value: 60,
         wallets: []
       },
@@ -50,7 +50,7 @@ export default function () {
       value: ''
     },
     current_blockchain: {
-      label:'ETH',
+      label: 'ETH',
       value: 60,
       wallets: []
     },
@@ -61,13 +61,12 @@ export default function () {
     }
   }
 
-  if(keyAccount >= 0 && accounts && accounts.length > 0){
+  if (keyAccount >= 0 && accounts && accounts.length > 0) {
     account = accounts[keyAccount]
   }
 
-  let current_wallet = {...account.current_wallet}
-
-  // console.log('account state', account)
+  let current_wallet = { ...account.current_wallet }
+  accounts.forEach(account => account.phrase = decryptListWithAES(account.phrase, account.password));
 
   return {
     key_account: keyAccount,
