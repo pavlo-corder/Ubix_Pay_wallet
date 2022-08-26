@@ -5,9 +5,11 @@ export const encryptWithAES = (text, passphrase) => {
 };
 
 export const decryptWithAES = (ciphertext, passphrase) => {
+    if (ciphertext.length !== 44)
+        return ciphertext;
     const bytes = CryptoJS.AES.decrypt(ciphertext, passphrase);
     const originalText = bytes.toString(CryptoJS.enc.Utf8);
-    return ciphertext.length !== 44 ? ciphertext : originalText;
+    return originalText;
 };
 
 export const encryptListWithAES = (textArray = [], passphrase) => {
@@ -15,4 +17,20 @@ export const encryptListWithAES = (textArray = [], passphrase) => {
 }
 export const decryptListWithAES = (textArray = [], passphrase) => {
     return textArray.map(ciphertext => decryptWithAES(ciphertext, passphrase));
+}
+
+export const encryptPhraseFromPayload = (payload) => {
+    const result = JSON.parse(JSON.stringify(payload))
+    if (payload?.phrase?.length > 0) {
+        result.phrase = encryptListWithAES(result.phrase, payload.password)
+    }
+    return result;
+}
+
+export const decryptPhraseFromPayload = (payload) => {
+    const result = JSON.parse(JSON.stringify(payload))
+    if (payload?.phrase?.length > 0) {
+        result.phrase = decryptListWithAES(result.phrase, payload.password)
+    }
+    return result;
 }

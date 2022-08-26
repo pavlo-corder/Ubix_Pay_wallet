@@ -1,18 +1,17 @@
 <template>
   <main class="q-pt-md">
     <div class="container">
-      {{ common }}
-
       <p class="text-subtitle2 q-mb-sm">From</p>
 
       <q-select
-        v-model="model_wallet"
-        :label="model_wallet.name"
         filled
-        :options="walletOptions"
         behavior="menu"
-        :display-value="`Balance: ${model_wallet.balance}`"
+        :value="fromWallet"
         class="input input--borderDark q-mb-md"
+        :label="currentWallets[fromWallet].name"
+        :options="currentWallets"
+        :display-value="`Balance: ${currentWallets[fromWallet].balance}`"
+        @update:model-value="fromWalletHandler"
       >
         <template v-slot:option="scope">
           <q-item v-bind="scope.itemProps">
@@ -31,9 +30,11 @@
             </q-item-section>
             <q-item-section>
               <q-item-label caption>{{ scope.opt.name }}</q-item-label>
-              <q-item-label class="text-subtitle2 text-bold">{{
-                textPriceAndBlockchain(scope.opt.balance)
-              }}</q-item-label>
+              <q-item-label class="text-subtitle2 text-bold">
+                {{
+                  `${scope.opt.balance} ${currentAccount.current_blockchain.label}`
+                }}
+              </q-item-label>
             </q-item-section>
           </q-item>
         </template>
@@ -53,39 +54,39 @@
         type="text"
       />
 
-      <button
+      <q-btn
         v-show="button_set_name"
         @click="addAddressName"
         class="btn btn--transparent q-mb-lg"
       >
         Add this address
-      </button>
+      </q-btn>
 
-      <button
+      <q-btn
         v-show="button_cancel_name"
         @click="cancelAddressName"
         class="btn btn--transparent q-mb-lg"
       >
         Cancel
-      </button>
+      </q-btn>
 
-      <button
+      <q-btn
         v-show="button_save_name"
         @click="savelAddressName"
         class="btn btn--transparent q-mb-lg"
       >
         Save this address
-      </button>
+      </q-btn>
 
-      <button
+      <q-btn
         v-show="button_edit_name"
         @click="editAddressName"
         class="btn btn--transparent q-mb-lg"
       >
         Edit this address
-      </button>
+      </q-btn>
 
-      <a class="btn btn--primary">Next</a>
+      <q-btn class="btn btn--primary" @click="onNextHandler">Next</q-btn>
 
       <q-select
         v-model="searchAddress"
@@ -140,8 +141,9 @@
                 caption
                 class="text-ellipsis"
                 style="max-width: 100%"
-                >{{ scope.opt.address }}</q-item-label
               >
+                {{ scope.opt.address }}
+              </q-item-label>
             </q-item-section>
           </q-item>
         </template>
@@ -151,18 +153,56 @@
 </template>
 
 <script>
-import { ref } from "vue";
+import { computed, onMounted, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
-import axios from "axios";
-// import {getBalance} from "src/store/wallet/mutations";
 
 export default {
   name: "Send",
-  props: ["account"],
   setup() {
-    const $store = useStore();
+    const store = useStore();
+    const route = useRoute();
+    const router = useRouter();
+
+    const updateCurrentWallet = (wallet) =>
+      store.commit("account/updateCurrentWallet", wallet);
+
+    const currentAccount = computed(
+      () => store.getters["account/getCurrentAccount"]
+    );
+    const currentWallets = computed(
+      () => store.getters["account/getCurrentWallets"]
+    );
+
+    const fromWallet = ref(0);
+    const toWallet = ref("");
+
+    const fromWalletHandler = (wallet) => {
+      fromWallet.value = currentWallets.value.indexOf(wallet);
+      updateCurrentWallet(wallet);
+    };
+
+    onMounted(async () => {
+      await router.isReady();
+      toWallet.value = route.query.to;
+      store.dispatch("account/updateBalances");
+    });
+
+    const onNextHandler = () => {
+      router.push({
+        path: "/send/amount",
+        query: { to: toWallet.value },
+      });
+    };
 
     return {
+      currentAccount,
+      currentWallets,
+      fromWallet,
+      toWallet,
+      updateCurrentWallet,
+      fromWalletHandler,
+      onNextHandler,
       searchAddress: ref(null),
       addresses: [
         {
@@ -182,11 +222,8 @@ export default {
         },
       ],
       searchAddressMenuWidth: 0,
-      // account: $store.state.account.account,
-      nicknames: $store.state.nicknames.nicknames,
-      // current_wallet: $store.state.wallet.current_wallet,
-      updateNicknames: (val) => $store.commit("nicknames/updateNicknames", val),
-      getBalance: (val) => $store.dispatch("wallet/getBalance", val),
+      nicknames: store.state.nicknames.nicknames,
+      updateNicknames: (val) => store.commit("nicknames/updateNicknames", val),
     };
   },
   data() {
@@ -199,21 +236,7 @@ export default {
       button_save_name: false,
       button_edit_name: false,
 
-      current_wallet: {},
       current_blockchain: {},
-      model_wallet: {},
-      walletOptions: [
-        {
-          name: "Wallet1",
-          balance: "45,256 UBX",
-          icon: null,
-        },
-        {
-          name: "Wallet2",
-          balance: "65,256 UBX",
-          icon: "img:https://cdn.cdnlogo.com/logos/e/39/ethereum.svg",
-        },
-      ],
     };
   },
   methods: {
@@ -277,71 +300,12 @@ export default {
         }
       });
     },
-    setData() {
-      let account = { ...this.account };
-      let blockchains = [...account.blockchains];
-
-      this.current_blockchain = { ...account.current_blockchain };
-
-      // console.log('account.current_wallet', {...account.current_wallet} )
-
-      this.model_wallet = { ...account.current_wallet };
-
-      // this.getBalance(this.model_wallet.wallet)
-
-      let wallets = [];
-
-      blockchains.map((blockchain) => {
-        if (blockchain.label === this.current_blockchain.label) {
-          wallets = [...blockchain.wallets];
-
-          let wal = [];
-          //
-          wallets.map(({ ...wallet }) => {
-            console.log(
-              "current_blockchain.label",
-              this.current_blockchain.label
-            );
-            // console.log({...wallet.wallet})
-            // wallet.balance = `0.0000 ${current_blockchain.label}`
-
-            this.getBalance({
-              blockchain: this.current_blockchain.label,
-              wallet: { ...wallet.wallet },
-            }).then((response) => {
-              console.log("response balance", response);
-
-              if (response.data.success) {
-                wallet.balance = response.data.value.balance;
-              }
-            });
-
-            wal.push(wallet);
-          });
-
-          console.log(wal);
-          //
-          this.walletOptions = wal;
-          // this.getBalances(wal)
-          //
-        }
-      });
-    },
     nextStep() {},
-    textPriceAndBlockchain(price) {
-      return `${price} ${this.current_blockchain.label}`;
-    },
   },
 
   mounted() {
-    //
-    // console.log('{...account.current_blockchain}', {...this.account.current_blockchain})
-
-    this.setData();
-
     if (this.$route.query.to) {
       this.address = this.$route.query.to;
-      // this.getBalance(this.current_wallet.wallet)
     }
 
     this.getNickName();

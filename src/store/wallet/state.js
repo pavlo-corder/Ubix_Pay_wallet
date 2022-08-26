@@ -1,5 +1,3 @@
-import axios from "axios";
-import { getEtherBalance } from "src/helper/ethers-interact";
 export default function () {
   let count_wallets = 0
   let current_blockchain = {}
@@ -23,10 +21,10 @@ export default function () {
     //Создаём текущий кошелёк
     current_wallet = { ...account.current_wallet }
     //Получаем баланс текущего кошелька
-    getEtherBalance(current_wallet.wallet).then(balance => {
-      console.log(balance)
-      current_wallet.balance = balance
-    })
+    // getEtherBalance(current_wallet.wallet).then(balance => {
+    //   console.log(balance)
+    //   current_wallet.balance = balance
+    // })
   }
   if (account) {
     let blockchains = [...account.blockchains]

@@ -2,7 +2,6 @@
   <main class="start-screen">
     <div class="container desktop-2-cols-container">
       <div>
-        <!-- Persons carousel -->
         <q-carousel
           v-model="carousel"
           swipeable
@@ -163,9 +162,9 @@
             </q-item-section>
             <q-item-section>
               <q-item-label caption>Balance:</q-item-label>
-              <q-item-label class="text-subtitle2 text-bold"
-                >{{ token.balance }} {{ token.label }}</q-item-label
-              >
+              <q-item-label class="text-subtitle2 text-bold">
+                {{ parseFloat(token.balance).toFixed(4) }} {{ token.label }}
+              </q-item-label>
             </q-item-section>
             <q-item-section side>
               <q-btn
@@ -180,9 +179,9 @@
           </q-item>
         </q-list>
 
-        <a class="btn btn--primary q-mb-lg" @click="importToken"
-          >Import tokens</a
-        >
+        <a class="btn btn--primary q-mb-lg" @click="importToken">
+          Import tokens
+        </a>
       </div>
     </div>
   </main>
@@ -190,7 +189,7 @@
 
 <script>
 import axios from "axios";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useStore } from "vuex";
 import {
   matAdd,
@@ -201,7 +200,7 @@ import ImportToken from "components/ImportToken";
 import AddAccount from "components/AddAccount";
 import EditAccount from "components/EditAccount";
 import SelectAccount from "components/SelectAccount";
-import { updateWallets } from "src/store/account/mutations";
+
 import { getElipseText } from "src/helper/formater";
 import { useQuasar } from "quasar";
 import {
@@ -219,7 +218,11 @@ export default {
   setup() {
     const $q = useQuasar();
 
-    const $store = useStore();
+    const store = useStore();
+
+    const currentWallet = computed(
+      () => store.getters["account/getCurrentWallet"]
+    );
 
     function editAccount(key) {
       this.$router.push("/setupperson");
@@ -256,6 +259,7 @@ export default {
     }
 
     function showNotifNegative() {
+      showNotifWarning();
       $q.notify({
         message:
           'Transaction status: <span class="notification__msg notification__msg--negative">fail</span>',
@@ -293,6 +297,8 @@ export default {
       carousel: 0,
       carouselOptions: [],
 
+      currentWallet,
+
       editAccount,
       createAccount,
       importToken,
@@ -304,13 +310,13 @@ export default {
 
       getElipseText,
 
-      account: $store.state.account.account,
-      updateAccount: (val) => $store.commit("account/update", val),
+      account: store.state.account.account,
+      updateAccount: (val) => store.commit("account/update", val),
       updateCurrentWallet: (val) =>
-        $store.commit("account/updateCurrentWallet", val),
+        store.commit("account/updateCurrentWallet", val),
       updateCurrentBlockchain: (val) =>
-        $store.commit("account/updateCurrentBlockchain", val),
-      updateWallets: (val) => $store.commit("account/updateWallets", val),
+        store.commit("account/updateCurrentBlockchain", val),
+      updateWallets: (val) => store.commit("account/updateWallets", val),
     };
   },
   data() {
@@ -351,42 +357,23 @@ export default {
       });
     },
     createWallet() {
-      console.log(this.account.phrase);
       let count_wallets = this.model_blockchain.wallets.length;
 
-      console.log("count_wallets", this.account.phrase);
       const createdWallet = createWalletFromMnenomic(
         this.account.phrase,
         count_wallets
       );
-
       let account = { ...this.account };
-
-      let name_wallet = `Wallet ${count_wallets + 1}`;
-
-      let new_wallet = {
-        label: name_wallet,
-        name: name_wallet,
-        balance: 0,
-        numberWallet: count_wallets,
-        value: createdWallet.wallet,
-        wallet: createdWallet.wallet,
-        privateKey: createdWallet.privateKey,
-      };
-
       let blockchains = [...this.account.blockchains];
-      console.log("blockchains", blockchains);
 
       blockchains.map((item) => {
         if (item.label === this.model_blockchain.label) {
-          console.log("new_wallet", new_wallet);
-          this.updateWallets(new_wallet);
+          this.updateWallets(createdWallet);
         }
       });
-      this.updateAccount(account);
-      this.updateCurrentWallet(new_wallet);
+      this.updateCurrentWallet(createdWallet);
+      this.model_wallet = createdWallet;
       this.setData();
-      this.model_wallet = new_wallet;
       this.fetchBalance();
     },
     changeWallet(wallet) {
@@ -437,8 +424,6 @@ export default {
       this.model_blockchain = account.blockchains[0];
 
       this.walletsList = this.model_blockchain.wallets;
-      this.model_wallet = this.model_blockchain.wallets[0];
-
       this.model_wallet = this.account.current_wallet;
     },
     showWallet() {

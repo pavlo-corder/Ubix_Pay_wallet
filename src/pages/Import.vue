@@ -61,7 +61,6 @@
             class="input-password"
             :type="isPwd2 ? 'password' : 'text'"
           />
-
           <button
             style="width: calc(100% - 16px)"
             class="btn btn--primary import__btn"
@@ -76,12 +75,10 @@
 <script>
 import { useStore } from "vuex";
 import InputPhrase from "components/InputPhrase";
-
 import {
   createWalletFromMnenomic,
   validationPhrase,
 } from "../helper/ethers-interact";
-
 export default {
   name: "Import",
   components: {
@@ -89,7 +86,6 @@ export default {
   },
   setup() {
     const $store = useStore();
-
     return {
       account: $store.state.account.account,
       updateAccount: (val) => $store.commit("account/update", val),
@@ -105,20 +101,20 @@ export default {
       mnemonicPhrase: [],
       count_phrase: 12,
       text_group_1: [
-        { value: "trouble" },
-        { value: "segment" },
-        { value: "nice" },
-        { value: "patrol" },
-        { value: "say" },
-        { value: "laundry" },
+        { value: "shop" },
+        { value: "fever" },
+        { value: "release" },
+        { value: "august" },
+        { value: "odor" },
+        { value: "relax" },
       ],
       text_group_2: [
-        { value: "lunch" },
-        { value: "weasel" },
-        { value: "royal" },
-        { value: "motor" },
-        { value: "midnight" },
-        { value: "royal" },
+        { value: "gallery" },
+        { value: "broccoli" },
+        { value: "merry" },
+        { value: "yard" },
+        { value: "settle" },
+        { value: "eager" },
       ],
       model_password: "12345678",
       model_confirmpassword: "12345678",
@@ -138,28 +134,19 @@ export default {
     },
     onSubmit() {
       this.mnemonicPhrase = [];
-
       this.text_group_1.map((item) => {
         this.mnemonicPhrase.push(item.value);
       });
-
       this.text_group_2.map((item) => {
         this.mnemonicPhrase.push(item.value);
       });
-
       if (validationPhrase(this.mnemonicPhrase)) {
         let account = { ...this.account };
-
         account.phrase = this.mnemonicPhrase;
         account.password = this.model_password;
         account.confirmPhrase = true;
-
-        //Обновление аккаунта
         this.updateAccount(account);
-
         this.updateCurrentBlockchain(account.blockchains[0]);
-
-        //Создание кошелька
         this.createWallet();
         this.$router.push("/setupperson");
       } else {
@@ -169,22 +156,11 @@ export default {
     onReset() {},
     createWallet() {
       let account = { ...this.account };
-
       const createdWallet = createWalletFromMnenomic(this.account.phrase);
-
       account.blockchains.map((blockchain) => {
         if (blockchain.label === account.current_blockchain.label) {
-          const wallet = {
-            wallet: createdWallet.wallet,
-            value: createdWallet.wallet,
-            privateKey: createdWallet.privateKey,
-            label: `Wallet ${blockchain.wallets.length + 1}`,
-            name: `Wallet ${blockchain.wallets.length + 1}`,
-          };
-
-          this.updateWallets(wallet);
-
-          this.updateCurrentWallet(wallet);
+          this.updateWallets(createdWallet);
+          this.updateCurrentWallet(createdWallet);
         }
       });
     },

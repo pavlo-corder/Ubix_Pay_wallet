@@ -38,6 +38,8 @@ export default {
       model_currency: { ...$store.state.account.account.blockchains[0] },
       updateAccount: (val) => $store.commit("account/update", val),
       updateWallets: (val) => $store.commit("account/updateWallets", val),
+      updateCurrentWallet: (val) =>
+        $store.commit("account/updateCurrentWallet", val),
     };
   },
 
@@ -52,13 +54,8 @@ export default {
 
       blockchains.map((item, key) => {
         if (item.value === this.model_currency.value) {
-          this.updateWallets({
-            wallet: createdWallet.wallet,
-            value: createdWallet.wallet,
-            privateKey: createdWallet.privateKey,
-            label: `Wallet ${item.wallets.length + 1}`,
-            name: `Wallet ${item.wallets.length + 1}`,
-          });
+          this.updateWallets(createdWallet);
+          this.updateCurrentWallet(createdWallet);
         }
       });
       this.$router.push("/setupperson");
