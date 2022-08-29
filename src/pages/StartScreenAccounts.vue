@@ -198,7 +198,6 @@ import {
 } from "@quasar/extras/material-icons";
 import ImportToken from "components/ImportToken";
 import AddAccount from "components/AddAccount";
-import EditAccount from "components/EditAccount";
 import SelectAccount from "components/SelectAccount";
 
 import { getElipseText } from "src/helper/formater";
@@ -207,6 +206,7 @@ import {
   createWalletFromMnenomic,
   getEtherBalance,
 } from "src/helper/ethers-interact";
+import { useRouter } from "vue-router";
 
 export default {
   name: "Accounts",
@@ -219,6 +219,7 @@ export default {
     const $q = useQuasar();
 
     const store = useStore();
+    const router = useRouter();
 
     const currentWallet = computed(
       () => store.getters["account/getCurrentWallet"]
@@ -292,6 +293,16 @@ export default {
         .onDismiss(() => {});
     }
 
+    const showWallet = () => {
+      router.push({
+        path: "/shareaddress",
+        query: {
+          wallet: currentWallet.value.wallet,
+          account: currentWallet.value.label,
+        },
+      });
+    };
+
     return {
       currency: ref("ETH"),
       carousel: 0,
@@ -307,6 +318,8 @@ export default {
       showNotifWarning,
       showNotifInfo,
       selectAccount,
+
+      showWallet,
 
       getElipseText,
 
@@ -330,16 +343,11 @@ export default {
           balance: "0.0",
           wallet: true,
         },
-        // {
-        //   label: "BTC",
-        //   balance: 0,
-        //   wallet: false,
-        // },
-        // {
-        //   label: "UBX",
-        //   balance: 0,
-        //   wallet: false,
-        // },
+        {
+          label: "UBX",
+          balance: 0,
+          wallet: false,
+        },
       ],
       blockchainsList: [],
       walletsList: [],
@@ -425,16 +433,6 @@ export default {
 
       this.walletsList = this.model_blockchain.wallets;
       this.model_wallet = this.account.current_wallet;
-    },
-    showWallet() {
-      this.$global.$emit("WALLET_SHOW", {});
-      this.$router.push({
-        path: "/shareaddress",
-        query: {
-          wallet: this.model_wallet.value.wallet,
-          account: this.model_wallet.label,
-        },
-      });
     },
     sendTransaction() {
       this.$router.push({

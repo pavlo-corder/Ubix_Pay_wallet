@@ -29,40 +29,45 @@
       </q-card-section>
 
       <q-card-actions>
-        <a class="btn btn--primary q-mb-sm" @click="onCancelClick">Import tokens</a>
+        <a class="btn btn--primary q-mb-sm" @click="omImportToken"
+          >Import tokens</a
+        >
         <a class="btn btn--transparent" @click="onOKClick">Skip for now</a>
       </q-card-actions>
     </q-card>
   </q-dialog>
-
 </template>
 
 <script>
-    import {ref} from "vue";
-    import { useDialogPluginComponent } from 'quasar'
+import { ref } from "vue";
+import { useDialogPluginComponent } from "quasar";
 
-    export default {
-      name: "ImportToken",
-      emits: [
-        ...useDialogPluginComponent.emits
-      ],
-      setup () {
-        const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent()
+export default {
+  name: "ImportToken",
+  emits: [...useDialogPluginComponent.emits],
+  setup() {
+    const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
+      useDialogPluginComponent();
 
-        return {
-          contract: ref(''),
-          symbol: ref(''),
-          decimal: ref(''),
+    const omImportToken = () => {
+      alert("omImportToken");
+    };
+    return {
+      contract: ref(""),
+      omImportToken,
+      symbol: ref(""),
+      decimal: ref(""),
 
-          dialogRef,
-          onDialogHide,
+      dialogRef,
+      onDialogHide,
 
-          onOKClick () {
-            onDialogOK()
-          },
+      onOKClick() {
+        alert(1);
+        onDialogOK();
+      },
 
-          onCancelClick: onDialogCancel
-        }
-      }
-    }
+      onCancelClick: onDialogCancel,
+    };
+  },
+};
 </script>
