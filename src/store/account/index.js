@@ -12,7 +12,7 @@ const storeAccountWithEncryption = (accounts) => {
 export default {
   namespaced: true,
   state: () => {
-    let keyAccount = 0
+    let keyAccount = 0;
     keyAccount = localStorage.getItem('key_account')
     let accounts = JSON.parse(localStorage.getItem('accounts'))
 
@@ -34,6 +34,7 @@ export default {
         {
           label: 'ETH',
           value: 60,
+          tokens: [],
           wallets: []
         },
         // {
@@ -57,7 +58,8 @@ export default {
       current_blockchain: {
         label: 'ETH',
         value: 60,
-        wallets: []
+        wallets: [],
+        tokens: []
       },
       transaction: {
         blockchain_id: 0,
@@ -92,6 +94,11 @@ export default {
     },
     getCurrentBlockchain(state) {
       return state.account.current_blockchain;
+    },
+    getCurrentTokens(state) {
+      return state.account.blockchains
+        .find(blockchain => blockchain.label === state.account.current_blockchain.label)
+        .tokens;
     },
     getCurrentWallets(state) {
       return state.account.blockchains
@@ -154,7 +161,6 @@ export default {
       accounts[state.key_account] = encryptPhraseFromPayload(payload);
       storeAccountWithEncryption(accounts);
       localStorage.setItem('key_account', state.key_account)
-      console.log('103', payload);
       Object.assign(state.account, payload)
     },
 
@@ -172,6 +178,21 @@ export default {
           }
         })
       })
+    },
+
+    addCustomToken: (state, { address, name, symbol, decimals, type }) => {
+      if (address.length !== 42 || symbol.length === 0)
+        return;
+      const targetAccount = state.accounts[state.key_account];
+      const networkLabel = targetAccount.current_blockchain.label;
+      targetAccount.blockchains.forEach(blockchain => {
+        console.log(blockchain.label, networkLabel)
+        if (blockchain.label === networkLabel) {
+          console.log("added");
+          blockchain.tokens.push({ networkLabel, address, name, symbol, decimals, type })
+        }
+      });
+      storeAccountWithEncryption(state.accounts);
     }
 
   },
@@ -189,6 +210,9 @@ export default {
       const balance = await getEtherBalance(obj.wallet, obj.label);
       commit('setBalance', { ...obj, balance });
       return balance;
+    },
+    async addCustomeToken({ commit }, { address, name, symbol, decimals, logo = "", type = "erc20" }) {
+      commit('addCustomToken', { address, name, symbol, decimals, logo, type });
     }
   }
 }

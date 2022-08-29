@@ -81,11 +81,11 @@ export default {
     },
   },
   setup() {
-    const $store = useStore();
+    const store = useStore();
 
     return {
-      account: $store.state.account.account,
-      updateAccount: (val) => $store.commit("account/update", val),
+      account: store.state.account.account,
+      updateAccount: (val) => store.commit("account/update", val),
     };
   },
   mounted() {},

@@ -121,12 +121,12 @@
           <a class="btn col" @click="showNotifInfo">Link</a>
         </div>
 
-        <!-- Tokens list -->
+        <!-- tokenList list -->
         <q-list class="q-pb-md">
           <q-item
-            v-for="token in tokens"
+            v-for="token in tokenList"
             v-show="token.wallet"
-            :key="token.label"
+            :key="token.symbol"
             class="q-pl-none"
           >
             <q-item-section side>
@@ -137,11 +137,11 @@
                 text-color="blue-light"
               >
                 <q-icon
-                  v-show="token.label === 'ETH'"
+                  v-show="token.symbol === 'ETH'"
                   name="img:https://cdn.cdnlogo.com/logos/e/39/ethereum.svg"
                 />
                 <q-avatar
-                  v-show="token.label === 'UBX'"
+                  v-show="token.symbol === 'UBX'"
                   rounded
                   size="56px"
                   color="blue-transparent"
@@ -150,20 +150,25 @@
                   U
                 </q-avatar>
                 <q-avatar
-                  v-show="token.label === 'BTC'"
+                  v-show="token.symbol !== 'UBX' && token.symbol !== 'ETH'"
                   rounded
-                  size="56px"
+                  size="40px"
                   color="blue-transparent"
                   text-color="blue-light"
                 >
-                  B
+                  {{ token.type === "erc20" ? "T" : "NFT" }}
                 </q-avatar>
               </q-avatar>
             </q-item-section>
             <q-item-section>
               <q-item-label caption>Balance:</q-item-label>
               <q-item-label class="text-subtitle2 text-bold">
-                {{ parseFloat(token.balance).toFixed(4) }} {{ token.label }}
+                {{
+                  token.type === "erc20" || token.type === "coin"
+                    ? parseFloat(token.balance).toFixed(4)
+                    : token.balance
+                }}
+                {{ token.symbol }}
               </q-item-label>
             </q-item-section>
             <q-item-section side>
@@ -189,7 +194,7 @@
 
 <script>
 import axios from "axios";
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useStore } from "vuex";
 import {
   matAdd,
@@ -205,6 +210,7 @@ import { useQuasar } from "quasar";
 import {
   createWalletFromMnenomic,
   getEtherBalance,
+  getTokenBalance,
 } from "src/helper/ethers-interact";
 import { useRouter } from "vue-router";
 
@@ -216,23 +222,55 @@ export default {
     this.matChevronRight = matChevronRight;
   },
   setup() {
-    const $q = useQuasar();
+    const quasar = useQuasar();
 
     const store = useStore();
     const router = useRouter();
 
+    const tokenList = ref([
+      {
+        decimals: 18,
+        name: "Ethereum",
+        symbol: "ETH",
+        balance: "0.0",
+        wallet: true,
+        type: "coin",
+      },
+    ]);
+
     const currentWallet = computed(
       () => store.getters["account/getCurrentWallet"]
     );
+    const currentTokens = computed(
+      () => store.getters["account/getCurrentTokens"]
+    );
+    const currentAccount = computed(
+      () => store.getters["account/getCurrentAccount"]
+    );
+
+    onMounted(async () => {
+      tokenList.value = tokenList.value.concat(
+        currentTokens.value
+          .map((token) => {
+            return {
+              ...token,
+              balance: 0,
+              wallet: true,
+            };
+          })
+          .filter((token) => token.symbol !== "")
+      );
+    });
 
     function editAccount(key) {
-      this.$router.push("/setupperson");
+      router.push("/setupperson");
     }
 
     function createAccount() {
-      $q.dialog({
-        component: AddAccount,
-      })
+      quasar
+        .dialog({
+          component: AddAccount,
+        })
         .onOk((data) => {
           console.log("OK", data);
         })
@@ -243,16 +281,17 @@ export default {
     }
 
     function importToken() {
-      $q.dialog({
-        component: ImportToken,
-      })
+      quasar
+        .dialog({
+          component: ImportToken,
+        })
         .onOk(() => {})
         .onCancel(() => {})
         .onDismiss(() => {});
     }
 
     function showNotifPositive() {
-      $q.notify({
+      quasar.notify({
         message:
           'Transaction status: <span class="notification__msg notification__msg--positive">success</span>',
         html: true,
@@ -261,7 +300,7 @@ export default {
 
     function showNotifNegative() {
       showNotifWarning();
-      $q.notify({
+      quasar.notify({
         message:
           'Transaction status: <span class="notification__msg notification__msg--negative">fail</span>',
         html: true,
@@ -269,7 +308,7 @@ export default {
     }
 
     function showNotifWarning() {
-      $q.notify({
+      quasar.notify({
         message:
           'Transaction status: <span class="notification__msg notification__msg--warning">warning</span>',
         html: true,
@@ -277,7 +316,7 @@ export default {
     }
 
     function showNotifInfo() {
-      $q.notify({
+      quasar.notify({
         message:
           'Transaction status: <span class="notification__msg notification__msg--info">info</span>',
         html: true,
@@ -285,9 +324,10 @@ export default {
     }
 
     function selectAccount() {
-      $q.dialog({
-        component: SelectAccount,
-      })
+      quasar
+        .dialog({
+          component: SelectAccount,
+        })
         .onOk(() => {})
         .onCancel(() => {})
         .onDismiss(() => {});
@@ -308,6 +348,7 @@ export default {
       carousel: 0,
       carouselOptions: [],
 
+      tokenList,
       currentWallet,
 
       editAccount,
@@ -337,18 +378,7 @@ export default {
       accounts: [],
       model_blockchain: {},
       model_wallet: {},
-      tokens: [
-        {
-          label: "ETH",
-          balance: "0.0",
-          wallet: true,
-        },
-        {
-          label: "UBX",
-          balance: 0,
-          wallet: false,
-        },
-      ],
+
       blockchainsList: [],
       walletsList: [],
       model_wallet_to: "",
@@ -356,12 +386,14 @@ export default {
   },
   methods: {
     async fetchBalance() {
-      const balance = await getEtherBalance(this.model_wallet.value);
-      this.tokens.map((item) => {
-        if (item.label === "ETH") {
-          item.balance = balance;
-          item.wallet = this.model_wallet.value;
-        }
+      const balances = await Promise.all(
+        this.tokenList.map((token) =>
+          getTokenBalance(token, this.model_wallet.value)
+        )
+      );
+
+      this.tokenList.map((token, index) => {
+        token.balance = balances[index] / 10 ** token.decimals;
       });
     },
     createWallet() {

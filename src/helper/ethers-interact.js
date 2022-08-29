@@ -1,20 +1,27 @@
 import axios from "axios";
 import { Wallet, ethers } from "ethers";
 
+import ERC20_ABI from "./abis/ERC20_ABI.json";
+import ERC721_ABI from "./abis/ERC721_ABI.json";
+
 const MAINNET = {
     RPC_URL: "https://rpc.ankr.com/eth",
+    label: "ETH",
     chainId: 1
 };
 const ROPSTEN_TESTNET = {
     RPC_URL: "https://rpc.ankr.com/eth_ropsten",
+    label: "ETH",
     chainId: 3
 };
 const GOERLI_TESTNET = {
     RPC_URL: "https://rpc.ankr.com/eth_goerli",
+    label: "ETH",
     chainId: 420
 };
 const SEPOLIA_TESTNET = {
     RPC_URL: "https://rpc.sepolia.org",
+    label: "ETH",
     chainId: 11155111
 };
 const CURRNET_NETWORK = SEPOLIA_TESTNET;
@@ -46,6 +53,20 @@ export const getEtherBalance = async (address) => {
     return ethers.utils.formatEther(balance);
 }
 
+export const getTokenBalance = async (token, address) => {
+    if (token.type === 'coin')
+        return await mainnet_provider.getBalance(address);
+    else {
+        try {
+            const erc20Contract = new ethers.Contract(token.address, ERC20_ABI, mainnet_provider);
+            return await erc20Contract.balanceOf(address);
+        } catch (error) {
+            console.log(error);
+            return 0;
+        }
+    }
+}
+
 export const getFeeData = async () => {
     return await mainnet_provider.getFeeData();
 }
@@ -54,6 +75,30 @@ export const fetchEtherPrice = async () => {
     let response = await axios.get('https://api.etherscan.io/api?module=stats&action=ethprice&apikey=99C33Z32KHVZGRVCPXGF6CGJWZBACU6AUB');
     response = await response.data;
     return response?.result?.ethusd;
+}
+
+export const fetchTokenInformation = async (address) => {
+    address = ethers.utils.getAddress(address);
+    try {
+        const erc20Contract = new ethers.Contract(address, ERC20_ABI, mainnet_provider);
+        const [name, symbol, decimals, type] = await Promise.all([
+            erc20Contract.name(),
+            erc20Contract.symbol(),
+            erc20Contract.decimals(),
+            "erc20"
+        ]);
+        return { address, name, symbol, decimals, type };
+    } catch (error) {
+        const erc721Contract = new ethers.Contract(address, ERC721_ABI, mainnet_provider);
+        const [name, symbol, decimals, type] = await Promise.all([
+            erc721Contract.name(),
+            erc721Contract.symbol(),
+            0,
+            "erc721"
+        ]);
+
+        return { address, name, symbol, decimals, type };
+    }
 }
 
 export const submitSendCoinTransaction = async (fromWallet, toWallet, amountCoin) => {

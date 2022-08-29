@@ -6,21 +6,28 @@
       </q-card-section>
       <q-card-section>
         <q-input
-          v-model="contract"
-          class="input input--borderDark q-mb-sm"
+          v-model="tokenInfo.address"
+          class="input input--borderDark q-mb-sm mb-4"
           filled
           label="Token address contract"
           type="text"
+          @change="onChangeTokenAddress"
+          lazy-rules
+          :rules="[
+            (val) => (val !== null && val !== '') || 'The required field',
+            (val) =>
+              val.length == 42 || 'Please use valid token address (42 letters)',
+          ]"
         />
         <q-input
-          v-model="symbol"
+          v-model="tokenInfo.symbol"
           class="input input--borderDark q-mb-sm"
           filled
           label="Token symbol"
           type="text"
         />
         <q-input
-          v-model="decimal"
+          v-model="tokenInfo.decimals"
           class="input input--borderDark"
           filled
           label="Token decimal"
@@ -29,10 +36,10 @@
       </q-card-section>
 
       <q-card-actions>
-        <a class="btn btn--primary q-mb-sm" @click="omImportToken"
-          >Import tokens</a
-        >
-        <a class="btn btn--transparent" @click="onOKClick">Skip for now</a>
+        <a class="btn btn--primary q-mb-sm" @click="omImportToken">
+          Import tokens
+        </a>
+        <a class="btn btn--transparent" @click="onCloseModal">Skip for now</a>
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -41,28 +48,43 @@
 <script>
 import { ref } from "vue";
 import { useDialogPluginComponent } from "quasar";
-
+import { fetchTokenInformation } from "src/helper/ethers-interact";
+import { useStore } from "vuex";
 export default {
   name: "ImportToken",
   emits: [...useDialogPluginComponent.emits],
+
   setup() {
+    const store = useStore();
+
     const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
       useDialogPluginComponent();
 
     const omImportToken = () => {
-      alert("omImportToken");
+      store.commit("account/addCustomToken", tokenInfo.value);
+    };
+    const tokenInfo = ref({
+      address: "",
+      symbol: "",
+      decimals: "",
+      type: "ERC20",
+    });
+    const onChangeTokenAddress = async (e) => {
+      const inputValue = e;
+      if (inputValue.length === 42) {
+        tokenInfo.value = await fetchTokenInformation(inputValue);
+        onDialogOK();
+      }
     };
     return {
-      contract: ref(""),
       omImportToken,
-      symbol: ref(""),
-      decimal: ref(""),
 
       dialogRef,
       onDialogHide,
+      onChangeTokenAddress,
+      tokenInfo,
 
-      onOKClick() {
-        alert(1);
+      onCloseModal() {
         onDialogOK();
       },
 
