@@ -175,6 +175,15 @@
               <q-btn
                 round
                 unelevated
+                text-color="dark"
+                size="11px"
+                :icon="matDeleteOutline"
+              />
+            </q-item-section>
+            <q-item-section side>
+              <q-btn
+                round
+                unelevated
                 color="grey-gradient"
                 @click="showWallet"
                 text-color="dark"
@@ -200,6 +209,7 @@ import {
   matAdd,
   matIosShare,
   matChevronRight,
+  matDeleteOutline,
 } from "@quasar/extras/material-icons";
 import ImportToken from "components/ImportToken";
 import AddAccount from "components/AddAccount";
@@ -220,6 +230,7 @@ export default {
     this.matAdd = matAdd;
     this.matIosShare = matIosShare;
     this.matChevronRight = matChevronRight;
+    this.matDeleteOutline = matDeleteOutline;
   },
   setup() {
     const quasar = useQuasar();
