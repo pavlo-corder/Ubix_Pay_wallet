@@ -1,5 +1,6 @@
 import { decryptListWithAES, decryptPhraseFromPayload, encryptListWithAES, encryptPhraseFromPayload } from 'src/helper/text-crypt'
 import { getEtherBalance } from 'src/helper/ethers-interact'
+import { NULL_ADDRESS } from 'src/helper/constants';
 
 const storeAccountWithEncryption = (accounts) => {
   const copiedAccounts = JSON.parse(JSON.stringify(accounts));
@@ -96,9 +97,23 @@ export default {
       return state.account.current_blockchain;
     },
     getCurrentTokens(state) {
-      return state.account.blockchains
+      let customTokens = state.account.blockchains
         .find(blockchain => blockchain.label === state.account.current_blockchain.label)
         .tokens;
+      customTokens = JSON.parse(JSON.stringify(customTokens))
+      if (state.account.current_blockchain.label === 'ETH')
+        customTokens.push(
+          {
+            decimals: 18,
+            name: "Ethereum",
+            symbol: "ETH",
+            balance: "0.0",
+            wallet: true,
+            type: "coin",
+            networkLabel: "ETH",
+            address: NULL_ADDRESS,
+          });
+      return customTokens.reverse();
     },
     getCurrentWallets(state) {
       return state.account.blockchains

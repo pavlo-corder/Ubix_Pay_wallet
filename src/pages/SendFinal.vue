@@ -77,7 +77,7 @@
         </q-input>
 
         <h2 class="text-dark text-center text-desktop-left q-mt-lg q-mb-md">
-          Amount<br />{{ amountCoin }} ETH
+          Amount<br />{{ amountCoin }} {{ currentToken?.symbol }}
         </h2>
 
         <q-card flat class="start-screen__person q-mb-md">
@@ -86,46 +86,66 @@
               <q-item-label class="text-body2">
                 Estimated gas fee (?) ${{
                   (
-                    (feeData?.maxFeePerGas * 21000 * coinPrice) /
+                    (feeData?.maxFeePerGas * estimatedGas * coinPrice) /
                     10 ** 18
                   ).toFixed(3)
                 }}
-                {{ ((feeData?.maxFeePerGas * 21000) / 10 ** 18).toFixed(4) }}
+                {{
+                  ((feeData?.maxFeePerGas * estimatedGas) / 10 ** 18).toFixed(4)
+                }}
                 ETH
               </q-item-label>
               <q-item-label caption class="q-mb-sm text-grey">
                 Max fee:
                 {{
-                  ((feeData?.maxFeePerGas * 21000 * 2) / 10 ** 18).toFixed(4)
+                  (
+                    (feeData?.maxFeePerGas * estimatedGas * 2) /
+                    10 ** 18
+                  ).toFixed(4)
                 }}
                 ETH
               </q-item-label>
               <q-item-label class="text-body2">Total:</q-item-label>
-              <q-item-label class="text-body2"
-                >${{
+              <q-item-label class="text-body2">
+                ${{
                   (
-                    (parseFloat((feeData?.maxFeePerGas * 21000) / 10 ** 18) +
-                      parseFloat(amountCoin)) *
+                    (parseFloat(
+                      (feeData?.maxFeePerGas * estimatedGas) / 10 ** 18
+                    ) +
+                      parseFloat(
+                        currentToken?.address === NULL_ADDRESS ? amountCoin : 0
+                      )) *
                     coinPrice
                   ).toFixed(3)
                 }}
+                -
                 {{
-                  (
-                    parseFloat((feeData?.maxFeePerGas * 21000) / 10 ** 18) +
-                    parseFloat(amountCoin)
-                  ).toFixed(4)
+                  currentToken?.address === NULL_ADDRESS
+                    ? `${(
+                        parseFloat(
+                          (feeData?.maxFeePerGas * estimatedGas) / 10 ** 18
+                        ) + parseFloat(amountCoin)
+                      ).toFixed(4)} ETH`
+                    : `${amountCoin} ${currentToken?.symbol} +  ${(
+                        (feeData?.maxFeePerGas * estimatedGas) /
+                        10 ** 18
+                      ).toFixed(4)} ETH`
                 }}
-                ETH</q-item-label
-              >
+              </q-item-label>
               <q-item-label caption class="text-grey">
                 Max amount:
                 {{
-                  (
-                    parseFloat((feeData?.maxFeePerGas * 2 * 21000) / 10 ** 18) +
-                    parseFloat(amountCoin)
-                  ).toFixed(4)
+                  currentToken?.address === NULL_ADDRESS
+                    ? (
+                        parseFloat(
+                          (feeData?.maxFeePerGas * 2 * estimatedGas) / 10 ** 18
+                        ) + parseFloat(amountCoin)
+                      ).toFixed(4)
+                    : `${amountCoin} ${currentToken?.symbol} +  ${(
+                        (feeData?.maxFeePerGas * estimatedGas * 2) /
+                        10 ** 18
+                      ).toFixed(4)} ETH`
                 }}
-                ETH
               </q-item-label>
             </q-item-section>
           </q-item>
@@ -141,12 +161,14 @@
 import { useQuasar } from "quasar";
 import {
   fetchEtherPrice,
+  getEstimatedGas,
   getFeeData,
   submitSendCoinTransaction,
 } from "src/helper/ethers-interact";
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
+import { NULL_ADDRESS } from "src/helper/constants";
 
 export default {
   name: "SendFinal",
@@ -158,26 +180,46 @@ export default {
     const route = useRoute();
 
     const toWallet = ref("");
+    const fromWallet = ref("");
+    const token = ref({});
     const amountCoin = ref(0);
 
     const intervalId = ref(-1);
     const feeData = ref({});
+    const estimatedGas = ref({});
     const coinPrice = ref(1);
 
     const currentWallet = computed(
       () => store.getters["account/getCurrentWallet"]
     );
 
+    const currentToken = computed(() => {
+      const result = store.getters["account/getCurrentTokens"];
+      return result?.find((item) => item.address === token.value);
+    });
+
     onMounted(async () => {
       await router.isReady();
+      fromWallet.value = route.query.from;
       toWallet.value = route.query.to;
       amountCoin.value = route.query.amount;
+      token.value = route.query.token;
 
-      coinPrice.value = await fetchEtherPrice();
-      feeData.value = await getFeeData();
+      [coinPrice.value, estimatedGas.value, feeData.value] = await Promise.all([
+        fetchEtherPrice(),
+        getEstimatedGas(
+          token.value,
+          currentWallet.value,
+          toWallet.value,
+          amountCoin.value * 10 ** currentToken.value.decimals
+        ),
+        getFeeData(),
+      ]);
       intervalId.value = setInterval(async () => {
-        coinPrice.value = await fetchEtherPrice();
-        feeData.value = await getFeeData();
+        [coinPrice.value, feeData.value] = await Promise.all([
+          fetchEtherPrice(),
+          getFeeData(),
+        ]);
       }, 10000);
     });
 
@@ -190,7 +232,8 @@ export default {
         const transactionObj = await submitSendCoinTransaction(
           currentWallet.value,
           toWallet.value,
-          amountCoin.value
+          amountCoin.value * 10 ** currentToken.value.decimals,
+          currentToken.value
         );
 
         quasar.notify({
@@ -207,15 +250,20 @@ export default {
 
         store.dispatch("account/updateBalances");
         router.push("/accounts");
-      } catch (error) {}
+      } catch (error) {
+        console.log(error);
+      }
     };
 
     return {
       toWallet,
       amountCoin,
       currentWallet,
+      estimatedGas,
       feeData,
       coinPrice,
+      currentToken,
+      NULL_ADDRESS,
       walletOptions: [currentWallet],
 
       recipient: {

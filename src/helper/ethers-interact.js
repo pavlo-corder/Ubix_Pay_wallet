@@ -3,6 +3,7 @@ import { Wallet, ethers } from "ethers";
 
 import ERC20_ABI from "./abis/ERC20_ABI.json";
 import ERC721_ABI from "./abis/ERC721_ABI.json";
+import { NULL_ADDRESS } from "./constants";
 
 const MAINNET = {
     RPC_URL: "https://rpc.ankr.com/eth",
@@ -71,6 +72,18 @@ export const getFeeData = async () => {
     return await mainnet_provider.getFeeData();
 }
 
+export const getEstimatedGas = async (tokenAddress, walletObj, to, amount) => {
+    const signer = new Wallet(walletObj?.privateKey, mainnet_provider);
+    if (tokenAddress === NULL_ADDRESS) {
+        return 21000;
+    }
+    else {
+        const contract = new ethers.Contract(tokenAddress, ERC20_ABI, signer);
+        const gas = await contract.estimateGas.transfer(to, amount.toLocaleString('fullwide', { useGrouping: false }));
+        return gas.toNumber();
+    }
+}
+
 export const fetchEtherPrice = async () => {
     let response = await axios.get('https://api.etherscan.io/api?module=stats&action=ethprice&apikey=99C33Z32KHVZGRVCPXGF6CGJWZBACU6AUB');
     response = await response.data;
@@ -101,23 +114,30 @@ export const fetchTokenInformation = async (address) => {
     }
 }
 
-export const submitSendCoinTransaction = async (fromWallet, toWallet, amountCoin) => {
+export const submitSendCoinTransaction = async (fromWallet, toWallet, amountCoin, token) => {
     const [nonce, feeData] = await Promise.all([mainnet_provider.getTransactionCount(fromWallet.wallet),
     mainnet_provider.getFeeData()]);
-    console.log(feeData);
-    const tx = {
-        type: 2,
-        nonce: nonce,
-        to: toWallet, // Address to send to
-        maxPriorityFeePerGas: feeData["maxPriorityFeePerGas"], // Recommended maxPriorityFeePerGas
-        maxFeePerGas: feeData["maxFeePerGas"], // Recommended maxFeePerGas
-        value: ethers.utils.parseEther(amountCoin), // .01 ETH
-        gasLimit: "21000", // basic transaction costs exactly 21000
-        chainId: CURRNET_NETWORK.chainId
-    };
-    const wallet = new ethers.Wallet(fromWallet.privateKey.toString('hex'));
 
-    const signedTx = await wallet.signTransaction(tx);
-    const submitedTx = await mainnet_provider.sendTransaction(signedTx);;
-    return submitedTx;
+    if (token.address === NULL_ADDRESS) {
+        const tx = {
+            type: 2,
+            nonce: nonce,
+            to: toWallet, // Address to send to
+            maxPriorityFeePerGas: feeData["maxPriorityFeePerGas"], // Recommended maxPriorityFeePerGas
+            maxFeePerGas: feeData["maxFeePerGas"], // Recommended maxFeePerGas
+            value: amountCoin.toLocaleString('fullwide', { useGrouping: false }), // .01 ETH
+            gasLimit: "21000", // basic transaction costs exactly 21000
+            chainId: CURRNET_NETWORK.chainId
+        };
+        const wallet = new ethers.Wallet(fromWallet.privateKey.toString('hex'));
+
+        const signedTx = await wallet.signTransaction(tx);
+        const submitedTx = await mainnet_provider.sendTransaction(signedTx);;
+        return submitedTx;
+    } else {
+        const signer = new Wallet(fromWallet?.privateKey, mainnet_provider);
+        const contract = new ethers.Contract(token.address, ERC20_ABI, signer);
+        const tx = await contract.transfer(toWallet, amountCoin.toLocaleString('fullwide', { useGrouping: false }));
+        return tx;
+    }
 }
