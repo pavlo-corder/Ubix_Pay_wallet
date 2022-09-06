@@ -32,32 +32,37 @@
         :breakpoint="500"
       >
         <q-list class="drawer__list">
-          <q-item>
+          <q-item to="#" exact clickable v-ripple>
             <q-item-section>
-              <a href="#">
                 <span class="link--big link--noUnderline">Support</span>
-              </a>
             </q-item-section>
           </q-item>
-          <q-item>
+          <q-item to="#" exact clickable v-ripple>
             <q-item-section>
-              <a href="#">
-                <span class="link--big link--noUnderline">Backup seed phrase</span>
-              </a>
+              <span class="link--big link--noUnderline">Backup seed phrase</span>
             </q-item-section>
           </q-item>
-          <q-item>
+          <q-item to="#" exact clickable v-ripple>
             <q-item-section>
-              <a href="#">
-                <span class="link--big link--noUnderline">A link in several lines to check the interlineation</span>
-              </a>
+              <span class="link--big link--noUnderline">A link in several lines to check the interlineation</span>
             </q-item-section>
           </q-item>
-          <q-item>
+          <q-item to="#" exact clickable v-ripple>
             <q-item-section>
-              <a href="#">
-                <span class="link--big link--noUnderline">Link</span>
-              </a>
+              <span class="link--big link--noUnderline">Link</span>
+            </q-item-section>
+          </q-item>
+          <q-separator style="margin-top: auto"/>
+          <q-item clickable v-ripple :onclick="logOutDialog">
+            <q-item-section avatar style="min-width: unset">
+<!--              <a href="#" class="drawer__logout">-->
+<!--                <q-icon :name="matLogout" size="20px"/>-->
+<!--                <span class="link&#45;&#45;big link&#45;&#45;noUnderline">Logout</span>-->
+<!--              </a>-->
+              <q-icon :name="matLogout" color="black"/>
+            </q-item-section>
+            <q-item-section>
+              <span class="link--big link--noUnderline">Log out</span>
             </q-item-section>
           </q-item>
         </q-list>
@@ -85,14 +90,20 @@ import {ref} from 'vue'
 import { useQuasar } from 'quasar'
 import { useRoute } from 'vue-router'
 import {useStore} from "vuex";
+import {matLogout} from "@quasar/extras/material-icons"
+import LogOut from "components/LogOut";
 
 export default ({
   name: 'MainLayout',
   data(){
     return{
       btnBack: false,
-      btnBackRoute: '/'
+      btnBackRoute: '/',
+      showLogOutDialog: false
     }
+  },
+  created() {
+    this.matLogout = matLogout
   },
   methods:{
     backRoute(){
@@ -114,6 +125,14 @@ export default ({
       drawer.value = !drawer.value;
     }
 
+    function logOutDialog() {
+      $q.dialog({
+        component: LogOut,
+      })
+        .onOk(() => {})
+        .onCancel(() => {})
+        .onDismiss(() => {});
+    }
 
     return {
       account: $store.state.account.account,
@@ -121,6 +140,7 @@ export default ({
       current_wallet: $store.state.wallet.current_wallet,
       drawer,
       toggleDrawer,
+      logOutDialog
     }
   },
   mounted(){
