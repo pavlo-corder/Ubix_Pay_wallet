@@ -30,17 +30,25 @@
 
 <script>
 import { computed, ref } from "vue";
+import { useRouter } from "vue-router";
 import { useStore } from "vuex";
 
 export default {
   name: "Locked",
   setup() {
     const store = useStore();
+    const router = useRouter();
     const password = ref("");
 
     const unlockWallet = () => {
       if (password.value.length === 0) return;
-      store.dispatch("account/unlockAccount", password.value);
+      try {
+        store.dispatch("account/unlockAccount", password.value);
+        router.push("/accounts");
+        window.location.reload();
+      } catch (error) {
+        console.log(error);
+      }
     };
     return {
       unlockWallet,

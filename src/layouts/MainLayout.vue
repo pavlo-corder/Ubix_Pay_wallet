@@ -99,6 +99,7 @@
 import { ref } from "vue";
 import { matLock } from "@quasar/extras/material-icons";
 import { useStore } from "vuex";
+import { useRouter } from "vue-router";
 
 export default {
   name: "MainLayout",
@@ -121,7 +122,7 @@ export default {
   setup() {
     const drawer = ref(false);
     const store = useStore();
-    // const router = useRouter()
+    const router = useRouter();
 
     function toggleDrawer() {
       drawer.value = !drawer.value;
@@ -129,6 +130,7 @@ export default {
 
     const lockWallet = () => {
       store.dispatch("account/lockAccount");
+      router.push("/locked");
     };
 
     return {

@@ -1,4 +1,4 @@
-import { auth, account, lock } from "./middlewares";
+import { auth, account, lock, unlock } from "./middlewares";
 const routes = [
   {
     path: "/",
@@ -10,24 +10,24 @@ const routes = [
   },
   {
     path: "/locked",
-    component: () => import("layouts/MainLayout.vue"),
-    children: [
-      {
-        path: "",
-        name: "locked",
-        component: () => import("pages/Locked.vue"),
-      },
-    ],
+    name: "locked",
+    meta: {
+      middlewares: [unlock],
+    },
+    component: () => import("pages/Locked.vue"),
   },
   {
     path: "/import",
+    meta: {
+      middlewares: [lock],
+    },
     component: () => import("layouts/MainLayout.vue"),
     children: [{ path: "", component: () => import("pages/Import.vue") }],
   },
   {
     path: "/createwalletstep1",
     meta: {
-      middlewares: [account],
+      middlewares: [account, lock],
     },
     component: () => import("layouts/MainLayout.vue"),
     children: [
@@ -37,7 +37,7 @@ const routes = [
   {
     path: "/createwalletstep2",
     meta: {
-      middlewares: [account],
+      middlewares: [account, lock],
     },
     component: () => import("layouts/MainLayout.vue"),
     children: [
@@ -47,7 +47,7 @@ const routes = [
   {
     path: "/createwalletstep3",
     meta: {
-      middlewares: [account],
+      middlewares: [account, lock],
     },
     component: () => import("layouts/MainLayout.vue"),
     children: [
@@ -57,7 +57,7 @@ const routes = [
   {
     path: "/startscreen",
     meta: {
-      middlewares: [account],
+      middlewares: [account, unlock],
     },
     component: () => import("layouts/MainLayout.vue"),
     children: [{ path: "", component: () => import("pages/StartScreen.vue") }],
@@ -84,7 +84,7 @@ const routes = [
   {
     path: "/accounts",
     meta: {
-      middlewares: [auth],
+      middlewares: [auth, lock],
     },
     component: () => import("layouts/MainLayout.vue"),
     children: [
@@ -97,6 +97,9 @@ const routes = [
   },
   {
     path: "/send",
+    meta: {
+      middlewares: [auth, lock],
+    },
     component: () => import("layouts/MainLayout.vue"),
     children: [
       { path: "", name: "send", component: () => import("pages/Send.vue") },
@@ -112,6 +115,9 @@ const routes = [
   },
   {
     path: "/setupperson",
+    meta: {
+      middlewares: [auth, lock],
+    },
     component: () => import("layouts/MainLayout.vue"),
     children: [
       {
@@ -128,11 +134,17 @@ const routes = [
   },
   {
     path: "/shareaddress",
+    meta: {
+      middlewares: [auth, lock],
+    },
     component: () => import("layouts/MainLayout.vue"),
     children: [{ path: "", component: () => import("pages/ShareAddress.vue") }],
   },
   {
     path: "/receivecoins",
+    meta: {
+      middlewares: [auth, lock],
+    },
     component: () => import("layouts/MainLayout.vue"),
     children: [{ path: "", component: () => import("pages/ReceiveCoins.vue") }],
   },
@@ -145,6 +157,9 @@ const routes = [
   },
   {
     path: "/requestpaymentlink",
+    meta: {
+      middlewares: [auth, lock],
+    },
     component: () => import("layouts/MainLayout.vue"),
     children: [
       { path: "", component: () => import("pages/RequestPaymentLink.vue") },
@@ -152,6 +167,9 @@ const routes = [
   },
   {
     path: "/accountdetails",
+    meta: {
+      middlewares: [auth, lock],
+    },
     component: () => import("layouts/MainLayout.vue"),
     children: [
       { path: "", component: () => import("pages/AccountDetails.vue") },

@@ -49,7 +49,7 @@ import { useQuasar } from "quasar";
 import bip39 from "../assets/libs/bip39.min.js";
 import hdkey from "../assets/libs/hdkey.min.js";
 import { validationPhrase } from "src/helper/ethers-interact";
-import { storeAccountWithEncryption } from "src/store/account/index";
+
 import { useRouter } from "vue-router";
 export default {
   name: "CreateWalletStep2",
@@ -92,7 +92,6 @@ export default {
       if (validationPhrase(mnemonicPhrase.value)) {
         account.value.phrase = mnemonicPhrase.value;
         store.commit("account/update", account.value);
-        // storeAccountWithEncryption(accounts.value);
         router.push("/createwalletstep3");
       }
     };

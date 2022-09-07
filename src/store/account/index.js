@@ -9,19 +9,41 @@ import {
   encryptWithAES,
 } from "src/helper/text-crypt";
 import { getEtherBalance } from "src/helper/ethers-interact";
-import { NULL_ADDRESS } from "src/helper/constants";
+import { NULL_ADDRESS, UBIX_SECRECT } from "src/helper/constants";
 
 export const storeAccountWithEncryption = (accounts) => {
   const copiedAccounts = JSON.parse(JSON.stringify(accounts));
   copiedAccounts.map((account) => {
     account.phrase = encryptListWithAES(account.phrase, account.password);
   });
-  localStorage.setItem("accounts", JSON.stringify(copiedAccounts));
+  localStorage.setItem(
+    "accounts",
+    encryptAnyWithAES(JSON.stringify(copiedAccounts), UBIX_SECRECT)
+  );
 };
 
 export const loadAccountWithEncryption = () => {
+  try {
+    const rawAccounts = localStorage.getItem("accounts");
+    return JSON.parse(decryptAnyWithAES(rawAccounts, UBIX_SECRECT));
+  } catch (error) {
+    return null;
+  }
+};
+
+export const decryptAccountsBySecret = () => {
   const rawAccounts = localStorage.getItem("accounts");
-  return JSON.parse(rawAccounts);
+  return JSON.parse(decryptAnyWithAES(rawAccounts, UBIX_SECRECT));
+};
+
+export const decryptAccountsByPassword = (password) => {
+  const rawAccounts = localStorage.getItem("accounts");
+  return decryptAnyWithAES(rawAccounts, password);
+};
+
+export const lockAccountsWithPassword = (password) => {
+  const rawAccounts = localStorage.getItem("accounts");
+  localStorage.setItem("accounts", encryptAnyWithAES(rawAccounts, password));
 };
 
 export default {
@@ -29,7 +51,7 @@ export default {
   state: () => {
     let keyAccount = 0;
     keyAccount = localStorage.getItem("key_account");
-    let accounts = JSON.parse(localStorage.getItem("accounts"));
+    let accounts = loadAccountWithEncryption();
 
     if (keyAccount === null || keyAccount === "" || !keyAccount) {
       keyAccount = 0;
@@ -258,6 +280,21 @@ export default {
       });
       storeAccountWithEncryption(state.accounts);
     },
+
+    lockAccounts: (state) => {
+      if (state.accounts) {
+        storeAccountWithEncryption(state.accounts);
+        const targetAccount = state.accounts[state.key_account];
+        console.log(targetAccount.password);
+        lockAccountsWithPassword(targetAccount.password);
+        state.accounts = [];
+      }
+    },
+    unlockAccounts: (state, password) => {
+      const rawAccounts = decryptAccountsByPassword(password);
+      const accounts = decryptAnyWithAES(rawAccounts, UBIX_SECRECT);
+      storeAccountWithEncryption(JSON.parse(accounts));
+    },
   },
   actions: {
     updateAccount({ commit }, payload) {
@@ -285,28 +322,11 @@ export default {
       commit("removeCustomToken", { address, type });
     },
 
-    lockAccount({ getters, commit }) {
-      const test = localStorage.getItem("test");
-      let json = {};
-      try {
-        json = JSON.parse(test);
-        if (json.password)
-          localStorage.setItem("test", encryptAnyWithAES(test, json.password));
-      } catch (error) {
-        // invalid password or locked state
-        console.log(error);
-      }
+    lockAccount({ commit }) {
+      commit("lockAccounts");
     },
     unlockAccount({ getters, commit }, password) {
-      let test = localStorage.getItem("test");
-      test = decryptAnyWithAES(test, password);
-      let json = {};
-      try {
-        json = JSON.parse(test);
-        if (json.password === password) localStorage.setItem("test", test);
-      } catch (error) {
-        console.log(error);
-      }
+      commit("unlockAccounts", password);
     },
   },
 };

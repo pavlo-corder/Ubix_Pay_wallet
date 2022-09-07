@@ -1,32 +1,40 @@
+import {
+  decryptAccountsBySecret,
+  loadAccountWithEncryption,
+} from "src/store/account";
+
 function auth({ next, store }) {
-  let accounts = JSON.parse(localStorage.getItem("accounts"));
+  let accounts = loadAccountWithEncryption();
 
   if (accounts === null || accounts[0].blockchains.length === 0) {
     return next({ name: "" });
-  }
-  try {
-    let test = JSON.parse(localStorage.getItem("test"));
-    console.log(test);
-  } catch (error) {
-    console.log(error);
-    return next({ name: "locked" });
   }
   return next();
 }
 
 function lock({ next, store }) {
   try {
-    let test = JSON.parse(localStorage.getItem("test"));
-    console.log(test);
+    const decrytedAccountsBySecret = decryptAccountsBySecret();
+    console.log(decrytedAccountsBySecret);
   } catch (error) {
     console.log(error);
     return next({ name: "locked" });
   }
   return next();
 }
+function unlock({ next, store }) {
+  console.log("unlock");
+  try {
+    decryptAccountsBySecret();
+    return next({ name: "accounts" });
+  } catch (error) {
+    console.log(error);
+    return next();
+  }
+}
 
 function account({ next, store }) {
-  let accounts = JSON.parse(localStorage.getItem("accounts"));
+  let accounts = loadAccountWithEncryption();
 
   if (
     accounts !== null &&
@@ -40,4 +48,4 @@ function account({ next, store }) {
   return next();
 }
 
-export { auth, account, lock };
+export { auth, account, lock, unlock };
