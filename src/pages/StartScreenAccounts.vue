@@ -113,7 +113,7 @@
           <q-card-actions align="right">
             <q-btn flat label="Cancel" color="primary" v-close-popup />
             <q-btn
-              @click="alert(1)"
+              @click="confirmDeleteToken"
               flat
               label="Yes"
               color="primary"
@@ -195,7 +195,7 @@
                 round
                 unelevated
                 color="grey-gradient"
-                @click="removeTokenModal.visible = true"
+                @click="clickTrashToken(token.address)"
                 text-color="dark"
                 :icon="matDeleteForever"
               />
@@ -243,6 +243,7 @@ import {
   getTokenBalance,
 } from "src/helper/ethers-interact";
 import { useRouter } from "vue-router";
+import { loadAccountWithEncryption } from "src/store/account";
 
 export default {
   name: "Accounts",
@@ -353,11 +354,6 @@ export default {
         .onDismiss(() => {});
     }
 
-    const removeCustomToken = () => {
-      // quasar.
-      removeTokenModal.value.visible = true;
-    };
-
     const showWallet = () => {
       router.push({
         path: "/shareaddress",
@@ -366,6 +362,20 @@ export default {
           account: currentWallet.value.label,
         },
       });
+    };
+
+    const selectedToken = ref("");
+    const clickTrashToken = (address) => {
+      removeTokenModal.value.visible = true;
+      selectedToken.value = address;
+    };
+
+    const confirmDeleteToken = () => {
+      store.commit("account/removeCustomToken", {
+        address: selectedToken.value,
+        type: "erc20",
+      });
+      window.location.reload();
     };
 
     return {
@@ -385,8 +395,9 @@ export default {
       showNotifInfo,
       selectAccount,
 
+      clickTrashToken,
       removeTokenModal,
-      removeCustomToken,
+      confirmDeleteToken,
       showWallet,
       numberConverter,
 
@@ -477,7 +488,7 @@ export default {
       this.model_blockchain = {};
       this.model_wallet = {};
 
-      this.accounts = JSON.parse(localStorage.getItem("accounts"));
+      this.accounts = loadAccountWithEncryption();
 
       let account = { ...this.account };
 

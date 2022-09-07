@@ -36,51 +36,55 @@
 
 <script>
 import { useDialogPluginComponent, useQuasar } from "quasar";
+import { ref } from "vue";
+import { useStore } from "vuex";
 
 export default {
   props: ["idAccount"],
   name: "EditAccount",
-  data() {
-    return {
-      dialog: false,
-      accounts: [],
-      account: {},
-      name: "",
-      details: "",
-    };
-  },
+
   emits: [...useDialogPluginComponent.emits],
   setup() {
     const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
       useDialogPluginComponent();
 
+    const store = useStore();
+
+    const accounts = computed(() => store.getters["account/getAccounts"]);
+
+    const dialog = ref(false);
+    const account = ref({});
+    const name = ref("");
+    const details = ref("");
+
+    onMounted(async () => {
+      account.value = accounts.value[0];
+      if (account.value.name) {
+        name.value = account.value.name;
+      }
+      if (account.value.details) {
+        details.value = account.value.details;
+      }
+    });
+
+    const onOKClick = () => {
+      account.value.name = name.value;
+      account.value.details = details.value;
+      console.log("account", account.value);
+      accounts.value[0] = account.value;
+      this.$global.$emit("ACCOUNT_UPDATE", true);
+      dialog = false;
+    };
+
     return {
+      dialog,
+      details,
       dialogRef,
       onDialogHide,
 
+      onOKClick,
       onCancelClick: onDialogCancel,
     };
-  },
-  methods: {
-    onOKClick() {
-      this.account.name = this.name;
-      this.account.details = this.details;
-      console.log("account", this.account);
-      this.accounts[0] = this.account;
-      // localStorage.setItem('accounts', JSON.stringify(this.accounts))
-      this.$global.$emit("ACCOUNT_UPDATE", true);
-      this.dialog = false;
-    },
-  },
-  mounted() {
-    this.accounts = JSON.parse(localStorage.getItem("accounts"));
-    this.account = this.accounts[0];
-    if (this.account.name) {
-      this.name = this.account.name;
-    }
-    if (this.account.details) {
-      this.details = this.account.details;
-    }
   },
 };
 </script>

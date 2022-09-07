@@ -63,6 +63,7 @@ export default {
     const omImportToken = () => {
       store.commit("account/addCustomToken", tokenInfo.value);
       onDialogOK();
+      window.location.reload();
     };
     const tokenInfo = ref({
       address: "",

@@ -46,26 +46,17 @@ export default {
       updateAccount: (val) => $store.commit("account/update", val),
     };
   },
-  data() {
-    return {
-      accounts: [],
-    };
-  },
   methods: {
     onSubmit(e) {
       e.preventDefault();
       if (this.name.length > 2) {
         this.account.name = this.name;
         this.account.details = this.details;
-        // localStorage.setItem('accounts', JSON.stringify(this.accounts))
         this.updateAccount(this.account);
         this.$router.push("/accounts");
       }
     },
     onReset() {},
-  },
-  mounted() {
-    this.accounts = JSON.parse(localStorage.getItem("accounts"));
   },
 };
 </script>
