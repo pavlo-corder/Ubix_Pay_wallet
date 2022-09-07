@@ -4,13 +4,35 @@
       <q-form>
         <div class="row justify-between items-center q-mb-md q-gutter-sm">
           <div class="col-6">
-            <q-select
-              v-model="currency"
-              filled
-              :options="currencyOptions"
-              behavior="menu"
-              class="input input--borderDark"
-            />
+            <q-item>
+              <q-item-section side>
+                <q-avatar
+                  rounded
+                  size="42px"
+                  color="blue-transparent"
+                  text-color="blue-light"
+                >
+                  <template v-if="currentToken?.icon">
+                    <q-icon :name="currentToken?.icon" />
+                  </template>
+
+                  <q-icon
+                    v-else-if="
+                      currentToken?.type === 'coin' &&
+                      currentToken?.networkLabel === 'ETH'
+                    "
+                    name="img:https://cdn.cdnlogo.com/logos/e/39/ethereum.svg"
+                  />
+                  <template v-else>{{ currentToken?.symbol?.at(0) }}</template>
+                </q-avatar>
+              </q-item-section>
+              <q-item-section>
+                <q-item-label caption>{{ currentToken?.name }}</q-item-label>
+                <q-item-label class="text-subtitle2 text-bold">
+                  {{ currentToken?.symbol }}
+                </q-item-label>
+              </q-item-section>
+            </q-item>
           </div>
           <div class="col-auto">
             <span class="link link--big" @click="onClickMax">Use max</span>
@@ -23,16 +45,17 @@
               filled
               class="input input--borderDark"
               type="number"
-              :max="currentWallet.balance"
+              :max="tokenBalance"
               v-model="amountCoin"
-              @update:model-value="onChangeAmountCoin"
+              @update:model-value="onChangeAmount"
             />
           </div>
-          <div class="col-auto">
+          <div class="col-auto" v-if="currentToken?.type === 'coin'">
             <q-icon name="swap_horiz" size="20px"></q-icon>
           </div>
           <div class="col">
             <q-input
+              v-if="currentToken?.type === 'coin'"
               filled
               prefix="$"
               class="input input--borderDark"
@@ -46,7 +69,8 @@
         <p class="row items-center q-mb-lg">
           <span class="text-caption text-grey-dark">Balance:&nbsp;</span>
           <span class="text-bold text-h6">
-            {{ parseFloat(currentWallet.balance).toFixed(4) }} {{ currency }}
+            {{ numberConverter(tokenBalance) }}
+            {{ currentToken?.symbol }}
           </span>
         </p>
         <q-btn class="btn btn--primary" @click="onNextHandler">Next</q-btn>
@@ -60,7 +84,12 @@ import { computed } from "@vue/reactivity";
 import { onMounted, onUnmounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
-import { fetchEtherPrice, getFeeData } from "src/helper/ethers-interact";
+import {
+  fetchEtherPrice,
+  getFeeData,
+  getTokenBalance,
+} from "src/helper/ethers-interact";
+import { numberConverter } from "src/helper/formater";
 
 export default {
   name: "SendAmount",
@@ -75,12 +104,48 @@ export default {
     const amountDollar = ref(0);
 
     const intervalId = ref(-1);
+    const fromWallet = ref("");
     const toWallet = ref("");
+    const token = ref("");
+    const tokenBalance = ref(0);
+
+    const currentTokens = computed(
+      () => store.getters["account/getCurrentTokens"]
+    );
+    const currentToken = computed(() => {
+      const result = store.getters["account/getCurrentTokens"];
+      return result?.find((item) => item.address === token.value);
+    });
+    // const currentToken = ref({});
+
+    const fetchBalance = async () => {
+      const balance = await getTokenBalance(
+        currentToken.value,
+        fromWallet.value
+      );
+
+      tokenBalance.value = balance / 10 ** currentToken.value.decimals;
+    };
+
+    const onNextHandler = () => {
+      router.push({
+        path: "/send/final",
+        query: {
+          from: fromWallet.value,
+          to: toWallet.value,
+          token: token.value,
+          amount: amountCoin.value,
+        },
+      });
+    };
 
     onMounted(async () => {
       await router.isReady();
+      fromWallet.value = route.query.from;
       toWallet.value = route.query.to;
+      token.value = route.query.token;
 
+      fetchBalance();
       coinPrice.value = await fetchEtherPrice();
       feeData.value = await getFeeData();
       intervalId.value = setInterval(async () => {
@@ -100,8 +165,9 @@ export default {
       () => store.getters["account/getCurrentBlockchain"]
     );
 
-    const onChangeAmountCoin = (coin) => {
+    const onChangeAmount = (coin) => {
       if (coin.length === 0) amountCoin.value = 0;
+      amountCoin.value = coin;
       amountDollar.value = (amountCoin.value * coinPrice.value).toFixed(3);
     };
 
@@ -112,35 +178,36 @@ export default {
 
     const onClickMax = () => {
       if (feeData.value.maxFeePerGas) {
-        const estimatedTxFee = feeData.value.maxFeePerGas * 21000;
-        amountCoin.value = (
-          currentWallet.value.balance -
-          (estimatedTxFee * 2) / 10 ** 18
-        ).toFixed(4);
-        onChangeAmountCoin(amountCoin.value);
+        if (currentToken.value.type === "coin") {
+          const estimatedTxFee = feeData.value.maxFeePerGas * 21000;
+          amountCoin.value = (
+            currentWallet.value.balance -
+            (estimatedTxFee * 2) / 10 ** 18
+          ).toFixed(4);
+          onChangeAmount(amountCoin.value);
+        } else if (currentToken.value.type === "erc20") {
+          console.log(tokenBalance.value);
+          onChangeAmount(tokenBalance.value);
+        }
       }
-    };
-
-    const onNextHandler = () => {
-      router.push({
-        path: "/send/final",
-        query: { to: toWallet.value, amount: amountCoin.value },
-      });
     };
 
     return {
       currentWallet,
+      token,
+      tokenBalance,
       currentBlockchain,
-      currency: ref("ETH"),
-      currencyOptions: ["ETH", "UBX"],
+      currentTokens,
+      currentToken,
       feeData,
       coinPrice,
-      onChangeAmountCoin,
+      onChangeAmount,
       onChangeAmountDollar,
       onClickMax,
       amountCoin,
       amountDollar,
       onNextHandler,
+      numberConverter,
     };
   },
 };

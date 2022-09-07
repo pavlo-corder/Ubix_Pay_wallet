@@ -104,6 +104,24 @@
         </div>
       </div>
 
+      <q-dialog v-model="removeTokenModal.visible" persistent>
+        <q-card>
+          <q-card-section class="row items-center">
+            <span class="q-ml-sm">Are you sure you want to remove token?</span>
+          </q-card-section>
+
+          <q-card-actions align="right">
+            <q-btn flat label="Cancel" color="primary" v-close-popup />
+            <q-btn
+              @click="confirmDeleteToken"
+              flat
+              label="Yes"
+              color="primary"
+              v-close-popup
+            />
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
       <div>
         <h1 class="q-mt-lg q-mb-md">Send</h1>
 
@@ -165,7 +183,7 @@
               <q-item-label class="text-subtitle2 text-bold">
                 {{
                   token.type === "erc20" || token.type === "coin"
-                    ? parseFloat(token.balance).toFixed(4)
+                    ? numberConverter(token.balance, 2)
                     : token.balance
                 }}
                 {{ token.symbol }}
@@ -173,11 +191,13 @@
             </q-item-section>
             <q-item-section side>
               <q-btn
+                v-if="token.type === 'erc20'"
                 round
                 unelevated
+                color="grey-gradient"
+                @click="clickTrashToken(token.address)"
                 text-color="dark"
-                size="11px"
-                :icon="matDeleteOutline"
+                :icon="matDeleteForever"
               />
             </q-item-section>
             <q-item-section side>
@@ -209,13 +229,13 @@ import {
   matAdd,
   matIosShare,
   matChevronRight,
-  matDeleteOutline,
+  matDeleteForever,
 } from "@quasar/extras/material-icons";
 import ImportToken from "components/ImportToken";
 import AddAccount from "components/AddAccount";
 import SelectAccount from "components/SelectAccount";
 
-import { getElipseText } from "src/helper/formater";
+import { getElipseText, numberConverter } from "src/helper/formater";
 import { useQuasar } from "quasar";
 import {
   createWalletFromMnenomic,
@@ -223,6 +243,7 @@ import {
   getTokenBalance,
 } from "src/helper/ethers-interact";
 import { useRouter } from "vue-router";
+import { loadAccountWithEncryption } from "src/store/account";
 
 export default {
   name: "Accounts",
@@ -230,7 +251,6 @@ export default {
     this.matAdd = matAdd;
     this.matIosShare = matIosShare;
     this.matChevronRight = matChevronRight;
-    this.matDeleteOutline = matDeleteOutline;
   },
   setup() {
     const quasar = useQuasar();
@@ -238,25 +258,15 @@ export default {
     const store = useStore();
     const router = useRouter();
 
-    const tokenList = ref([
-      {
-        decimals: 18,
-        name: "Ethereum",
-        symbol: "ETH",
-        balance: "0.0",
-        wallet: true,
-        type: "coin",
-      },
-    ]);
+    const removeTokenModal = ref({ visible: false });
+
+    const tokenList = ref([]);
 
     const currentWallet = computed(
       () => store.getters["account/getCurrentWallet"]
     );
     const currentTokens = computed(
       () => store.getters["account/getCurrentTokens"]
-    );
-    const currentAccount = computed(
-      () => store.getters["account/getCurrentAccount"]
     );
 
     onMounted(async () => {
@@ -354,6 +364,20 @@ export default {
       });
     };
 
+    const selectedToken = ref("");
+    const clickTrashToken = (address) => {
+      removeTokenModal.value.visible = true;
+      selectedToken.value = address;
+    };
+
+    const confirmDeleteToken = () => {
+      store.commit("account/removeCustomToken", {
+        address: selectedToken.value,
+        type: "erc20",
+      });
+      window.location.reload();
+    };
+
     return {
       currency: ref("ETH"),
       carousel: 0,
@@ -371,7 +395,11 @@ export default {
       showNotifInfo,
       selectAccount,
 
+      clickTrashToken,
+      removeTokenModal,
+      confirmDeleteToken,
       showWallet,
+      numberConverter,
 
       getElipseText,
 
@@ -382,6 +410,8 @@ export default {
       updateCurrentBlockchain: (val) =>
         store.commit("account/updateCurrentBlockchain", val),
       updateWallets: (val) => store.commit("account/updateWallets", val),
+
+      matDeleteForever,
     };
   },
   data() {
@@ -458,7 +488,7 @@ export default {
       this.model_blockchain = {};
       this.model_wallet = {};
 
-      this.accounts = JSON.parse(localStorage.getItem("accounts"));
+      this.accounts = loadAccountWithEncryption();
 
       let account = { ...this.account };
 

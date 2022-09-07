@@ -1,36 +1,49 @@
-const CryptoJS = require('crypto-js');
+const CryptoJS = require("crypto-js");
 
-export const encryptWithAES = (text, passphrase) => {
-    return text.length === 44 ? text : CryptoJS.AES.encrypt(text, passphrase).toString();
+// This is only for privatekey
+export const encryptAnyWithAES = (text, passphrase) => {
+  return CryptoJS.AES.encrypt(text, passphrase).toString();
+};
+// This is only for privatekey
+export const decryptAnyWithAES = (ciphertext, passphrase) => {
+  const bytes = CryptoJS.AES.decrypt(ciphertext, passphrase);
+  const originalText = bytes.toString(CryptoJS.enc.Utf8);
+  return originalText;
 };
 
+// This is only for privatekey
+export const encryptWithAES = (text, passphrase) => {
+  return text.length === 44
+    ? text
+    : CryptoJS.AES.encrypt(text, passphrase).toString();
+};
+// This is only for privatekey
 export const decryptWithAES = (ciphertext, passphrase) => {
-    if (ciphertext.length !== 44)
-        return ciphertext;
-    const bytes = CryptoJS.AES.decrypt(ciphertext, passphrase);
-    const originalText = bytes.toString(CryptoJS.enc.Utf8);
-    return originalText;
+  if (ciphertext.length !== 44) return ciphertext;
+  const bytes = CryptoJS.AES.decrypt(ciphertext, passphrase);
+  const originalText = bytes.toString(CryptoJS.enc.Utf8);
+  return originalText;
 };
 
 export const encryptListWithAES = (textArray = [], passphrase) => {
-    return textArray.map(text => encryptWithAES(text, passphrase));
-}
+  return textArray.map((text) => encryptWithAES(text, passphrase));
+};
 export const decryptListWithAES = (textArray = [], passphrase) => {
-    return textArray.map(ciphertext => decryptWithAES(ciphertext, passphrase));
-}
+  return textArray.map((ciphertext) => decryptWithAES(ciphertext, passphrase));
+};
 
 export const encryptPhraseFromPayload = (payload) => {
-    const result = JSON.parse(JSON.stringify(payload))
-    if (payload?.phrase?.length > 0) {
-        result.phrase = encryptListWithAES(result.phrase, payload.password)
-    }
-    return result;
-}
+  const result = JSON.parse(JSON.stringify(payload));
+  if (payload?.phrase?.length > 0) {
+    result.phrase = encryptListWithAES(result.phrase, payload.password);
+  }
+  return result;
+};
 
 export const decryptPhraseFromPayload = (payload) => {
-    const result = JSON.parse(JSON.stringify(payload))
-    if (payload?.phrase?.length > 0) {
-        result.phrase = decryptListWithAES(result.phrase, payload.password)
-    }
-    return result;
-}
+  const result = JSON.parse(JSON.stringify(payload));
+  if (payload?.phrase?.length > 0) {
+    result.phrase = decryptListWithAES(result.phrase, payload.password);
+  }
+  return result;
+};

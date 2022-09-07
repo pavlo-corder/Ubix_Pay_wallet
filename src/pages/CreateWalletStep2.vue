@@ -42,6 +42,7 @@
   </div>
 </template>
 <script>
+import { ref, computed, onMounted } from "vue";
 import { useStore } from "vuex";
 import { useQuasar } from "quasar";
 
@@ -49,37 +50,30 @@ import bip39 from "../assets/libs/bip39.min.js";
 import hdkey from "../assets/libs/hdkey.min.js";
 import { validationPhrase } from "src/helper/ethers-interact";
 
+import { useRouter } from "vue-router";
 export default {
   name: "CreateWalletStep2",
   setup() {
-    const $store = useStore();
-    const $q = useQuasar();
+    const store = useStore();
+    const router = useRouter();
+    const quasar = useQuasar();
 
-    return {
-      account: $store.state.account.account,
-      updateAccount: (val) => $store.commit("account/update", val),
-    };
-  },
-  data() {
-    return {
-      accounts: [],
-      key_account: 0,
-      countwords: 12,
-      mnemonicPhrase: [],
-      password: "",
-    };
-  },
-  methods: {
-    generateRandomPhrase() {
-      let account = { ...this.account };
+    const account = computed(() => store.getters["account/getCurrentAccount"]);
 
+    const mnemonicPhrase = ref([]);
+
+    onMounted(async () => {
+      generateRandomPhrase();
+    });
+
+    const generateRandomPhrase = () => {
       const strength = 128;
       const wordList = eval(bip39.wordlists.english);
 
       const mnemonic = bip39.generateMnemonic(strength, null, wordList);
-      this.mnemonicPhrase = mnemonic.split(" ");
+      mnemonicPhrase.value = mnemonic.split(" ");
 
-      account.phrase = this.mnemonicPhrase;
+      account.value.phrase = mnemonicPhrase.value;
 
       const seed = bip39.mnemonicToSeed(mnemonic, null);
 
@@ -87,37 +81,34 @@ export default {
       const privateExtendedKey = hdwallet.privateExtendedKey();
       const publicExtendedKey = hdwallet.publicExtendedKey();
 
-      account.privateExtendedKey = privateExtendedKey;
-      account.publicExtendedKey = publicExtendedKey;
-      account.confirmPhrase = false;
+      account.value.privateExtendedKey = privateExtendedKey;
+      account.value.publicExtendedKey = publicExtendedKey;
+      account.value.confirmPhrase = false;
 
-      this.updateAccount(account);
-    },
-    savePhrase() {
-      if (validationPhrase(this.mnemonicPhrase)) {
-        this.accounts[this.key_account].phrase = this.mnemonicPhrase;
-        localStorage.setItem("accounts", JSON.stringify(this.accounts));
-        this.$router.push("/createwalletstep3");
+      store.commit("account/update", account.value);
+    };
+
+    const savePhrase = () => {
+      if (validationPhrase(mnemonicPhrase.value)) {
+        account.value.phrase = mnemonicPhrase.value;
+        store.commit("account/update", account.value);
+        router.push("/createwalletstep3");
       }
-    },
-    showAlertSkip() {
-      this.$q.notify({
+    };
+    const showAlertSkip = () => {
+      quasar.notify({
         message:
           'Transaction status: <span class="notification__msg notification__msg--positive">success</span>',
         html: true,
       });
-    },
-  },
-  mounted() {
-    let key_account = localStorage.getItem("key_account");
-    if (key_account) {
-      this.key_account = key_account;
-    }
-    let accounts = JSON.parse(localStorage.getItem("accounts"));
-    if (accounts) {
-      this.accounts = accounts;
-    }
-    this.generateRandomPhrase();
+    };
+
+    return {
+      account,
+      mnemonicPhrase,
+      savePhrase,
+      showAlertSkip,
+    };
   },
 };
 </script>

@@ -6,12 +6,12 @@
       <q-select
         filled
         behavior="menu"
-        :value="fromWallet"
+        :value="fromToken"
         class="input input--borderDark q-mb-md"
-        :label="currentWallets[fromWallet].name"
-        :options="currentWallets"
-        :display-value="`Balance: ${currentWallets[fromWallet].balance}`"
-        @update:model-value="fromWalletHandler"
+        :label="tokenList[fromToken]?.symbol"
+        :options="tokenList"
+        :display-value="`Balance: ${tokenList[fromToken]?.balance} ${tokenList[fromToken]?.symbol}`"
+        @update:model-value="fromTokenHandler"
       >
         <template v-slot:option="scope">
           <q-item v-bind="scope.itemProps">
@@ -25,20 +25,27 @@
                 <template v-if="scope.opt.icon">
                   <q-icon :name="scope.opt.icon" />
                 </template>
-                <template v-else>U</template>
+
+                <q-icon
+                  v-else-if="
+                    scope.opt.type === 'coin' &&
+                    scope.opt.networkLabel === 'ETH'
+                  "
+                  name="img:https://cdn.cdnlogo.com/logos/e/39/ethereum.svg"
+                />
+                <template v-else>{{ scope.opt.symbol[0] }}</template>
               </q-avatar>
             </q-item-section>
             <q-item-section>
               <q-item-label caption>{{ scope.opt.name }}</q-item-label>
               <q-item-label class="text-subtitle2 text-bold">
-                {{
-                  `${scope.opt.balance} ${currentAccount.current_blockchain.label}`
-                }}
+                {{ `${scope.opt.balance} ${scope.opt.symbol}` }}
               </q-item-label>
             </q-item-section>
           </q-item>
         </template>
       </q-select>
+
       <p class="text-subtitle2 q-mb-sm">To</p>
 
       <q-input
@@ -153,6 +160,7 @@
 </template>
 
 <script>
+import { getTokenBalance } from "src/helper/ethers-interact";
 import { computed, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
@@ -170,38 +178,74 @@ export default {
     const currentAccount = computed(
       () => store.getters["account/getCurrentAccount"]
     );
-    const currentWallets = computed(
-      () => store.getters["account/getCurrentWallets"]
+
+    const currentWallet = computed(
+      () => store.getters["account/getCurrentWallet"]
     );
 
-    const fromWallet = ref(0);
+    const tokenList = ref([]);
+
+    const currentTokens = computed(
+      () => store.getters["account/getCurrentTokens"]
+    );
+
+    const fromToken = ref(0);
     const toWallet = ref("");
 
-    const fromWalletHandler = (wallet) => {
-      fromWallet.value = currentWallets.value.indexOf(wallet);
-      updateCurrentWallet(wallet);
+    const fromTokenHandler = (token) => {
+      fromToken.value = tokenList.value.indexOf(token);
+      // updateCurrentToken(token);
+    };
+
+    const fetchBalance = async () => {
+      const balances = await Promise.all(
+        tokenList.value.map((token) =>
+          getTokenBalance(token, currentWallet.value.wallet)
+        )
+      );
+
+      tokenList.value.map((token, index) => {
+        token.balance = balances[index] / 10 ** token.decimals;
+      });
     };
 
     onMounted(async () => {
       await router.isReady();
       toWallet.value = route.query.to;
       store.dispatch("account/updateBalances");
+
+      tokenList.value = tokenList.value.concat(
+        currentTokens.value
+          .map((token) => {
+            return {
+              ...token,
+              balance: 0,
+              wallet: true,
+            };
+          })
+          .filter((token) => token.symbol !== "")
+      );
+      fetchBalance();
     });
 
     const onNextHandler = () => {
       router.push({
         path: "/send/amount",
-        query: { to: toWallet.value },
+        query: {
+          from: currentWallet.value.wallet,
+          to: toWallet.value,
+          token: tokenList.value[fromToken.value].address,
+        },
       });
     };
 
     return {
       currentAccount,
-      currentWallets,
-      fromWallet,
+      tokenList,
+      fromToken,
       toWallet,
       updateCurrentWallet,
-      fromWalletHandler,
+      fromTokenHandler,
       onNextHandler,
       searchAddress: ref(null),
       addresses: [
