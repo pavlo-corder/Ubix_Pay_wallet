@@ -33,6 +33,7 @@ export const loadAccountWithEncryption = () => {
 
 export const decryptAccountsBySecret = () => {
   const rawAccounts = localStorage.getItem("accounts");
+  if (rawAccounts === null) return null;
   return JSON.parse(decryptAnyWithAES(rawAccounts, UBIX_SECRECT));
 };
 
