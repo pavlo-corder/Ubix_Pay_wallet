@@ -5,6 +5,7 @@ import {
 
 function auth({ next, store }) {
   let accounts = loadAccountWithEncryption();
+  console.log(accounts);
 
   if (accounts === null || accounts[0].blockchains.length === 0) {
     return next({ name: "" });
@@ -15,7 +16,6 @@ function auth({ next, store }) {
 function lock({ next, store }) {
   try {
     const decrytedAccountsBySecret = decryptAccountsBySecret();
-    console.log(decrytedAccountsBySecret);
   } catch (error) {
     console.log(error);
     return next({ name: "locked" });
@@ -25,7 +25,9 @@ function lock({ next, store }) {
 function unlock({ next, store }) {
   console.log("unlock");
   try {
-    decryptAccountsBySecret();
+    const decrytedAccountsBySecret = decryptAccountsBySecret();
+    if (decrytedAccountsBySecret === null) return next({ name: "" });
+
     return next({ name: "accounts" });
   } catch (error) {
     console.log(error);
