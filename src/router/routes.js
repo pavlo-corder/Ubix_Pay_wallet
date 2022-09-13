@@ -1,9 +1,9 @@
-import { auth, account, lock, unlock } from "./middlewares";
+import { auth, account, lock, unlock, accountAndLock } from "./middlewares";
 const routes = [
   {
     path: "/",
     meta: {
-      middlewares: [account, lock],
+      middlewares: [accountAndLock],
     },
     component: () => import("layouts/MainLayout.vue"),
     children: [{ path: "", component: () => import("pages/Index.vue") }],
