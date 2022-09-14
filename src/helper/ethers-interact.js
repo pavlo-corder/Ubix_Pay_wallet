@@ -36,6 +36,67 @@ const etherscan_provider = new ethers.providers.EtherscanProvider(
   "38KX1UJJKQINF8TUBAVS5ZVDSFI61KSJ1B"
 );
 
+export const fetchTxHistory = async (token, address) => {
+  address = address.toLowerCase();
+  let response = [];
+  if (token.type === "coin") {
+    response = await axios.get(
+      `https://api.etherscan.io/api?module=account&action=txlist&page=1&address=${address}&sort=desc&apikey=38KX1UJJKQINF8TUBAVS5ZVDSFI61KSJ1B`
+    );
+
+    response = await response.data;
+    response = response?.result;
+    response = response.filter((item) => item.input == "0x");
+
+    response = response.map((item) => {
+      return {
+        type: item.to === address ? "received" : "sent",
+        confirmed: item.txreceipt_status == 1,
+        coin: token.symbol,
+        amount: item.value / 10 ** token.decimals,
+        timestamp: new Date(
+          parseInt(item.timeStamp) * 1000
+        ).toLocaleDateString(),
+      };
+    });
+    const _dateSet = Array(...new Set(response.map((item) => item.timestamp)));
+    response = _dateSet.map((date) => {
+      return {
+        timestamp: date,
+        txns: response.filter((item) => item.timestamp === date),
+      };
+    });
+  } else {
+    response = await axios.get(
+      `https://api.etherscan.io/api?module=account&action=tokentx&contractaddress=${token.address}&address=${address}&page=1&sort=desc&apikey=38KX1UJJKQINF8TUBAVS5ZVDSFI61KSJ1B`
+    );
+    response = await response.data;
+    response = response.result;
+
+    response = response.map((item) => {
+      return {
+        type: item.to === address ? "received" : "sent",
+        confirmed: true,
+        coin: token.symbol,
+        amount: item.value / 10 ** token.decimals,
+        timestamp: new Date(
+          parseInt(item.timeStamp) * 1000
+        ).toLocaleDateString(),
+      };
+    });
+    const _dateSet = Array(...new Set(response.map((item) => item.timestamp)));
+    response = _dateSet.map((date) => {
+      return {
+        timestamp: date,
+        txns: response.filter((item) => item.timestamp === date),
+      };
+    });
+    console.log(response);
+  }
+
+  return response;
+};
+
 export const validationPhrase = (wordList) => {
   return ethers.utils.isValidMnemonic(wordList.join(" "));
 };

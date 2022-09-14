@@ -2,8 +2,16 @@
   <main class="q-pt-md">
     <div class="container">
       <div class="q-mb-md text-center text-desktop-left">
-        <p class="text-bold text-h6 text-blue">65,458 ETH</p>
-        <p class="text-subtitle2 text-bold">1000 $</p>
+        <p class="text-bold text-h6 text-blue">
+          {{ numberConverter(currentToken?.balance, 2)
+          }}{{ currentToken?.symbol }}
+        </p>
+        <p
+          v-if="currentToken?.type === 'coin'"
+          class="text-subtitle2 text-bold"
+        >
+          {{ numberConverter(currentToken?.usdValue, 2) }} $
+        </p>
       </div>
 
       <div class="row justify-center q-mb-md">
@@ -11,7 +19,7 @@
           <q-icon name="north_east" />
           Send
         </a>
-        <a class="col btn btn--autoWidth">Receive</a>
+        <q-btn class="col btn btn--autoWidth" to="/receivecoins">Receive</q-btn>
       </div>
 
       <p class="text-subtitle2 text-bold q-mb-md">Transactions</p>
@@ -21,7 +29,7 @@
         v-bind:key="transactionsPerDay.timestamp"
       >
         <p class="text-caption text-grey-dark q-mb-sm">
-          {{ moment(timestamp).format("D MMM YYYY") }}
+          {{ moment(transactionsPerDay.timestamp).format("D MMM YYYY") }}
         </p>
         <q-list class="input input--borderDark q-mb-md" separator>
           <q-item v-for="tx in transactionsPerDay.txns" v-bind:key="tx">
@@ -36,85 +44,86 @@
               </q-item-label>
             </q-item-section>
             <q-item-section side top>
-              <q-item-label>{{ tx.amount }}&nbsp;{{ tx.coin }}</q-item-label>
+              <q-item-label
+                >{{ numberConverter(tx.amount, 2) }}&nbsp;{{
+                  tx.coin
+                }}</q-item-label
+              >
             </q-item-section>
           </q-item>
         </q-list>
       </div>
 
-      <a class="btn q-mb-sm">Full info on block explorer</a>
-      <a class="btn btn--transparent q-mb-lg">Close</a>
+      <q-btn
+        class="btn q-mb-sm"
+        :href="`https://etherscan.io/address/${wallet}`"
+        target="_blank"
+      >
+        Full info on block explorer
+      </q-btn>
+      <q-btn class="btn btn--transparent q-mb-lg" to="/accounts">Close</q-btn>
     </div>
   </main>
 </template>
 
 <script>
 import moment from "moment";
+import {
+  fetchEtherPrice,
+  getTokenBalance,
+  fetchTxHistory,
+} from "src/helper/ethers-interact";
+import { computed, onMounted, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { useStore } from "vuex";
+import { numberConverter } from "src/helper/formater";
 
 export default {
   name: "AccountDetails",
   setup() {
+    const router = useRouter();
+    const route = useRoute();
+    const store = useStore();
+    const wallet = ref("");
+    const currentToken = ref({});
+
+    const currentTokens = computed(
+      () => store.getters["account/getCurrentTokens"]
+    );
+    const currentWallet = computed(
+      () => store.getters["account/getCurrentWallet"]
+    );
+
+    const transactions = ref([]);
+
+    onMounted(async () => {
+      await router.isReady();
+      wallet.value = route.query.wallet;
+      const tokenAddress = route.query.token;
+      currentToken.value = currentTokens.value.find(
+        (item) => item.address.toLowerCase() === tokenAddress.toLowerCase()
+      );
+
+      const [balance, coinPrice, txHistory] = await Promise.all([
+        getTokenBalance(currentToken.value, wallet.value),
+        fetchEtherPrice(),
+        fetchTxHistory(currentToken.value, wallet.value),
+      ]);
+
+      currentToken.value.balance = balance / 10 ** currentToken.value.decimals;
+      currentToken.value.usdValue =
+        (balance * coinPrice) / 10 ** currentToken.value.decimals;
+
+      transactions.value = txHistory;
+      console.log(txHistory);
+    });
     return {
-      transactions: [
-        {
-          timestamp: "2022-03-30T14:21:23+00:00",
-          txns: [
-            {
-              type: "sent",
-              confirmed: true,
-              amount: 0.5,
-              coin: "ETH",
-            },
-            {
-              type: "received",
-              confirmed: true,
-              amount: 0.5,
-              coin: "ETH",
-            },
-            {
-              type: "received",
-              confirmed: false,
-              amount: 0.5,
-              coin: "ETH",
-            },
-          ],
-        },
-        {
-          timestamp: "2022-03-30T14:21:23+00:00",
-          txns: [
-            {
-              type: "sent",
-              confirmed: true,
-              amount: 0.5,
-              coin: "ETH",
-            },
-            {
-              type: "received",
-              confirmed: true,
-              amount: 0.5,
-              coin: "ETH",
-            },
-          ],
-        },
-        {
-          timestamp: "2022-03-30T14:21:23+00:00",
-          txns: [
-            {
-              type: "sent",
-              confirmed: true,
-              amount: 0.5,
-              coin: "ETH",
-            },
-            {
-              type: "received",
-              confirmed: true,
-              amount: 0.5,
-              coin: "ETH",
-            },
-          ],
-        },
-      ],
+      transactions,
+      wallet,
+      currentToken,
+      currentWallet,
       moment,
+      numberConverter,
     };
   },
 };

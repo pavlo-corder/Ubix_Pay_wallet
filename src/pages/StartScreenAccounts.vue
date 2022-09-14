@@ -146,38 +146,42 @@
             v-show="token.wallet"
             :key="token.symbol"
             class="q-pl-none"
-            :to="`/accountdetails?wallet=${currentWallet?.wallet}`"
           >
             <q-item-section side>
-              <q-avatar
-                rounded
-                size="56px"
-                color="blue-transparent"
-                text-color="blue-light"
+              <q-btn
+                class="q-pa-none"
+                :to="`/accountdetails?wallet=${currentWallet?.wallet}&token=${token?.address}`"
               >
-                <q-icon
-                  v-show="token.symbol === 'ETH'"
-                  name="img:https://cdn.cdnlogo.com/logos/e/39/ethereum.svg"
-                />
                 <q-avatar
-                  v-show="token.symbol === 'UBX'"
                   rounded
                   size="56px"
                   color="blue-transparent"
                   text-color="blue-light"
                 >
-                  U
-                </q-avatar>
-                <q-avatar
-                  v-show="token.symbol !== 'UBX' && token.symbol !== 'ETH'"
-                  rounded
-                  size="40px"
-                  color="blue-transparent"
-                  text-color="blue-light"
-                >
-                  {{ token.type === "erc20" ? "T" : "NFT" }}
-                </q-avatar>
-              </q-avatar>
+                  <q-icon
+                    v-show="token.symbol === 'ETH'"
+                    name="img:https://cdn.cdnlogo.com/logos/e/39/ethereum.svg"
+                  />
+                  <q-avatar
+                    v-show="token.symbol === 'UBX'"
+                    rounded
+                    size="56px"
+                    color="blue-transparent"
+                    text-color="blue-light"
+                  >
+                    U
+                  </q-avatar>
+                  <q-avatar
+                    v-show="token.symbol !== 'UBX' && token.symbol !== 'ETH'"
+                    rounded
+                    size="40px"
+                    color="blue-transparent"
+                    text-color="blue-light"
+                  >
+                    {{ token.type === "erc20" ? "T" : "NFT" }}
+                  </q-avatar>
+                </q-avatar></q-btn
+              >
             </q-item-section>
             <q-item-section>
               <q-item-label caption>Balance:</q-item-label>
@@ -196,7 +200,7 @@
                 round
                 unelevated
                 color="grey-gradient"
-                @click="clickTrashToken(token.address)"
+                @click="(e) => clickTrashToken(e, token.address)"
                 text-color="dark"
                 :icon="matDeleteForever"
               />
@@ -357,7 +361,8 @@ export default {
     };
 
     const selectedToken = ref("");
-    const clickTrashToken = (address) => {
+    const clickTrashToken = (e, address) => {
+      e.stopPropagation();
       removeTokenModal.value.visible = true;
       selectedToken.value = address;
     };
