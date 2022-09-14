@@ -46,6 +46,7 @@
               class="input input--borderDark"
               type="number"
               :max="tokenBalance"
+              :min="0"
               v-model="amountCoin"
               @update:model-value="onChangeAmount"
             />
@@ -166,8 +167,8 @@ export default {
     );
 
     const onChangeAmount = (coin) => {
-      if (coin.length === 0) amountCoin.value = 0;
-      amountCoin.value = coin;
+      if (coin.length === 0 || coin <= 0) amountCoin.value = 0;
+      else amountCoin.value = parseInt(coin);
       amountDollar.value = (amountCoin.value * coinPrice.value).toFixed(3);
     };
 

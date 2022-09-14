@@ -31,6 +31,11 @@ const mainnet_provider = new ethers.providers.JsonRpcProvider(
   CURRNET_NETWORK.RPC_URL
 );
 
+const etherscan_provider = new ethers.providers.EtherscanProvider(
+  "homestead",
+  "38KX1UJJKQINF8TUBAVS5ZVDSFI61KSJ1B"
+);
+
 export const validationPhrase = (wordList) => {
   return ethers.utils.isValidMnemonic(wordList.join(" "));
 };

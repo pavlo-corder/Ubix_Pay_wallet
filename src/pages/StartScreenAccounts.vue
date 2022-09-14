@@ -134,9 +134,9 @@
         </q-input>
 
         <div class="row q-my-sm q-gutter-sm">
-          <a class="btn col" @click="sendTransaction">Send</a>
-          <a class="btn col" @click="showNotifNegative">Receive</a>
-          <a class="btn col" @click="showNotifInfo">Link</a>
+          <q-btn class="btn col" @click="sendTransaction">Send</q-btn>
+          <q-btn class="btn col" to="/receivecoins">Receive</q-btn>
+          <q-btn class="btn col" @click="showNotifInfo">Link</q-btn>
         </div>
 
         <!-- tokenList list -->
@@ -146,6 +146,7 @@
             v-show="token.wallet"
             :key="token.symbol"
             class="q-pl-none"
+            :to="`/accountdetails?wallet=${currentWallet?.wallet}`"
           >
             <q-item-section side>
               <q-avatar
@@ -319,15 +320,6 @@ export default {
       });
     }
 
-    function showNotifNegative() {
-      showNotifWarning();
-      quasar.notify({
-        message:
-          'Transaction status: <span class="notification__msg notification__msg--negative">fail</span>',
-        html: true,
-      });
-    }
-
     function showNotifWarning() {
       quasar.notify({
         message:
@@ -390,7 +382,6 @@ export default {
       createAccount,
       importToken,
       showNotifPositive,
-      showNotifNegative,
       showNotifWarning,
       showNotifInfo,
       selectAccount,
