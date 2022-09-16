@@ -21,7 +21,7 @@ module.exports = configure(function (ctx) {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     // https://quasar.dev/quasar-cli/boot-files
-    boot: ['global-event-bus'],
+    boot: ["global-event-bus"],
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
     css: ["app.sass"],
@@ -45,9 +45,7 @@ module.exports = configure(function (ctx) {
       vueRouterMode: "history", // available values: 'hash', 'history'
 
       env: {
-        API: ctx.dev
-          ? 'http://localhost:3000'
-          : 'http://devp.ubix.network'
+        API: ctx.dev ? "http://localhost:3000" : "http://devp.ubix.network",
       },
 
       // transpile: false,
@@ -70,6 +68,8 @@ module.exports = configure(function (ctx) {
       // https://quasar.dev/quasar-cli/handling-webpack
       // "chain" is a webpack-chain object https://github.com/neutrinojs/webpack-chain
       chainWebpack(chain) {
+        const nodePolyfillWebpackPlugin = require("node-polyfill-webpack-plugin");
+        chain.plugin("node-polyfill").use(nodePolyfillWebpackPlugin);
         chain
           .plugin("eslint-webpack-plugin")
           .use(ESLintPlugin, [{ extensions: ["js", "vue"] }]);
@@ -89,21 +89,22 @@ module.exports = configure(function (ctx) {
     framework: {
       config: {
         notify: {
-          color: 'white',
-          textColor: 'black',
+          color: "white",
+          textColor: "black",
           closeBtn: true,
-          classes: 'notification'
+          classes: "notification",
         },
         capacitor: {
           // Quasar handles app exit on mobile phone back button.
-          backButtonExit: true/false/'*'/['/send', '/accounts', '/my-page'],
+          backButtonExit:
+            true / false / "*" / ["/send", "/accounts", "/my-page"],
 
           // On the other hand, the following completely
           // disables Quasar's back button management.
-          backButton: true/false
-        }
+          backButton: true / false,
+        },
       },
-      components: ['QToggle'],
+      components: ["QToggle"],
 
       // iconSet: 'material-icons', // Quasar icon set
       // lang: 'en-US', // Quasar language pack
@@ -116,7 +117,7 @@ module.exports = configure(function (ctx) {
       // directives: [],
 
       // Quasar plugins
-      plugins: ['Dialog', 'Notify'],
+      plugins: ["Dialog", "Notify"],
     },
 
     // animations: 'all', // --- includes all animations

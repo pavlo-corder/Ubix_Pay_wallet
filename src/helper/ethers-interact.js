@@ -4,6 +4,11 @@ import { Wallet, ethers } from "ethers";
 import ERC20_ABI from "./abis/ERC20_ABI.json";
 import ERC721_ABI from "./abis/ERC721_ABI.json";
 import { NULL_ADDRESS } from "./constants";
+import {
+  getPublic,
+  keyPairFromPrivate,
+  ubxAddressFromPublicKey,
+} from "./utils";
 
 const MAINNET = {
   RPC_URL: "https://rpc.ankr.com/eth",
@@ -101,14 +106,21 @@ export const validationPhrase = (wordList) => {
   return ethers.utils.isValidMnemonic(wordList.join(" "));
 };
 
-export const createWalletFromMnenomic = (wordList, index = 0) => {
+export const createWalletFromMnenomic = (wordList, index = 0, pathId = 60) => {
   const recoveredSigner = Wallet.fromMnemonic(
     wordList.join(" "),
-    `m/44'/60'/0'/0/${index}`
+    `m/44'/${pathId}'/0'/0/${index}`
   );
   const name_wallet = `Wallet ${index + 1}`;
-  const privateKey = recoveredSigner._signingKey().privateKey;
-  const address = recoveredSigner.address;
+  let privateKey = recoveredSigner._signingKey().privateKey;
+  let address = recoveredSigner.address;
+  // if wallet mode is not for EVM
+  if (pathId !== 60) {
+    privateKey = privateKey.slice(2);
+
+    const keyPair = keyPairFromPrivate(privateKey);
+    address = `Ux${ubxAddressFromPublicKey(getPublic(keyPair, true))}`;
+  }
   return {
     label: name_wallet,
     name: name_wallet,
@@ -126,6 +138,7 @@ export const getEtherBalance = async (address) => {
 };
 
 export const getTokenBalance = async (token, address) => {
+  if (address === undefined || address === null) return 0;
   if (token.type === "coin") return await mainnet_provider.getBalance(address);
   else {
     try {
