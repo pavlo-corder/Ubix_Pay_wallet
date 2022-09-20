@@ -4,6 +4,7 @@ import { Wallet, ethers } from "ethers";
 import ERC20_ABI from "./abis/ERC20_ABI.json";
 import ERC721_ABI from "./abis/ERC721_ABI.json";
 import { NULL_ADDRESS } from "./constants";
+import { getUbikiriBalanceApi } from "./ubx-interact";
 import {
   getPublic,
   keyPairFromPrivate,
@@ -138,6 +139,7 @@ export const getEtherBalance = async (address) => {
 };
 
 export const getTokenBalance = async (token, address) => {
+  if (token.symbol === "UBX") return await getUbikiriBalanceApi(address);
   if (address === undefined || address === null) return 0;
   if (token.type === "coin") return await mainnet_provider.getBalance(address);
   else {
@@ -155,11 +157,22 @@ export const getTokenBalance = async (token, address) => {
   }
 };
 
-export const getFeeData = async () => {
+export const getFeeData = async (label = "ETH") => {
+  // console.log(label);
+  if (label === "UBX") return { maxFeePerGas: 1 };
   return await mainnet_provider.getFeeData();
 };
 
-export const getEstimatedGas = async (tokenAddress, walletObj, to, amount) => {
+export const getEstimatedGas = async (
+  tokenAddress,
+  walletObj,
+  to,
+  amount,
+  label = "ETH"
+) => {
+  if (label === "UBX") {
+    return 1500;
+  }
   const signer = new Wallet(walletObj?.privateKey, mainnet_provider);
   if (tokenAddress === NULL_ADDRESS) {
     return 21000;
@@ -173,7 +186,26 @@ export const getEstimatedGas = async (tokenAddress, walletObj, to, amount) => {
   }
 };
 
-export const fetchEtherPrice = async () => {
+export const fetchEtherPrice = async (label = "ETH") => {
+  if (label === "UBX") {
+    let [response, ethPrice] = await Promise.all([
+      axios.post(
+        "https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2",
+        {
+          query:
+            '{ token(id: "0xf5b5efc906513b4344ebabcf47a04901f99f09f3") { derivedETH } }',
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      ),
+      fetchEtherPrice(),
+    ]);
+    response = await response.data;
+    return response.data.token.derivedETH * ethPrice;
+  }
   let response = await axios.get(
     "https://api.etherscan.io/api?module=stats&action=ethprice&apikey=99C33Z32KHVZGRVCPXGF6CGJWZBACU6AUB"
   );

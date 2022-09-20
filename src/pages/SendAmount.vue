@@ -1,6 +1,7 @@
 <template>
   <main class="q-pt-md">
     <div class="container">
+      {{ currentWallet }}
       <q-form>
         <div class="row justify-between items-center q-mb-md q-gutter-sm">
           <div class="col-6">
@@ -100,7 +101,7 @@ export default {
     const router = useRouter();
 
     const feeData = ref({});
-    const coinPrice = ref(1);
+    const coinPrice = ref(0);
     const amountCoin = ref(0);
     const amountDollar = ref(0);
 
@@ -147,7 +148,10 @@ export default {
       token.value = route.query.token;
 
       fetchBalance();
-      coinPrice.value = await fetchEtherPrice();
+
+      coinPrice.value = await fetchEtherPrice("UBX");
+
+      if (currentBlockchain.value.label === "UBX") return;
       feeData.value = await getFeeData();
       intervalId.value = setInterval(async () => {
         coinPrice.value = await fetchEtherPrice();
@@ -178,6 +182,11 @@ export default {
     };
 
     const onClickMax = () => {
+      if (currentBlockchain.value.label === "UBX") {
+        amountCoin.value = (tokenBalance.value - 1500).toFixed(4);
+        onChangeAmount(amountCoin.value);
+        return;
+      }
       if (feeData.value.maxFeePerGas) {
         if (currentToken.value.type === "coin") {
           const estimatedTxFee = feeData.value.maxFeePerGas * 21000;

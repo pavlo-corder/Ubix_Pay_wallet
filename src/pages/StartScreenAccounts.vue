@@ -301,12 +301,8 @@ export default {
     const updateCurrentBlockchain = (val) =>
       store.commit("account/updateCurrentBlockchain", val);
     const updateWallets = (val) => store.commit("account/updateWallets", val);
-
-    onMounted(async () => {
-      setData();
-      model_blockchain.value =
-        currentBlockchain.value || blockchainsList.value[0];
-      model_wallet.value = currentWallet.value;
+    const refreshTokenList = () => {
+      tokenList.value = [];
       tokenList.value = tokenList.value.concat(
         currentTokens.value
           .map((token) => {
@@ -318,6 +314,13 @@ export default {
           })
           .filter((token) => token.symbol !== "")
       );
+    };
+    onMounted(async () => {
+      setData();
+      model_blockchain.value =
+        currentBlockchain.value || blockchainsList.value[0];
+      model_wallet.value = currentWallet.value;
+      refreshTokenList();
       fetchBalance();
     });
 
@@ -444,11 +447,14 @@ export default {
     };
 
     const fetchBalance = async () => {
+      console.log(tokenList.value);
       const balances = await Promise.all(
         tokenList.value.map((token) =>
           getTokenBalance(token, model_wallet.value.value)
         )
       );
+
+      console.log(balances);
 
       tokenList.value.map((token, index) => {
         token.balance = balances[index] / 10 ** token.decimals;
@@ -466,6 +472,7 @@ export default {
 
       updateCurrentBlockchain(blockchain);
       updateCurrentWallet(model_wallet.value);
+      refreshTokenList();
       setData();
       fetchBalance();
     };
