@@ -69,6 +69,7 @@
             v-model="model_blockchain"
             filled
             :options="blockchainsList"
+            :display-value="model_blockchain?.label"
             @update:model-value="changeBlockchain"
             behavior="menu"
             class="input input--borderDark col-auto"
@@ -78,6 +79,7 @@
             v-model="model_wallet"
             filled
             :options="walletsList"
+            :display-value="model_wallet?.label"
             @update:model-value="changeWallet"
             behavior="menu"
             class="input input--borderDark col-grow"
@@ -134,9 +136,9 @@
         </q-input>
 
         <div class="row q-my-sm q-gutter-sm">
-          <a class="btn col" @click="sendTransaction">Send</a>
-          <a class="btn col" @click="showNotifNegative">Receive</a>
-          <a class="btn col" @click="showNotifInfo">Link</a>
+          <q-btn class="btn col" @click="sendTransaction">Send</q-btn>
+          <q-btn class="btn col" to="/receivecoins">Receive</q-btn>
+          <q-btn class="btn col" @click="showNotifInfo">Link</q-btn>
         </div>
 
         <!-- tokenList list -->
@@ -148,35 +150,40 @@
             class="q-pl-none"
           >
             <q-item-section side>
-              <q-avatar
-                rounded
-                size="56px"
-                color="blue-transparent"
-                text-color="blue-light"
+              <q-btn
+                class="q-pa-none"
+                :to="`/accountdetails?wallet=${currentWallet?.wallet}&token=${token?.address}`"
               >
-                <q-icon
-                  v-show="token.symbol === 'ETH'"
-                  name="img:https://cdn.cdnlogo.com/logos/e/39/ethereum.svg"
-                />
                 <q-avatar
-                  v-show="token.symbol === 'UBX'"
                   rounded
                   size="56px"
                   color="blue-transparent"
                   text-color="blue-light"
                 >
-                  U
-                </q-avatar>
-                <q-avatar
-                  v-show="token.symbol !== 'UBX' && token.symbol !== 'ETH'"
-                  rounded
-                  size="40px"
-                  color="blue-transparent"
-                  text-color="blue-light"
-                >
-                  {{ token.type === "erc20" ? "T" : "NFT" }}
-                </q-avatar>
-              </q-avatar>
+                  <q-icon
+                    v-show="token.symbol === 'ETH'"
+                    name="img:https://cdn.cdnlogo.com/logos/e/39/ethereum.svg"
+                  />
+                  <q-avatar
+                    v-show="token.symbol === 'UBX'"
+                    rounded
+                    size="56px"
+                    color="blue-transparent"
+                    text-color="blue-light"
+                  >
+                    U
+                  </q-avatar>
+                  <q-avatar
+                    v-show="token.symbol !== 'UBX' && token.symbol !== 'ETH'"
+                    rounded
+                    size="40px"
+                    color="blue-transparent"
+                    text-color="blue-light"
+                  >
+                    {{ token.type === "erc20" ? "T" : "NFT" }}
+                  </q-avatar>
+                </q-avatar></q-btn
+              >
             </q-item-section>
             <q-item-section>
               <q-item-label caption>Balance:</q-item-label>
@@ -195,7 +202,7 @@
                 round
                 unelevated
                 color="grey-gradient"
-                @click="clickTrashToken(token.address)"
+                @click="(e) => clickTrashToken(e, token.address)"
                 text-color="dark"
                 :icon="matDeleteForever"
               />
@@ -243,7 +250,6 @@ import {
   getTokenBalance,
 } from "src/helper/ethers-interact";
 import { useRouter } from "vue-router";
-import { loadAccountWithEncryption } from "src/store/account";
 
 export default {
   name: "Accounts",
@@ -265,11 +271,38 @@ export default {
     const currentWallet = computed(
       () => store.getters["account/getCurrentWallet"]
     );
+    const account = computed(() => store.getters["account/getCurrentAccount"]);
+
     const currentTokens = computed(
       () => store.getters["account/getCurrentTokens"]
     );
+    const accounts = computed(() => store.getters["account/getAccounts"]);
+    const model_blockchain = ref({});
 
-    onMounted(async () => {
+    const model_wallet = ref({});
+
+    const blockchainsList = computed(
+      () => store.getters["account/getBlockchains"]
+    );
+
+    const walletsList = computed(
+      () => store.getters["account/getCurrentWallets"]
+    );
+    const currentBlockchain = computed(
+      () => store.getters["account/getCurrentBlockchain"]
+    );
+    const model_wallet_to = ref("");
+
+    const carouselOptions = ref([]);
+
+    const updateAccount = (val) => store.commit("account/update", val);
+    const updateCurrentWallet = (val) =>
+      store.commit("account/updateCurrentWallet", val);
+    const updateCurrentBlockchain = (val) =>
+      store.commit("account/updateCurrentBlockchain", val);
+    const updateWallets = (val) => store.commit("account/updateWallets", val);
+    const refreshTokenList = () => {
+      tokenList.value = [];
       tokenList.value = tokenList.value.concat(
         currentTokens.value
           .map((token) => {
@@ -281,13 +314,21 @@ export default {
           })
           .filter((token) => token.symbol !== "")
       );
+    };
+    onMounted(async () => {
+      setData();
+      model_blockchain.value =
+        currentBlockchain.value || blockchainsList.value[0];
+      model_wallet.value = currentWallet.value;
+      refreshTokenList();
+      fetchBalance();
     });
 
-    function editAccount(key) {
+    const editAccount = (key) => {
       router.push("/setupperson");
-    }
+    };
 
-    function createAccount() {
+    const createAccount = () => {
       quasar
         .dialog({
           component: AddAccount,
@@ -299,9 +340,9 @@ export default {
           console.log("Cancel");
         })
         .onDismiss(() => {});
-    }
+    };
 
-    function importToken() {
+    const importToken = () => {
       quasar
         .dialog({
           component: ImportToken,
@@ -309,42 +350,33 @@ export default {
         .onOk(() => {})
         .onCancel(() => {})
         .onDismiss(() => {});
-    }
+    };
 
-    function showNotifPositive() {
+    const showNotifPositive = () => {
       quasar.notify({
         message:
           'Transaction status: <span class="notification__msg notification__msg--positive">success</span>',
         html: true,
       });
-    }
+    };
 
-    function showNotifNegative() {
-      showNotifWarning();
-      quasar.notify({
-        message:
-          'Transaction status: <span class="notification__msg notification__msg--negative">fail</span>',
-        html: true,
-      });
-    }
-
-    function showNotifWarning() {
+    const showNotifWarning = () => {
       quasar.notify({
         message:
           'Transaction status: <span class="notification__msg notification__msg--warning">warning</span>',
         html: true,
       });
-    }
+    };
 
-    function showNotifInfo() {
+    const showNotifInfo = () => {
       quasar.notify({
         message:
           'Transaction status: <span class="notification__msg notification__msg--info">info</span>',
         html: true,
       });
-    }
+    };
 
-    function selectAccount() {
+    const selectAccount = () => {
       quasar
         .dialog({
           component: SelectAccount,
@@ -352,7 +384,7 @@ export default {
         .onOk(() => {})
         .onCancel(() => {})
         .onDismiss(() => {});
-    }
+    };
 
     const showWallet = () => {
       router.push({
@@ -365,7 +397,8 @@ export default {
     };
 
     const selectedToken = ref("");
-    const clickTrashToken = (address) => {
+    const clickTrashToken = (e, address) => {
+      e.stopPropagation();
       removeTokenModal.value.visible = true;
       selectedToken.value = address;
     };
@@ -378,19 +411,97 @@ export default {
       window.location.reload();
     };
 
+    const setData = () => {
+      carouselOptions.value = [];
+      accounts.value.map((item, key) => {
+        if (accounts.value.length > 1) {
+          carouselOptions.value.push({
+            label: "",
+            value: key,
+          });
+        }
+      });
+    };
+
+    const createWallet = () => {
+      let count_wallets = walletsList.value.length;
+
+      // return;
+      const createdWallet = createWalletFromMnenomic(
+        account.value.phrase,
+        count_wallets,
+        model_blockchain.value.value
+      );
+
+      blockchainsList.value.map((item) => {
+        if (item.label === model_blockchain.value.label) {
+          updateWallets(createdWallet);
+        }
+      });
+      updateCurrentWallet(createdWallet);
+      model_wallet.value = createdWallet;
+
+      model_blockchain.value = currentBlockchain.value;
+      setData();
+      fetchBalance();
+    };
+
+    const fetchBalance = async () => {
+      console.log(tokenList.value);
+      const balances = await Promise.all(
+        tokenList.value.map((token) =>
+          getTokenBalance(token, model_wallet.value.value)
+        )
+      );
+
+      console.log(balances);
+
+      tokenList.value.map((token, index) => {
+        token.balance = balances[index] / 10 ** token.decimals;
+      });
+    };
+
+    const changeWallet = (wallet) => {
+      model_wallet.value = wallet;
+      updateCurrentWallet(wallet);
+      fetchBalance();
+    };
+    const changeBlockchain = (blockchain) => {
+      model_blockchain.value = blockchain;
+      model_wallet.value = blockchain.wallets[0];
+
+      updateCurrentBlockchain(blockchain);
+      updateCurrentWallet(model_wallet.value);
+      refreshTokenList();
+      setData();
+      fetchBalance();
+    };
+
+    const sendTransaction = () => {
+      router.push({
+        path: "/send",
+        query: { to: model_wallet_to.value },
+      });
+    };
+
     return {
       currency: ref("ETH"),
       carousel: 0,
       carouselOptions: [],
 
+      blockchainsList,
+      walletsList,
       tokenList,
       currentWallet,
+
+      model_wallet_to,
+      model_wallet,
+      model_blockchain,
 
       editAccount,
       createAccount,
       importToken,
       showNotifPositive,
-      showNotifNegative,
       showNotifWarning,
       showNotifInfo,
       selectAccount,
@@ -403,129 +514,15 @@ export default {
 
       getElipseText,
 
-      account: store.state.account.account,
-      updateAccount: (val) => store.commit("account/update", val),
-      updateCurrentWallet: (val) =>
-        store.commit("account/updateCurrentWallet", val),
-      updateCurrentBlockchain: (val) =>
-        store.commit("account/updateCurrentBlockchain", val),
-      updateWallets: (val) => store.commit("account/updateWallets", val),
+      account,
 
       matDeleteForever,
+
+      createWallet,
+      changeWallet,
+      changeBlockchain,
+      sendTransaction,
     };
-  },
-  data() {
-    return {
-      accounts: [],
-      model_blockchain: {},
-      model_wallet: {},
-
-      blockchainsList: [],
-      walletsList: [],
-      model_wallet_to: "",
-    };
-  },
-  methods: {
-    async fetchBalance() {
-      const balances = await Promise.all(
-        this.tokenList.map((token) =>
-          getTokenBalance(token, this.model_wallet.value)
-        )
-      );
-
-      this.tokenList.map((token, index) => {
-        token.balance = balances[index] / 10 ** token.decimals;
-      });
-    },
-    createWallet() {
-      let count_wallets = this.model_blockchain.wallets.length;
-
-      const createdWallet = createWalletFromMnenomic(
-        this.account.phrase,
-        count_wallets
-      );
-      let account = { ...this.account };
-      let blockchains = [...this.account.blockchains];
-
-      blockchains.map((item) => {
-        if (item.label === this.model_blockchain.label) {
-          this.updateWallets(createdWallet);
-        }
-      });
-      this.updateCurrentWallet(createdWallet);
-      this.model_wallet = createdWallet;
-      this.setData();
-      this.fetchBalance();
-    },
-    changeWallet(wallet) {
-      this.model_wallet = wallet;
-      this.updateCurrentWallet(wallet);
-      this.fetchBalance();
-    },
-    changeBlockchain(blockchain) {
-      this.model_blockchain = blockchain;
-      this.updateCurrentBlockchain(blockchain);
-      this.setData();
-      this.fetchBalance();
-    },
-    phraseToString(phrase) {
-      let string = "";
-      phrase.map((item, key) => {
-        if (key === 0) {
-          string += `${item}`;
-        } else {
-          string += ` ${item}`;
-        }
-      });
-      return string;
-    },
-    setData() {
-      this.accounts = [];
-
-      this.carouselOptions = [];
-      this.walletsList = [];
-
-      this.model_blockchain = {};
-      this.model_wallet = {};
-
-      this.accounts = loadAccountWithEncryption();
-
-      let account = { ...this.account };
-
-      this.accounts.map((item, key) => {
-        if (this.accounts.length > 1) {
-          this.carouselOptions.push({
-            label: "",
-            value: key,
-          });
-        }
-      });
-
-      this.blockchainsList = account.blockchains;
-      this.model_blockchain = account.blockchains[0];
-
-      this.walletsList = this.model_blockchain.wallets;
-      this.model_wallet = this.account.current_wallet;
-    },
-    sendTransaction() {
-      this.$router.push({
-        path: "/send",
-        query: { to: this.model_wallet_to },
-      });
-    },
-    setTransactionNumberWallet() {
-      let account = { ...this.account };
-      this.updateAccount(account);
-    },
-  },
-  mounted() {
-    this.$global.$on("ACCOUNT_UPDATE", (data) => {
-      if (data) {
-        this.setData();
-      }
-    });
-    this.setData();
-    this.fetchBalance();
   },
 };
 </script>

@@ -4,6 +4,12 @@ import { Wallet, ethers } from "ethers";
 import ERC20_ABI from "./abis/ERC20_ABI.json";
 import ERC721_ABI from "./abis/ERC721_ABI.json";
 import { NULL_ADDRESS } from "./constants";
+import { getUbikiriBalanceApi } from "./ubx-interact";
+import {
+  getPublic,
+  keyPairFromPrivate,
+  ubxAddressFromPublicKey,
+} from "./utils";
 
 const MAINNET = {
   RPC_URL: "https://rpc.ankr.com/eth",
@@ -31,18 +37,91 @@ const mainnet_provider = new ethers.providers.JsonRpcProvider(
   CURRNET_NETWORK.RPC_URL
 );
 
+const etherscan_provider = new ethers.providers.EtherscanProvider(
+  "homestead",
+  "38KX1UJJKQINF8TUBAVS5ZVDSFI61KSJ1B"
+);
+
+export const fetchTxHistory = async (token, address) => {
+  address = address.toLowerCase();
+  let response = [];
+  if (token.type === "coin") {
+    response = await axios.get(
+      `https://api.etherscan.io/api?module=account&action=txlist&page=1&address=${address}&sort=desc&apikey=38KX1UJJKQINF8TUBAVS5ZVDSFI61KSJ1B`
+    );
+
+    response = await response.data;
+    response = response?.result;
+    response = response.filter((item) => item.input == "0x");
+
+    response = response.map((item) => {
+      return {
+        type: item.to === address ? "received" : "sent",
+        confirmed: item.txreceipt_status == 1,
+        coin: token.symbol,
+        amount: item.value / 10 ** token.decimals,
+        timestamp: new Date(
+          parseInt(item.timeStamp) * 1000
+        ).toLocaleDateString(),
+      };
+    });
+    const _dateSet = Array(...new Set(response.map((item) => item.timestamp)));
+    response = _dateSet.map((date) => {
+      return {
+        timestamp: date,
+        txns: response.filter((item) => item.timestamp === date),
+      };
+    });
+  } else {
+    response = await axios.get(
+      `https://api.etherscan.io/api?module=account&action=tokentx&contractaddress=${token.address}&address=${address}&page=1&sort=desc&apikey=38KX1UJJKQINF8TUBAVS5ZVDSFI61KSJ1B`
+    );
+    response = await response.data;
+    response = response.result;
+
+    response = response.map((item) => {
+      return {
+        type: item.to === address ? "received" : "sent",
+        confirmed: true,
+        coin: token.symbol,
+        amount: item.value / 10 ** token.decimals,
+        timestamp: new Date(
+          parseInt(item.timeStamp) * 1000
+        ).toLocaleDateString(),
+      };
+    });
+    const _dateSet = Array(...new Set(response.map((item) => item.timestamp)));
+    response = _dateSet.map((date) => {
+      return {
+        timestamp: date,
+        txns: response.filter((item) => item.timestamp === date),
+      };
+    });
+    console.log(response);
+  }
+
+  return response;
+};
+
 export const validationPhrase = (wordList) => {
   return ethers.utils.isValidMnemonic(wordList.join(" "));
 };
 
-export const createWalletFromMnenomic = (wordList, index = 0) => {
+export const createWalletFromMnenomic = (wordList, index = 0, pathId = 60) => {
   const recoveredSigner = Wallet.fromMnemonic(
     wordList.join(" "),
-    `m/44'/60'/0'/0/${index}`
+    `m/44'/${pathId}'/0'/0/${index}`
   );
   const name_wallet = `Wallet ${index + 1}`;
-  const privateKey = recoveredSigner._signingKey().privateKey;
-  const address = recoveredSigner.address;
+  let privateKey = recoveredSigner._signingKey().privateKey;
+  let address = recoveredSigner.address;
+  // if wallet mode is not for EVM
+  if (pathId !== 60) {
+    privateKey = privateKey.slice(2);
+
+    const keyPair = keyPairFromPrivate(privateKey);
+    address = `Ux${ubxAddressFromPublicKey(getPublic(keyPair, true))}`;
+  }
   return {
     label: name_wallet,
     name: name_wallet,
@@ -60,6 +139,8 @@ export const getEtherBalance = async (address) => {
 };
 
 export const getTokenBalance = async (token, address) => {
+  if (token.symbol === "UBX") return await getUbikiriBalanceApi(address);
+  if (address === undefined || address === null) return 0;
   if (token.type === "coin") return await mainnet_provider.getBalance(address);
   else {
     try {
@@ -76,11 +157,22 @@ export const getTokenBalance = async (token, address) => {
   }
 };
 
-export const getFeeData = async () => {
+export const getFeeData = async (label = "ETH") => {
+  // console.log(label);
+  if (label === "UBX") return { maxFeePerGas: 1 };
   return await mainnet_provider.getFeeData();
 };
 
-export const getEstimatedGas = async (tokenAddress, walletObj, to, amount) => {
+export const getEstimatedGas = async (
+  tokenAddress,
+  walletObj,
+  to,
+  amount,
+  label = "ETH"
+) => {
+  if (label === "UBX") {
+    return 1500;
+  }
   const signer = new Wallet(walletObj?.privateKey, mainnet_provider);
   if (tokenAddress === NULL_ADDRESS) {
     return 21000;
@@ -94,7 +186,26 @@ export const getEstimatedGas = async (tokenAddress, walletObj, to, amount) => {
   }
 };
 
-export const fetchEtherPrice = async () => {
+export const fetchEtherPrice = async (label = "ETH") => {
+  if (label === "UBX") {
+    let [response, ethPrice] = await Promise.all([
+      axios.post(
+        "https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2",
+        {
+          query:
+            '{ token(id: "0xf5b5efc906513b4344ebabcf47a04901f99f09f3") { derivedETH } }',
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      ),
+      fetchEtherPrice(),
+    ]);
+    response = await response.data;
+    return response.data.token.derivedETH * ethPrice;
+  }
   let response = await axios.get(
     "https://api.etherscan.io/api?module=stats&action=ethprice&apikey=99C33Z32KHVZGRVCPXGF6CGJWZBACU6AUB"
   );

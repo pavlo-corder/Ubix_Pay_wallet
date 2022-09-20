@@ -4,7 +4,9 @@
       <div class="q-mb-md text-center text-desktop-left">
         <p class="text-h6 text-bold q-mb-sm">Receive ETH</p>
         <p class="text-subtitle2">ETH Deposit Address:</p>
-        <p class="text-bold text-h6 text-blue text-wrap">0x8146ac15542B470770D49Bbd3402741d6febF62F</p>
+        <p class="text-bold text-h6 text-blue text-wrap">
+          {{ currentWallet?.wallet }}
+        </p>
       </div>
 
       <div class="row justify-center flex-desktop-left q-mb-md q-gutter-md">
@@ -14,71 +16,65 @@
           flat
           icon="content_copy"
           class="bg-white text-primary"
-          @click="() => copy('something')"/>
+          @click="() => copy(currentWallet?.wallet)"
+        />
         <q-btn
           size="12px"
           round
           flat
           :icon="matIosShare"
-          class="bg-white text-primary"/>
+          class="bg-white text-primary"
+        />
       </div>
 
       <div class="row justify-center flex-desktop-left q-mb-lg">
         <div class="text-center bg-white q-pa-md">
           <qrcode-vue
-            :value="'0x8146ac15542B470770D49Bbd3402741d6febF62F'"
+            :value="currentWallet?.wallet"
             :size="140"
-            render-as="svg"/>
+            render-as="svg"
+          />
         </div>
       </div>
 
       <a class="btn btn--primary q-mb-sm">Request payment</a>
       <a class="btn q-mb-sm">Save as image</a>
 
-      <a class="btn btn--transparent q-mb-lg">Close</a>
-
+      <q-btn class="btn btn--transparent q-mb-lg" to="/">Close</q-btn>
     </div>
   </main>
 </template>
 
 <script>
-  import {matIosShare} from '@quasar/extras/material-icons'
-  import {copyToClipboard, useQuasar} from "quasar";
-  import QrcodeVue from 'qrcode.vue'
+import { matIosShare } from "@quasar/extras/material-icons";
+import { copyToClipboard, useQuasar } from "quasar";
+import QrcodeVue from "qrcode.vue";
+import { useStore } from "vuex";
+import { computed } from "vue";
 
-  export default {
-    name: "ReceiveCoins",
-    components: {QrcodeVue},
-    created() {
-      this.matIosShare = matIosShare
-    },
-    setup() {
-      const $q = useQuasar()
+export default {
+  name: "ReceiveCoins",
+  components: { QrcodeVue },
+  setup() {
+    const quasar = useQuasar();
+    const store = useStore();
 
-      function copy(text) {
-        copyToClipboard(text)
-        $q.notify({
-          message: 'Copied to clipboard!'
-        })
-      }
+    const currentWallet = computed(
+      () => store.getters["account/getCurrentWallet"]
+    );
 
-      return {
-        identifiers: [
-          {
-            socialNetwork: 'telegram',
-            id: '@telegram_acc'
-          },
-          {
-            socialNetwork: 'instagram',
-            id: '@insta_acc'
-          },
-          {
-            socialNetwork: 'twitter',
-            id: '@twitter_acc'
-          }
-        ],
-        copy
-      }
+    function copy(text) {
+      copyToClipboard(text);
+      quasar.notify({
+        message: "Copied to clipboard!",
+      });
     }
-  }
+
+    return {
+      matIosShare,
+      copy,
+      currentWallet,
+    };
+  },
+};
 </script>

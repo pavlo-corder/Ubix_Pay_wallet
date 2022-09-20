@@ -11,7 +11,7 @@
           v-model="currentWallet"
           :label="currentWallet.name"
           :options="walletOptions"
-          :display-value="`Balance: ${currentWallet.balance}`"
+          :display-value="`Balance: ${tokenBalance} ${currentToken?.symbol}`"
         >
           <template v-slot:option="scope">
             <q-item v-bind="scope.itemProps">
@@ -87,30 +87,34 @@
                 Estimated gas fee (?) ${{
                   (
                     (feeData?.maxFeePerGas * estimatedGas * coinPrice) /
-                    10 ** 18
+                    10 ** currentToken?.decimals
                   ).toFixed(3)
                 }}
                 {{
-                  ((feeData?.maxFeePerGas * estimatedGas) / 10 ** 18).toFixed(4)
+                  (
+                    (feeData?.maxFeePerGas * estimatedGas) /
+                    10 ** currentToken?.decimals
+                  ).toFixed(4)
                 }}
-                ETH
+                {{ currentBlockchain.label }}
               </q-item-label>
               <q-item-label caption class="q-mb-sm text-grey">
                 Max fee:
                 {{
                   (
                     (feeData?.maxFeePerGas * estimatedGas * 2) /
-                    10 ** 18
+                    10 ** currentToken?.decimals
                   ).toFixed(4)
                 }}
-                ETH
+                {{ currentBlockchain.label }}
               </q-item-label>
               <q-item-label class="text-body2">Total:</q-item-label>
               <q-item-label class="text-body2">
                 ${{
                   (
                     (parseFloat(
-                      (feeData?.maxFeePerGas * estimatedGas) / 10 ** 18
+                      (feeData?.maxFeePerGas * estimatedGas) /
+                        10 ** currentToken?.decimals
                     ) +
                       parseFloat(
                         currentToken?.address === NULL_ADDRESS ? amountCoin : 0
@@ -123,13 +127,14 @@
                   currentToken?.address === NULL_ADDRESS
                     ? `${(
                         parseFloat(
-                          (feeData?.maxFeePerGas * estimatedGas) / 10 ** 18
+                          (feeData?.maxFeePerGas * estimatedGas) /
+                            10 ** currentToken?.decimals
                         ) + parseFloat(amountCoin)
-                      ).toFixed(4)} ETH`
+                      ).toFixed(4)} ${currentBlockchain.label}`
                     : `${amountCoin} ${currentToken?.symbol} +  ${(
                         (feeData?.maxFeePerGas * estimatedGas) /
-                        10 ** 18
-                      ).toFixed(4)} ETH`
+                        10 ** currentToken?.decimals
+                      ).toFixed(4)} ${currentBlockchain.label}`
                 }}
               </q-item-label>
               <q-item-label caption class="text-grey">
@@ -138,13 +143,14 @@
                   currentToken?.address === NULL_ADDRESS
                     ? (
                         parseFloat(
-                          (feeData?.maxFeePerGas * 2 * estimatedGas) / 10 ** 18
+                          (feeData?.maxFeePerGas * 2 * estimatedGas) /
+                            10 ** currentToken?.decimals
                         ) + parseFloat(amountCoin)
                       ).toFixed(4)
                     : `${amountCoin} ${currentToken?.symbol} +  ${(
                         (feeData?.maxFeePerGas * estimatedGas * 2) /
-                        10 ** 18
-                      ).toFixed(4)} ETH`
+                        10 ** currentToken?.decimals
+                      ).toFixed(4)} ${currentBlockchain.label}`
                 }}
               </q-item-label>
             </q-item-section>
@@ -163,8 +169,11 @@ import {
   fetchEtherPrice,
   getEstimatedGas,
   getFeeData,
+  getTokenBalance,
   submitSendCoinTransaction,
 } from "src/helper/ethers-interact";
+
+import { submitSendUbxTransaction } from "src/helper/ubx-interact";
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
@@ -192,6 +201,10 @@ export default {
     const currentWallet = computed(
       () => store.getters["account/getCurrentWallet"]
     );
+    const tokenBalance = ref(0);
+    const currentBlockchain = computed(
+      () => store.getters["account/getCurrentBlockchain"]
+    );
 
     const currentToken = computed(() => {
       const result = store.getters["account/getCurrentTokens"];
@@ -205,29 +218,52 @@ export default {
       amountCoin.value = route.query.amount;
       token.value = route.query.token;
 
+      fetchBalance();
+
       [coinPrice.value, estimatedGas.value, feeData.value] = await Promise.all([
-        fetchEtherPrice(),
+        fetchEtherPrice(currentBlockchain.value.label),
         getEstimatedGas(
           token.value,
           currentWallet.value,
           toWallet.value,
-          amountCoin.value * 10 ** currentToken.value.decimals
+          amountCoin.value * 10 ** currentToken.value.decimals,
+          currentToken.value?.symbol
         ),
-        getFeeData(),
+        getFeeData(currentToken.value?.symbol),
       ]);
+
       intervalId.value = setInterval(async () => {
         [coinPrice.value, feeData.value] = await Promise.all([
-          fetchEtherPrice(),
-          getFeeData(),
+          fetchEtherPrice(currentBlockchain.value.label),
+          getFeeData(currentToken.value?.symbol),
         ]);
       }, 10000);
     });
+
+    const fetchBalance = async () => {
+      const balance = await getTokenBalance(
+        currentToken.value,
+        fromWallet.value
+      );
+
+      tokenBalance.value = balance / 10 ** currentToken.value.decimals;
+    };
 
     onUnmounted(() => {
       clearInterval(intervalId.value);
     });
 
     const onSumbitTransaction = async () => {
+      if (currentBlockchain.value.label === "UBX") {
+        const transactionObj = await submitSendUbxTransaction(
+          currentWallet.value,
+          toWallet.value,
+          amountCoin.value * 10 ** currentToken.value.decimals,
+          currentToken.value
+        );
+
+        return;
+      }
       try {
         const transactionObj = await submitSendCoinTransaction(
           currentWallet.value,
@@ -259,6 +295,8 @@ export default {
       toWallet,
       amountCoin,
       currentWallet,
+      tokenBalance,
+      currentBlockchain,
       estimatedGas,
       feeData,
       coinPrice,

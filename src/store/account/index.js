@@ -10,8 +10,10 @@ import {
 } from "src/helper/text-crypt";
 import { getEtherBalance } from "src/helper/ethers-interact";
 import { NULL_ADDRESS, UBIX_SECRECT } from "src/helper/constants";
+import { getUbikiriBalanceApi } from "src/helper/ubx-interact";
 
 export const storeAccountWithEncryption = (accounts) => {
+  console.log(accounts);
   const copiedAccounts = JSON.parse(JSON.stringify(accounts));
   copiedAccounts.map((account) => {
     account.phrase = encryptListWithAES(account.phrase, account.password);
@@ -80,11 +82,11 @@ export default {
         //   value: 0,
         //   wallets: []
         // },
-        // {
-        //   label:'UBX',
-        //   value: 713,
-        //   wallets: []
-        // }
+        {
+          label: "UBX",
+          value: 713,
+          wallets: [],
+        },
       ],
       current_wallet: {
         label: "",
@@ -115,7 +117,6 @@ export default {
       (account) =>
         (account.phrase = decryptListWithAES(account.phrase, account.password))
     );
-
     return {
       key_account: keyAccount,
       account,
@@ -128,20 +129,27 @@ export default {
       return state.accounts;
     },
     getCurrentWallet(state) {
+      console.log(state.current_wallet);
       return state.current_wallet;
     },
     getCurrentAccount(state) {
       return state.account;
     },
+    getBlockchains(state) {
+      return state.account.blockchains;
+    },
     getCurrentBlockchain(state) {
       return state.account.current_blockchain;
     },
     getCurrentTokens(state) {
-      let customTokens = state.account.blockchains.find(
-        (blockchain) =>
-          blockchain.label === state.account.current_blockchain.label
-      ).tokens;
+      let customTokens =
+        state.account.blockchains.find(
+          (blockchain) =>
+            blockchain.label === state.account.current_blockchain.label
+        ).tokens || [];
+
       customTokens = JSON.parse(JSON.stringify(customTokens));
+
       if (state.account.current_blockchain.label === "ETH")
         customTokens.push({
           decimals: 18,
@@ -151,6 +159,17 @@ export default {
           wallet: true,
           type: "coin",
           networkLabel: "ETH",
+          address: NULL_ADDRESS,
+        });
+      else if (state.account.current_blockchain.label === "UBX")
+        customTokens.push({
+          decimals: 0,
+          name: "Ubix Network",
+          symbol: "UBX",
+          balance: "0.0",
+          wallet: true,
+          type: "coin",
+          networkLabel: "UBX",
           address: NULL_ADDRESS,
         });
       return customTokens.reverse();
@@ -204,9 +223,7 @@ export default {
       });
 
       accounts[state.key_account] = account;
-      console.log(account, 52);
       Object.assign(state.account, decryptPhraseFromPayload(account));
-      console.log(account, 66);
       storeAccountWithEncryption(accounts);
     },
 
@@ -223,13 +240,21 @@ export default {
 
     setBalance: (state, { balance, label, wallet }) => {
       state.accounts.forEach((account) => {
-        console.log(account.current_wallet.wallet === wallet, wallet, balance);
+        console.log(
+          account.current_wallet.wallet === wallet,
+          wallet,
+          balance,
+          label
+        );
         if (account.current_wallet.wallet === wallet)
           account.current_wallet.balance = balance;
         account.blockchains.forEach((blockchain) => {
           if (blockchain.label === label) {
             blockchain.wallets.forEach((_wallet) => {
-              if (_wallet.wallet === wallet) _wallet.balance = balance;
+              if (_wallet.wallet === wallet) {
+                console.log(_wallet, 254);
+                _wallet.balance = balance;
+              }
             });
           }
         });
@@ -304,11 +329,21 @@ export default {
     async updateBalances({ getters, dispatch }, obj = { label: "ETH" }) {
       const walletList = getters.getCurrentWallets.map(({ wallet }) => wallet);
       walletList.map((wallet) => {
-        dispatch("fetchBalance", { wallet, label: obj.label });
+        console.log(wallet, getters.getCurrentBlockchain.label);
+        dispatch("fetchBalance", {
+          wallet,
+          label: getters.getCurrentBlockchain.label,
+        });
       });
     },
     async fetchBalance({ commit }, obj = { wallet, label: "ETH" }) {
-      const balance = await getEtherBalance(obj.wallet, obj.label);
+      let balance;
+      if (obj.label === "ETH")
+        balance = await getEtherBalance(obj.wallet, obj.label);
+      else if (obj.label === "UBX") {
+        balance = await getUbikiriBalanceApi(obj.wallet);
+      }
+
       commit("setBalance", { ...obj, balance });
       return balance;
     },
