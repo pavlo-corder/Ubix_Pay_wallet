@@ -515,6 +515,7 @@ export default {
       getElipseText,
 
       account,
+      accounts,
 
       matDeleteForever,
 
