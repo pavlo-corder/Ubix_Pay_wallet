@@ -14,27 +14,83 @@ export const getUbikiriBalanceApi = async (address) => {
     return 0;
   }
 };
+export const getUTXOs = async (address) => {
+  try {
+    let response = await axios.get(`${UBIKIRI_API_URL}/api/unspent/${address}`);
+    response = await response.data;
+    return response;
+  } catch (error) {
+    console.log(error);
+    return 0;
+  }
+};
 
+export const _calcFee = (nInputUsed, bSingle, bSweep) => {
+  // одна подпись - 67
+  // один инпут - 38 или 39 (если nOut больше 256 он будет занимать 2 байта!
+  // один аутпут - 33
+  const nEmptyTx = 6;
+
+  // sweep - 1 получатель
+  const nOutByteSize = bSweep ? 33 : 66;
+  const nInSize = nInputUsed * 39;
+
+  // 1 ключ на все?
+  const nSigSize = bSingle ? 67 : nInputUsed * 67;
+
+  const nFee =
+    parseInt(
+      (this._getTransferFee() / 1024) *
+        (nEmptyTx + nOutByteSize + nInSize + nSigSize + 2)
+    ) + 1;
+
+  return nFee;
+};
 export const submitSendUbxTransaction = async (
   currentWallet,
   receiver,
   amount,
   currentToken
 ) => {
+  const utxos = await getUTXOs(currentWallet.wallet);
+  console.log(utxos);
+
+  // return;
   const tx = new Transaction();
-  tx.addReceiver(amount, receiver.slice(2));
+  // tx.addInput(Buffer.from(currentWallet.wallet.slice(2), "hex"), 7);
+  let totalInputAmount = 0,
+    inputCnt = 0;
+  while (totalInputAmount < amount) {
+    tx.addInput(Buffer.from(utxos[inputCnt].hash, "hex"), 1);
+    totalInputAmount += utxos[inputCnt].amount;
+    inputCnt++;
+  }
+  tx.addReceiver(amount, Buffer.from(receiver.slice(2), "hex"));
+  tx.addReceiver(
+    totalInputAmount - amount - 1500,
+    Buffer.from(currentWallet.wallet.slice(2), "hex")
+  );
+
   tx.signForContract(currentWallet.privateKey);
-  console.log(receiver, amount, currentToken, currentWallet);
-  const txSig = tx.getTxSignature();
+  const txSig = tx.encode().toString("hex");
+
+  console.log(
+    "prvkey",
+    currentWallet.privateKey,
+    "amount",
+    amount,
+    "receiver",
+    receiver.slice(2)
+  );
+  console.log(txSig);
 
   const response = await axios.post(
     "http://rpc-dv-1.ubikiri.com:18222/",
     {
       jsonrpc: "2.0",
-      method: "getTx",
+      method: "sendRawTx",
       params: {
-        strTxHash:
-          "d39f3149481ef09c633321af5e7535df24025c8ecfa6aebbfa986146db7830bc",
+        strTx: txSig,
       },
       id: 67,
     },
