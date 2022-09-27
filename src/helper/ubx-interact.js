@@ -67,7 +67,7 @@ export const submitSendUbxTransaction = async (
   }
   tx.addReceiver(amount, Buffer.from(receiver.slice(2), "hex"));
   tx.addReceiver(
-    totalInputAmount - amount - 1500,
+    totalInputAmount - amount - 4000,
     Buffer.from(currentWallet.wallet.slice(2), "hex")
   );
 

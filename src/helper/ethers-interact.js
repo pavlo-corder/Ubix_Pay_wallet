@@ -45,6 +45,7 @@ const etherscan_provider = new ethers.providers.EtherscanProvider(
 export const fetchTxHistory = async (token, address) => {
   address = address.toLowerCase();
   let response = [];
+  if (token.symbol === "UBX") return [];
   if (token.type === "coin") {
     response = await axios.get(
       `https://api.etherscan.io/api?module=account&action=txlist&page=1&address=${address}&sort=desc&apikey=${ETHERSCAN_KEY}`

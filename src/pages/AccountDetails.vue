@@ -56,7 +56,11 @@
 
       <q-btn
         class="btn q-mb-sm"
-        :href="`https://etherscan.io/address/${wallet}`"
+        :href="
+          currentBlockchain?.label === 'ETH'
+            ? `https://etherscan.io/address/${wallet}}`
+            : `https://explorer.ubikiri.com/#address/${wallet}`
+        "
         target="_blank"
       >
         Full info on block explorer
@@ -93,6 +97,9 @@ export default {
     const currentWallet = computed(
       () => store.getters["account/getCurrentWallet"]
     );
+    const currentBlockchain = computed(
+      () => store.getters["account/getCurrentBlockchain"]
+    );
 
     const transactions = ref([]);
 
@@ -106,7 +113,7 @@ export default {
 
       const [balance, coinPrice, txHistory] = await Promise.all([
         getTokenBalance(currentToken.value, wallet.value),
-        fetchEtherPrice(),
+        fetchEtherPrice(currentBlockchain.value.label),
         fetchTxHistory(currentToken.value, wallet.value),
       ]);
 
@@ -115,7 +122,6 @@ export default {
         (balance * coinPrice) / 10 ** currentToken.value.decimals;
 
       transactions.value = txHistory;
-      console.log(txHistory);
     });
     return {
       transactions,

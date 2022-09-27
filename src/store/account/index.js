@@ -13,7 +13,6 @@ import { NULL_ADDRESS, UBIX_SECRECT } from "src/helper/constants";
 import { getUbikiriBalanceApi } from "src/helper/ubx-interact";
 
 export const storeAccountWithEncryption = (accounts) => {
-  console.log(accounts);
   const copiedAccounts = JSON.parse(JSON.stringify(accounts));
   copiedAccounts.map((account) => {
     account.phrase = encryptListWithAES(account.phrase, account.password);
@@ -129,7 +128,6 @@ export default {
       return state.accounts;
     },
     getCurrentWallet(state) {
-      console.log(state.current_wallet);
       return state.current_wallet;
     },
     getCurrentAccount(state) {
@@ -194,7 +192,7 @@ export default {
 
       accounts[state.key_account] = account;
       Object.assign(state.account, decryptPhraseFromPayload(account));
-      console.log(state.account, 29);
+
       storeAccountWithEncryption(accounts);
     },
 
@@ -240,19 +238,12 @@ export default {
 
     setBalance: (state, { balance, label, wallet }) => {
       state.accounts.forEach((account) => {
-        console.log(
-          account.current_wallet.wallet === wallet,
-          wallet,
-          balance,
-          label
-        );
         if (account.current_wallet.wallet === wallet)
           account.current_wallet.balance = balance;
         account.blockchains.forEach((blockchain) => {
           if (blockchain.label === label) {
             blockchain.wallets.forEach((_wallet) => {
               if (_wallet.wallet === wallet) {
-                console.log(_wallet, 254);
                 _wallet.balance = balance;
               }
             });
@@ -266,14 +257,12 @@ export default {
       const targetAccount = state.accounts[state.key_account];
       const networkLabel = targetAccount.current_blockchain.label;
       targetAccount.blockchains.forEach((blockchain) => {
-        console.log(blockchain.label, networkLabel);
         if (blockchain.label === networkLabel) {
           if (
             blockchain.tokens.findIndex(
               (item) => item.address === address && item.type === type
             ) >= 0
           ) {
-            console.log("already existed");
             return;
           }
           blockchain.tokens.push({
@@ -293,7 +282,6 @@ export default {
       const targetAccount = state.accounts[state.key_account];
       const networkLabel = targetAccount.current_blockchain.label;
       targetAccount.blockchains.forEach((blockchain) => {
-        console.log(blockchain.label, networkLabel);
         if (blockchain.label === networkLabel) {
           const splicedItem = blockchain.tokens.splice(
             blockchain.tokens.findIndex(
@@ -301,7 +289,6 @@ export default {
             ),
             1
           );
-          console.log(splicedItem);
         }
       });
       storeAccountWithEncryption(state.accounts);
@@ -311,7 +298,6 @@ export default {
       if (state.accounts) {
         storeAccountWithEncryption(state.accounts);
         const targetAccount = state.accounts[state.key_account];
-        console.log(targetAccount.password);
         lockAccountsWithPassword(targetAccount.password);
         state.accounts = [];
       }
@@ -329,7 +315,6 @@ export default {
     async updateBalances({ getters, dispatch }, obj = { label: "ETH" }) {
       const walletList = getters.getCurrentWallets.map(({ wallet }) => wallet);
       walletList.map((wallet) => {
-        console.log(wallet, getters.getCurrentBlockchain.label);
         dispatch("fetchBalance", {
           wallet,
           label: getters.getCurrentBlockchain.label,

@@ -447,14 +447,11 @@ export default {
     };
 
     const fetchBalance = async () => {
-      console.log(tokenList.value);
       const balances = await Promise.all(
         tokenList.value.map((token) =>
           getTokenBalance(token, model_wallet.value.value)
         )
       );
-
-      console.log(balances);
 
       tokenList.value.map((token, index) => {
         token.balance = balances[index] / 10 ** token.decimals;
