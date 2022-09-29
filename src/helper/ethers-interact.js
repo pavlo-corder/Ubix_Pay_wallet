@@ -173,7 +173,7 @@ export const getEstimatedGas = async (
   label = "ETH"
 ) => {
   if (label === "UBX") {
-    return 1500;
+    return 4000;
   }
   const signer = new Wallet(walletObj?.privateKey, mainnet_provider);
   if (tokenAddress === NULL_ADDRESS) {

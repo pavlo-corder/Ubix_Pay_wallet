@@ -53,7 +53,6 @@ export const submitSendUbxTransaction = async (
   currentToken
 ) => {
   const utxos = await getUTXOs(currentWallet.wallet);
-  console.log(utxos);
 
   // return;
   const tx = new Transaction();
@@ -73,16 +72,6 @@ export const submitSendUbxTransaction = async (
 
   tx.signForContract(currentWallet.privateKey);
   const txSig = tx.encode().toString("hex");
-
-  console.log(
-    "prvkey",
-    currentWallet.privateKey,
-    "amount",
-    amount,
-    "receiver",
-    receiver.slice(2)
-  );
-  console.log(txSig);
 
   const response = await axios.post(
     "http://rpc-dv-1.ubikiri.com:18222/",
