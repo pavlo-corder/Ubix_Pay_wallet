@@ -185,7 +185,7 @@ export default {
       let account = { ...accounts[state.key_account] };
 
       account.blockchains.map((item) => {
-        if (item.label === account.current_blockchain.label) {
+        if (item.label === payload.network) {
           item.wallets.push(payload);
         }
       });

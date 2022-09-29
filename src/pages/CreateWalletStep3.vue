@@ -95,6 +95,7 @@
   </div>
 </template>
 <script>
+import { createWalletFromMnenomic } from "src/helper/ethers-interact";
 import { useStore } from "vuex";
 
 export default {
@@ -105,6 +106,7 @@ export default {
     return {
       account: $store.state.account.account,
       updateAccount: (val) => $store.commit("account/update", val),
+      updateWallets: (val) => $store.commit("account/updateWallets", val),
     };
   },
   data() {
@@ -128,7 +130,7 @@ export default {
         });
         this.mnemonicPhraseCheck.push(item.word);
       }
-      console.log("this.mnemonicPhraseCheck", this.mnemonicPhraseCheck);
+
       this.nextStep();
     },
     clearTable() {
@@ -167,6 +169,14 @@ export default {
     nextConfirm() {
       let account = { ...this.account };
       account.confirmPhrase = false;
+
+      const createdEthWallet = createWalletFromMnenomic(account.phrase, 0, 60);
+      const createdUBXWallet = createWalletFromMnenomic(account.phrase, 0, 713);
+      console.log(createdEthWallet);
+      console.log(createdUBXWallet);
+
+      this.updateWallets(createdEthWallet);
+      this.updateWallets(createdUBXWallet);
       this.updateAccount(account);
 
       this.$router.push("/startscreen");

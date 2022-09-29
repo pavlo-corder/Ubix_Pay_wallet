@@ -36,7 +36,6 @@ function unlock({ next, store }) {
 
 function account({ next, store }) {
   let accounts = loadAccountWithEncryption();
-  console.log(accounts);
 
   if (
     accounts !== null &&

@@ -128,10 +128,10 @@ export const createWalletFromMnenomic = (wordList, index = 0, pathId = 60) => {
     name: name_wallet,
     balance: 0,
     numberWallet: index,
-    value: "Ux52fd856648e112e0816484f02464c5cab6ceefdc",
-    wallet: "Ux52fd856648e112e0816484f02464c5cab6ceefdc",
-    privateKey:
-      "3f00292654ff1dde0bde8850b31356c1ff648693cfa2dec5c61901ba1922b9a6",
+    value: address,
+    wallet: address,
+    privateKey,
+    network: pathId === 60 ? "ETH" : "UBX",
   };
 };
 

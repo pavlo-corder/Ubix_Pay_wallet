@@ -84,7 +84,7 @@ const routes = [
   {
     path: "/accounts",
     meta: {
-      middlewares: [auth, lock],
+      middlewares: [lock, auth],
     },
     component: () => import("layouts/MainLayout.vue"),
     children: [
