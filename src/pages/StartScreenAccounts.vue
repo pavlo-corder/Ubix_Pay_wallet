@@ -138,7 +138,17 @@
         <div class="row q-my-sm q-gutter-sm">
           <q-btn class="btn col" @click="sendTransaction">Send</q-btn>
           <q-btn class="btn col" to="/receivecoins">Receive</q-btn>
-          <q-btn class="btn col" @click="showNotifInfo">Link</q-btn>
+          <q-btn
+            class="btn col"
+            :href="
+              currentBlockchain?.label === 'ETH'
+                ? `https://etherscan.io/address/${currentWallet?.wallet}}`
+                : `https://explorer.ubikiri.com/#address/${currentWallet?.wallet}`
+            "
+            target="_blank"
+          >
+            Link
+          </q-btn>
         </div>
 
         <!-- tokenList list -->
@@ -190,7 +200,10 @@
               <q-item-label class="text-subtitle2 text-bold">
                 {{
                   token.type === "erc20" || token.type === "coin"
-                    ? numberConverter(token.balance, 2)
+                    ? numberConverter(
+                        token.balance,
+                        currentBlockchain.label === "UBX" ? 0 : 2
+                      )
                     : token.balance
                 }}
                 {{ token.symbol }}
@@ -513,6 +526,7 @@ export default {
 
       account,
       accounts,
+      currentBlockchain,
 
       matDeleteForever,
 

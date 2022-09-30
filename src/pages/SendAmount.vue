@@ -96,6 +96,7 @@ import {
   getTokenBalance,
 } from "src/helper/ethers-interact";
 import { numberConverter } from "src/helper/formater";
+import { UBX_MAX_FEE } from "src/helper/constants";
 
 export default {
   name: "SendAmount",
@@ -187,7 +188,7 @@ export default {
 
     const onClickMax = () => {
       if (currentBlockchain.value.label === "UBX") {
-        amountCoin.value = (tokenBalance.value - 1500).toFixed(4);
+        amountCoin.value = (tokenBalance.value - UBX_MAX_FEE).toFixed(4);
         onChangeAmount(amountCoin.value);
         return;
       }

@@ -1,4 +1,5 @@
 import axios from "axios";
+import { UBX_MAX_FEE } from "./constants";
 import Transaction from "./transaction/transaction";
 
 // export const UBIKIRI_API_URL = "https://explorer.ubikiri.com";
@@ -18,7 +19,7 @@ export const getUTXOs = async (address) => {
   try {
     let response = await axios.get(`${UBIKIRI_API_URL}/api/unspent/${address}`);
     response = await response.data;
-    return response;
+    return response.reverse();
   } catch (error) {
     console.log(error);
     return 0;
@@ -60,20 +61,20 @@ export const submitSendUbxTransaction = async (
   let totalInputAmount = 0,
     inputCnt = 0;
   while (totalInputAmount < amount) {
-    tx.addInput(Buffer.from(utxos[inputCnt].hash, "hex"), 1);
+    tx.addInput(Buffer.from(utxos[inputCnt].hash, "hex"), inputCnt);
     totalInputAmount += utxos[inputCnt].amount;
     inputCnt++;
   }
   tx.addReceiver(amount, Buffer.from(receiver.slice(2), "hex"));
   tx.addReceiver(
-    totalInputAmount - amount - 4000,
+    totalInputAmount - amount - UBX_MAX_FEE,
     Buffer.from(currentWallet.wallet.slice(2), "hex")
   );
 
   tx.signForContract(currentWallet.privateKey);
   const txSig = tx.encode().toString("hex");
 
-  const response = await axios.post(
+  let response = await axios.post(
     "http://rpc-dv-1.ubikiri.com:18222/",
     {
       jsonrpc: "2.0",
@@ -90,4 +91,8 @@ export const submitSendUbxTransaction = async (
       },
     }
   );
+  response = await response.data;
+  if (response.error) {
+    return response.error;
+  }
 };

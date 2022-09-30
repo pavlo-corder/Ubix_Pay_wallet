@@ -44,7 +44,7 @@
       <a class="btn btn--primary q-mb-sm">Request payment</a>
       <a class="btn q-mb-sm">Save as image</a>
 
-      <q-btn class="btn btn--transparent q-mb-lg" to="/">Close</q-btn>
+      <q-btn class="btn btn--transparent q-mb-lg" to="/accounts">Close</q-btn>
     </div>
   </main>
 </template>

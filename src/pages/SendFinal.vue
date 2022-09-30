@@ -275,6 +275,15 @@ export default {
           currentToken.value
         );
 
+        if (transactionObj) {
+          quasar.notify({
+            message:
+              'Transaction failed: <span class="notification__msg notification__msg--negative">Error</span>',
+            html: true,
+          });
+          return;
+        }
+
         quasar.notify({
           message:
             'Transaction status: <span class="notification__msg notification__msg--warning">Pending</span>',
