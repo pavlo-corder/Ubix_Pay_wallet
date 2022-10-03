@@ -75,7 +75,7 @@ export const submitSendUbxTransaction = async (
   const txSig = tx.encode().toString("hex");
 
   let response = await axios.post(
-    "http://rpc-dv-1.ubikiri.com:18222/",
+    "http://rpc-dv-1.ubikiri.com:18222",
     {
       jsonrpc: "2.0",
       method: "sendRawTx",
