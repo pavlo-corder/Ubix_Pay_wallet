@@ -183,8 +183,10 @@ export default {
     updateWallets: (state, payload) => {
       let accounts = state.accounts;
       let account = { ...accounts[state.key_account] };
+      // console.log(account, state.key_account);
 
       account.blockchains.map((item) => {
+        // console.log(item);
         if (item.label === payload.network) {
           item.wallets.push(payload);
         }
