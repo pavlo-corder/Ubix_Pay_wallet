@@ -2,8 +2,12 @@
   <main class="q-pt-md">
     <div class="container">
       <div class="q-mb-md text-center text-desktop-left">
-        <p class="text-h6 text-bold q-mb-sm">Receive ETH</p>
-        <p class="text-subtitle2">ETH Deposit Address:</p>
+        <p class="text-h6 text-bold q-mb-sm">
+          Receive {{ currentBlockchain?.label }}
+        </p>
+        <p class="text-subtitle2">
+          {{ currentBlockchain?.label }} Deposit Address:
+        </p>
         <p class="text-bold text-h6 text-blue text-wrap">
           {{ currentWallet?.wallet }}
         </p>
@@ -40,7 +44,7 @@
       <a class="btn btn--primary q-mb-sm">Request payment</a>
       <a class="btn q-mb-sm">Save as image</a>
 
-      <q-btn class="btn btn--transparent q-mb-lg" to="/">Close</q-btn>
+      <q-btn class="btn btn--transparent q-mb-lg" to="/accounts">Close</q-btn>
     </div>
   </main>
 </template>
@@ -62,6 +66,9 @@ export default {
     const currentWallet = computed(
       () => store.getters["account/getCurrentWallet"]
     );
+    const currentBlockchain = computed(
+      () => store.getters["account/getCurrentBlockchain"]
+    );
 
     function copy(text) {
       copyToClipboard(text);
@@ -74,6 +81,7 @@ export default {
       matIosShare,
       copy,
       currentWallet,
+      currentBlockchain,
     };
   },
 };

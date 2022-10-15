@@ -3,7 +3,7 @@ import { Wallet, ethers } from "ethers";
 
 import ERC20_ABI from "./abis/ERC20_ABI.json";
 import ERC721_ABI from "./abis/ERC721_ABI.json";
-import { NULL_ADDRESS } from "./constants";
+import { ETHERSCAN_KEY, NULL_ADDRESS } from "./constants";
 import { getUbikiriBalanceApi } from "./ubx-interact";
 import {
   getPublic,
@@ -39,15 +39,16 @@ const mainnet_provider = new ethers.providers.JsonRpcProvider(
 
 const etherscan_provider = new ethers.providers.EtherscanProvider(
   "homestead",
-  "38KX1UJJKQINF8TUBAVS5ZVDSFI61KSJ1B"
+  ETHERSCAN_KEY
 );
 
 export const fetchTxHistory = async (token, address) => {
   address = address.toLowerCase();
   let response = [];
+  if (token.symbol === "UBX") return [];
   if (token.type === "coin") {
     response = await axios.get(
-      `https://api.etherscan.io/api?module=account&action=txlist&page=1&address=${address}&sort=desc&apikey=38KX1UJJKQINF8TUBAVS5ZVDSFI61KSJ1B`
+      `https://api.etherscan.io/api?module=account&action=txlist&page=1&address=${address}&sort=desc&apikey=${ETHERSCAN_KEY}`
     );
 
     response = await response.data;
@@ -74,7 +75,7 @@ export const fetchTxHistory = async (token, address) => {
     });
   } else {
     response = await axios.get(
-      `https://api.etherscan.io/api?module=account&action=tokentx&contractaddress=${token.address}&address=${address}&page=1&sort=desc&apikey=38KX1UJJKQINF8TUBAVS5ZVDSFI61KSJ1B`
+      `https://api.etherscan.io/api?module=account&action=tokentx&contractaddress=${token.address}&address=${address}&page=1&sort=desc&apikey=${ETHERSCAN_KEY}`
     );
     response = await response.data;
     response = response.result;
@@ -130,6 +131,7 @@ export const createWalletFromMnenomic = (wordList, index = 0, pathId = 60) => {
     value: address,
     wallet: address,
     privateKey,
+    network: pathId === 60 ? "ETH" : "UBX",
   };
 };
 
@@ -171,7 +173,7 @@ export const getEstimatedGas = async (
   label = "ETH"
 ) => {
   if (label === "UBX") {
-    return 1500;
+    return 4000;
   }
   const signer = new Wallet(walletObj?.privateKey, mainnet_provider);
   if (tokenAddress === NULL_ADDRESS) {
@@ -207,7 +209,7 @@ export const fetchEtherPrice = async (label = "ETH") => {
     return response.data.token.derivedETH * ethPrice;
   }
   let response = await axios.get(
-    "https://api.etherscan.io/api?module=stats&action=ethprice&apikey=99C33Z32KHVZGRVCPXGF6CGJWZBACU6AUB"
+    `https://api.etherscan.io/api?module=stats&action=ethprice&apikey=${ETHERSCAN_KEY}`
   );
   response = await response.data;
   return response?.result?.ethusd;

@@ -118,7 +118,6 @@ export default {
 
       account.name = this.name;
       account.details = this.details;
-      console.log(account);
       this.updateAccount(account);
     },
     setBtnBack() {
@@ -131,8 +130,6 @@ export default {
   mounted() {
     this.name = this.account.name;
     this.details = this.account.details;
-
-    console.log("account mounted  ", this.account);
 
     setTimeout(() => {
       this.setBtnBack();

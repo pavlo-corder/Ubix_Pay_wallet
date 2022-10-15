@@ -1,7 +1,6 @@
 <template>
   <main class="q-pt-md">
     <div class="container">
-      {{ currentWallet }}
       <q-form>
         <div class="row justify-between items-center q-mb-md q-gutter-sm">
           <div class="col-6">
@@ -71,7 +70,12 @@
         <p class="row items-center q-mb-lg">
           <span class="text-caption text-grey-dark">Balance:&nbsp;</span>
           <span class="text-bold text-h6">
-            {{ numberConverter(tokenBalance) }}
+            {{
+              numberConverter(
+                tokenBalance,
+                currentBlockchain.label === "UBX" ? 0 : 3
+              )
+            }}
             {{ currentToken?.symbol }}
           </span>
         </p>
@@ -92,6 +96,7 @@ import {
   getTokenBalance,
 } from "src/helper/ethers-interact";
 import { numberConverter } from "src/helper/formater";
+import { UBX_MAX_FEE } from "src/helper/constants";
 
 export default {
   name: "SendAmount",
@@ -183,7 +188,7 @@ export default {
 
     const onClickMax = () => {
       if (currentBlockchain.value.label === "UBX") {
-        amountCoin.value = (tokenBalance.value - 1500).toFixed(4);
+        amountCoin.value = (tokenBalance.value - UBX_MAX_FEE).toFixed(4);
         onChangeAmount(amountCoin.value);
         return;
       }

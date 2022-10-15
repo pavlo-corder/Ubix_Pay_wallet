@@ -155,14 +155,19 @@ export default {
     },
     onReset() {},
     createWallet() {
-      let account = { ...this.account };
-      const createdWallet = createWalletFromMnenomic(this.account.phrase);
-      account.blockchains.map((blockchain) => {
-        if (blockchain.label === account.current_blockchain.label) {
-          this.updateWallets(createdWallet);
-          this.updateCurrentWallet(createdWallet);
-        }
-      });
+      const createdEthWallet = createWalletFromMnenomic(
+        this.account.phrase,
+        0,
+        60
+      );
+      const createdUBXWallet = createWalletFromMnenomic(
+        this.account.phrase,
+        0,
+        713
+      );
+
+      this.updateWallets(createdEthWallet);
+      this.updateWallets(createdUBXWallet);
     },
   },
 };

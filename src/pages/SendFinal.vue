@@ -94,7 +94,7 @@
                   (
                     (feeData?.maxFeePerGas * estimatedGas) /
                     10 ** currentToken?.decimals
-                  ).toFixed(4)
+                  ).toFixed(currentBlockchain.label === "UBX" ? 0 : 4)
                 }}
                 {{ currentBlockchain.label }}
               </q-item-label>
@@ -102,9 +102,11 @@
                 Max fee:
                 {{
                   (
-                    (feeData?.maxFeePerGas * estimatedGas * 2) /
+                    (feeData?.maxFeePerGas *
+                      estimatedGas *
+                      (currentBlockchain.label === "UBX" ? 1 : 2)) /
                     10 ** currentToken?.decimals
-                  ).toFixed(4)
+                  ).toFixed(currentBlockchain.label === "UBX" ? 0 : 4)
                 }}
                 {{ currentBlockchain.label }}
               </q-item-label>
@@ -130,7 +132,9 @@
                           (feeData?.maxFeePerGas * estimatedGas) /
                             10 ** currentToken?.decimals
                         ) + parseFloat(amountCoin)
-                      ).toFixed(4)} ${currentBlockchain.label}`
+                      ).toFixed(currentBlockchain.label === "UBX" ? 0 : 4)} ${
+                        currentBlockchain.label
+                      }`
                     : `${amountCoin} ${currentToken?.symbol} +  ${(
                         (feeData?.maxFeePerGas * estimatedGas) /
                         10 ** currentToken?.decimals
@@ -143,14 +147,23 @@
                   currentToken?.address === NULL_ADDRESS
                     ? (
                         parseFloat(
-                          (feeData?.maxFeePerGas * 2 * estimatedGas) /
+                          (feeData?.maxFeePerGas *
+                            (currentBlockchain.label === "UBX" ? 1 : 2) *
+                            estimatedGas) /
                             10 ** currentToken?.decimals
                         ) + parseFloat(amountCoin)
                       ).toFixed(4)
                     : `${amountCoin} ${currentToken?.symbol} +  ${(
-                        (feeData?.maxFeePerGas * estimatedGas * 2) /
+                        (feeData?.maxFeePerGas *
+                          estimatedGas *
+                          currentBlockchain.label ===
+                        "UBX"
+                          ? 1
+                          : 2) /
                         10 ** currentToken?.decimals
-                      ).toFixed(4)} ${currentBlockchain.label}`
+                      ).toFixed(currentBlockchain.label === "UBX" ? 0 : 4)} ${
+                        currentBlockchain.label
+                      }`
                 }}
               </q-item-label>
             </q-item-section>
@@ -262,6 +275,21 @@ export default {
           currentToken.value
         );
 
+        if (transactionObj) {
+          quasar.notify({
+            message:
+              'Transaction failed: <span class="notification__msg notification__msg--negative">Error</span>',
+            html: true,
+          });
+          return;
+        }
+
+        quasar.notify({
+          message:
+            'Transaction status: <span class="notification__msg notification__msg--warning">Pending</span>',
+          html: true,
+        });
+        router.push("/accounts");
         return;
       }
       try {

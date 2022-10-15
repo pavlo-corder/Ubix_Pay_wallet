@@ -95,16 +95,19 @@
   </div>
 </template>
 <script>
+import { createWalletFromMnenomic } from "src/helper/ethers-interact";
+import { computed } from "vue";
 import { useStore } from "vuex";
 
 export default {
   name: "CreateWalletStep3",
   setup() {
-    const $store = useStore();
+    const store = useStore();
 
     return {
-      account: $store.state.account.account,
-      updateAccount: (val) => $store.commit("account/update", val),
+      account: computed(() => store.getters["account/getCurrentAccount"]),
+      updateAccount: (val) => store.commit("account/update", val),
+      updateWallets: (val) => store.commit("account/updateWallets", val),
     };
   },
   data() {
@@ -119,6 +122,21 @@ export default {
     };
   },
   methods: {
+    createWallet() {
+      const createdEthWallet = createWalletFromMnenomic(
+        this.account.phrase,
+        0,
+        60
+      );
+      const createdUBXWallet = createWalletFromMnenomic(
+        this.account.phrase,
+        0,
+        713
+      );
+
+      this.updateWallets(createdEthWallet);
+      this.updateWallets(createdUBXWallet);
+    },
     checkWord(item, key) {
       if (!item.check) {
         this.mnemonicPhraseRandom.map((word) => {
@@ -128,7 +146,7 @@ export default {
         });
         this.mnemonicPhraseCheck.push(item.word);
       }
-      console.log("this.mnemonicPhraseCheck", this.mnemonicPhraseCheck);
+
       this.nextStep();
     },
     clearTable() {
@@ -158,6 +176,7 @@ export default {
     },
     buttonNextStep() {
       if (!this.dasableNextStep) {
+        this.createWallet();
         let account = { ...this.account };
         account.confirmPhrase = true;
         this.updateAccount(account);
@@ -165,10 +184,10 @@ export default {
       }
     },
     nextConfirm() {
+      this.createWallet();
       let account = { ...this.account };
       account.confirmPhrase = false;
       this.updateAccount(account);
-
       this.$router.push("/startscreen");
     },
     showAlertSuccess() {
