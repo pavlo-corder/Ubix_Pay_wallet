@@ -3,7 +3,9 @@ import { UBX_MAX_FEE } from "./constants";
 import Transaction from "./transaction/transaction";
 
 // export const UBIKIRI_API_URL = "https://explorer.ubikiri.com";
-export const UBIKIRI_API_URL = "https://test-explorer.ubikiri.com";
+// export const UBIKIRI_API_URL = "https://test-explorer.ubikiri.com";
+export const UBIKIRI_API_URL = process.env.URL_UBX;
+
 
 export const getUbikiriBalanceApi = async (address) => {
   try {
