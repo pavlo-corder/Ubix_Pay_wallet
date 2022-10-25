@@ -75,6 +75,7 @@ export default {
       const inputValue = e;
       if (inputValue.length === 42) {
         tokenInfo.value = await fetchTokenInformation(inputValue);
+        console.log(tokenInfo.value);
       }
     };
     return {

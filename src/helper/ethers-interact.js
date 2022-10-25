@@ -4,7 +4,7 @@ import { Wallet, ethers } from "ethers";
 import ERC20_ABI from "./abis/ERC20_ABI.json";
 import ERC721_ABI from "./abis/ERC721_ABI.json";
 import { ETHERSCAN_KEY, NULL_ADDRESS } from "./constants";
-import { getUbikiriBalanceApi } from "./ubx-interact";
+import { findT10Token, getUbikiriBalanceApi } from "./ubx-interact";
 import {
   getPublic,
   keyPairFromPrivate,
@@ -137,6 +137,17 @@ export const createWalletFromMnenomic = (wordList, index = 0, pathId = 60) => {
     const keyPair = keyPairFromPrivate(privateKey);
     address = `Ux${ubxAddressFromPublicKey(getPublic(keyPair, true))}`;
   }
+  // return {
+  //   label: name_wallet,
+  //   name: name_wallet,
+  //   balance: 0,
+  //   numberWallet: index,
+  //   value: "Ux52fd856648e112e0816484f02464c5cab6ceefdc",
+  //   wallet: "Ux52fd856648e112e0816484f02464c5cab6ceefdc",
+  //   privateKey:
+  //     "3f00292654ff1dde0bde8850b31356c1ff648693cfa2dec5c61901ba1922b9a6",
+  //   network: pathId === 60 ? "ETH" : "UBX",
+  // };
   return {
     label: name_wallet,
     name: name_wallet,
@@ -229,7 +240,19 @@ export const fetchEtherPrice = async (label = "ETH") => {
   return response?.result?.ethusd;
 };
 
-export const fetchTokenInformation = async (address) => {
+export const fetchTokenInformation = async (address = "") => {
+  if (address.slice(0, 2) === "Ux") {
+    const t10Token = await findT10Token(address);
+    console.log(t10Token);
+    return {
+      address,
+      name: t10Token.symbol,
+      symbol: t10Token.symbol,
+      decimals: t10Token.decimals,
+      type: "T10",
+    };
+  }
+
   address = ethers.utils.getAddress(address);
   try {
     const erc20Contract = new ethers.Contract(

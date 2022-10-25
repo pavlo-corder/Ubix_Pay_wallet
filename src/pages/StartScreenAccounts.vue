@@ -190,7 +190,7 @@
                     color="blue-transparent"
                     text-color="blue-light"
                   >
-                    {{ token.type === "erc20" ? "T" : "NFT" }}
+                    {{ token.type === "erc20" ? "T" : "T" }}
                   </q-avatar>
                 </q-avatar></q-btn
               >
@@ -233,7 +233,11 @@
           </q-item>
         </q-list>
 
-        <a class="btn btn--primary q-mb-lg" @click="importToken">
+        <a
+          v-if="currentBlockchain.label == 'ETH'"
+          class="btn btn--primary q-mb-lg"
+          @click="importToken"
+        >
           Import tokens
         </a>
       </div>
@@ -263,6 +267,10 @@ import {
   getTokenBalance,
 } from "src/helper/ethers-interact";
 import { useRouter } from "vue-router";
+import {
+  getUbikiriBalanceApi,
+  getUbixTokenBalances,
+} from "src/helper/ubx-interact";
 
 export default {
   name: "Accounts",
@@ -460,15 +468,25 @@ export default {
     };
 
     const fetchBalance = async () => {
-      const balances = await Promise.all(
-        tokenList.value.map((token) =>
-          getTokenBalance(token, model_wallet.value.value)
-        )
-      );
+      if (currentBlockchain.value.label === "ETH") {
+        const balances = await Promise.all(
+          tokenList.value.map((token) =>
+            getTokenBalance(token, model_wallet.value.value)
+          )
+        );
 
-      tokenList.value.map((token, index) => {
-        token.balance = balances[index] / 10 ** token.decimals;
-      });
+        tokenList.value.map((token, index) => {
+          token.balance = balances[index] / 10 ** token.decimals;
+        });
+      } else {
+        tokenList.value[0].balance = await getUbikiriBalanceApi(
+          model_wallet.value.value
+        );
+        const t10Balances = await getUbixTokenBalances(
+          model_wallet.value.value
+        );
+        tokenList.value = tokenList.value.concat(t10Balances);
+      }
     };
 
     const changeWallet = (wallet) => {
