@@ -186,7 +186,10 @@ import {
   submitSendCoinTransaction,
 } from "src/helper/ethers-interact";
 
-import { submitSendUbxTransaction } from "src/helper/ubx-interact";
+import {
+  getUbixTokenBalances,
+  submitSendUbxTransaction,
+} from "src/helper/ubx-interact";
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
@@ -219,10 +222,12 @@ export default {
       () => store.getters["account/getCurrentBlockchain"]
     );
 
-    const currentToken = computed(() => {
-      const result = store.getters["account/getCurrentTokens"];
-      return result?.find((item) => item.address === token.value);
-    });
+    const currentToken = ref({});
+
+    // const currentToken = computed(() => {
+    //   const result = store.getters["account/getCurrentTokens"];
+    //   return result?.find((item) => item.address === token.value);
+    // });
 
     onMounted(async () => {
       await router.isReady();
@@ -230,6 +235,17 @@ export default {
       toWallet.value = route.query.to;
       amountCoin.value = route.query.amount;
       token.value = route.query.token;
+
+      if (currentBlockchain.value.label === "ETH") {
+        console.log("ETH token");
+        currentToken.value = currentTokens.value.find(
+          (item) => item.address === token.value
+        );
+      } else {
+        const _temp = await getUbixTokenBalances(fromWallet.value);
+        currentToken.value = _temp.find((item) => item.symbol === token.value);
+        tokenBalance.value = currentToken.value.balance;
+      }
 
       fetchBalance();
 
@@ -240,7 +256,7 @@ export default {
           currentWallet.value,
           toWallet.value,
           amountCoin.value * 10 ** currentToken.value.decimals,
-          currentToken.value?.symbol
+          currentBlockchain.value.label
         ),
         getFeeData(currentToken.value?.symbol),
       ]);
@@ -254,12 +270,14 @@ export default {
     });
 
     const fetchBalance = async () => {
-      const balance = await getTokenBalance(
-        currentToken.value,
-        fromWallet.value
-      );
+      if (currentBlockchain.value.label === "ETH") {
+        const balance = await getTokenBalance(
+          currentToken.value,
+          fromWallet.value
+        );
 
-      tokenBalance.value = balance / 10 ** currentToken.value.decimals;
+        tokenBalance.value = balance / 10 ** currentToken.value.decimals;
+      }
     };
 
     onUnmounted(() => {

@@ -97,6 +97,7 @@ import {
 } from "src/helper/ethers-interact";
 import { numberConverter } from "src/helper/formater";
 import { UBX_MAX_FEE } from "src/helper/constants";
+import { getUbixTokenBalances } from "src/helper/ubx-interact";
 
 export default {
   name: "SendAmount",
@@ -119,19 +120,28 @@ export default {
     const currentTokens = computed(
       () => store.getters["account/getCurrentTokens"]
     );
-    const currentToken = computed(() => {
-      const result = store.getters["account/getCurrentTokens"];
-      return result?.find((item) => item.address === token.value);
-    });
-    // const currentToken = ref({});
+    const currentBlockchain = computed(
+      () => store.getters["account/getCurrentBlockchain"]
+    );
+
+    const currentWallet = computed(
+      () => store.getters["account/getCurrentWallet"]
+    );
+    // const currentToken = computed(() => {
+    //   const result = store.getters["account/getCurrentTokens"];
+    //   return result?.find((item) => item.address === token.value);
+    // });
+    const currentToken = ref({});
 
     const fetchBalance = async () => {
-      const balance = await getTokenBalance(
-        currentToken.value,
-        fromWallet.value
-      );
+      if (currentBlockchain.value.label === "ETH") {
+        const balance = await getTokenBalance(
+          currentToken.value,
+          fromWallet.value
+        );
 
-      tokenBalance.value = balance / 10 ** currentToken.value.decimals;
+        tokenBalance.value = balance / 10 ** currentToken.value.decimals;
+      }
     };
 
     const onNextHandler = () => {
@@ -152,6 +162,16 @@ export default {
       toWallet.value = route.query.to;
       token.value = route.query.token;
 
+      if (currentBlockchain.value.label === "ETH") {
+        console.log("ETH token");
+        currentToken.value = currentTokens.value.find(
+          (item) => item.address === token.value
+        );
+      } else {
+        const _temp = await getUbixTokenBalances(fromWallet.value);
+        currentToken.value = _temp.find((item) => item.symbol === token.value);
+        tokenBalance.value = currentToken.value.balance;
+      }
       fetchBalance();
 
       coinPrice.value = await fetchEtherPrice("UBX");
@@ -168,13 +188,6 @@ export default {
       clearInterval(intervalId.value);
     });
 
-    const currentWallet = computed(
-      () => store.getters["account/getCurrentWallet"]
-    );
-    const currentBlockchain = computed(
-      () => store.getters["account/getCurrentBlockchain"]
-    );
-
     const onChangeAmount = (coin) => {
       if (coin.length === 0 || coin <= 0) amountCoin.value = 0;
       else amountCoin.value = parseInt(coin);
@@ -188,7 +201,10 @@ export default {
 
     const onClickMax = () => {
       if (currentBlockchain.value.label === "UBX") {
-        amountCoin.value = (tokenBalance.value - UBX_MAX_FEE).toFixed(4);
+        amountCoin.value = (
+          tokenBalance.value -
+          (currentToken.value.type === "T10" ? 0 : UBX_MAX_FEE)
+        ).toFixed(4);
         onChangeAmount(amountCoin.value);
         return;
       }

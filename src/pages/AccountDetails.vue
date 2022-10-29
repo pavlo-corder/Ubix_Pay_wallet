@@ -58,7 +58,7 @@
         class="btn q-mb-sm"
         :href="
           currentBlockchain?.label === 'ETH'
-            ? `https://etherscan.io/address/${wallet}}`
+            ? `https://etherscan.io/address/${wallet}`
             : `https://explorer.ubikiri.com/#address/${wallet}`
         "
         target="_blank"
@@ -130,6 +130,7 @@ export default {
       currentWallet,
       moment,
       numberConverter,
+      currentBlockchain,
     };
   },
 };
