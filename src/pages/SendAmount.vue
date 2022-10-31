@@ -134,14 +134,14 @@ export default {
     const currentToken = ref({});
 
     const fetchBalance = async () => {
-      if (currentBlockchain.value.label === "ETH") {
-        const balance = await getTokenBalance(
-          currentToken.value,
-          fromWallet.value
-        );
+      // if (currentBlockchain.value.label === "ETH") {
+      const balance = await getTokenBalance(
+        currentToken.value,
+        fromWallet.value
+      );
 
-        tokenBalance.value = balance / 10 ** currentToken.value.decimals;
-      }
+      tokenBalance.value = balance / 10 ** currentToken.value.decimals;
+      // }
     };
 
     const onNextHandler = () => {
@@ -163,18 +163,23 @@ export default {
       token.value = route.query.token;
 
       if (currentBlockchain.value.label === "ETH") {
-        console.log("ETH token");
         currentToken.value = currentTokens.value.find(
           (item) => item.address === token.value
         );
       } else {
-        const _temp = await getUbixTokenBalances(fromWallet.value);
-        currentToken.value = _temp.find((item) => item.symbol === token.value);
-        tokenBalance.value = currentToken.value.balance;
+        if (token.value !== "UBX") {
+          const _temp = await getUbixTokenBalances(fromWallet.value);
+          currentToken.value = _temp.find(
+            (item) => item.symbol === token.value
+          );
+          tokenBalance.value = currentToken.value.balance;
+        } else {
+          currentToken.value = currentTokens.value[0];
+        }
       }
       fetchBalance();
 
-      coinPrice.value = await fetchEtherPrice("UBX");
+      coinPrice.value = await fetchEtherPrice(currentBlockchain.value.label);
 
       if (currentBlockchain.value.label === "UBX") return;
       feeData.value = await getFeeData();
@@ -190,7 +195,11 @@ export default {
 
     const onChangeAmount = (coin) => {
       if (coin.length === 0 || coin <= 0) amountCoin.value = 0;
-      else amountCoin.value = parseInt(coin);
+      else {
+        if (currentBlockchain.value.label === "UBX")
+          amountCoin.value = parseInt(coin);
+        else amountCoin.value = parseFloat(coin);
+      }
       amountDollar.value = (amountCoin.value * coinPrice.value).toFixed(3);
     };
 

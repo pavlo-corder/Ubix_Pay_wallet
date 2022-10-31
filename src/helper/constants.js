@@ -3,3 +3,4 @@ export const UBIX_SECRECT = "eU#x9a#$~57Xz.";
 
 export const ETHERSCAN_KEY = "38KX1UJJKQINF8TUBAVS5ZVDSFI61KSJ1B";
 export const UBX_MAX_FEE = 4000;
+export const UBX_T10_MAX_FEE = 8000;
