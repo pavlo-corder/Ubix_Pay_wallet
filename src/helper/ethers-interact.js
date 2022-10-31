@@ -3,7 +3,12 @@ import { Wallet, ethers } from "ethers";
 
 import ERC20_ABI from "./abis/ERC20_ABI.json";
 import ERC721_ABI from "./abis/ERC721_ABI.json";
-import { ETHERSCAN_KEY, NULL_ADDRESS } from "./constants";
+import {
+  ETHERSCAN_KEY,
+  NULL_ADDRESS,
+  UBX_MAX_FEE,
+  UBX_T10_MAX_FEE,
+} from "./constants";
 import { findT10Token, getUbikiriBalanceApi } from "./ubx-interact";
 import {
   getPublic,
@@ -184,7 +189,8 @@ export const getEstimatedGas = async (
   label = "ETH"
 ) => {
   if (label === "UBX") {
-    return 4000;
+    if (tokenAddress === "UBX") return UBX_MAX_FEE;
+    else return UBX_T10_MAX_FEE;
   }
   const signer = new Wallet(walletObj?.privateKey, mainnet_provider);
   if (tokenAddress === NULL_ADDRESS) {

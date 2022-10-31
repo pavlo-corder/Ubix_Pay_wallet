@@ -202,7 +202,7 @@ const formT10TransferTx = async (
 
   for (let utxoRecord of utxos) {
     if (!utxoRecord.amount || utxoRecord.amount < feeWeNeed / 20) continue;
-
+    console.log(utxoRecord.hash, utxoRecord.amount);
     tx.addInput(utxoRecord.hash, utxoRecord.nOut);
 
     nGatheredCoins += utxoRecord.amount;
@@ -212,7 +212,7 @@ const formT10TransferTx = async (
 
   tx.signForContract(currentWallet.privateKey);
   // console.log(tx, tx.inputs, currentWallet.privateKey);
-  // tx.verify();
+  tx.verify();
 
   return tx;
 };
