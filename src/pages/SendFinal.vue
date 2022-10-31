@@ -156,10 +156,7 @@
                     : `${amountCoin} ${currentToken?.symbol} +  ${(
                         (feeData?.maxFeePerGas *
                           estimatedGas *
-                          currentBlockchain.label ===
-                        "UBX"
-                          ? 1
-                          : 2) /
+                          (currentBlockchain.label === "UBX" ? 1 : 2)) /
                         10 ** currentToken?.decimals
                       ).toFixed(currentBlockchain.label === "UBX" ? 0 : 4)} ${
                         currentBlockchain.label
@@ -186,7 +183,10 @@ import {
   submitSendCoinTransaction,
 } from "src/helper/ethers-interact";
 
-import { submitSendUbxTransaction } from "src/helper/ubx-interact";
+import {
+  getUbixTokenBalances,
+  submitSendUbxTransaction,
+} from "src/helper/ubx-interact";
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
@@ -219,10 +219,11 @@ export default {
       () => store.getters["account/getCurrentBlockchain"]
     );
 
-    const currentToken = computed(() => {
-      const result = store.getters["account/getCurrentTokens"];
-      return result?.find((item) => item.address === token.value);
-    });
+    const currentToken = ref({});
+
+    const currentTokens = computed(
+      () => store.getters["account/getCurrentTokens"]
+    );
 
     onMounted(async () => {
       await router.isReady();
@@ -230,6 +231,23 @@ export default {
       toWallet.value = route.query.to;
       amountCoin.value = route.query.amount;
       token.value = route.query.token;
+
+      if (currentBlockchain.value.label === "ETH") {
+        console.log("ETH token");
+        currentToken.value = currentTokens.value.find(
+          (item) => item.address === token.value
+        );
+      } else {
+        if (token.value !== "UBX") {
+          const _temp = await getUbixTokenBalances(fromWallet.value);
+          currentToken.value = _temp.find(
+            (item) => item.symbol === token.value
+          );
+          tokenBalance.value = currentToken.value.balance;
+        } else {
+          currentToken.value = currentTokens.value[0];
+        }
+      }
 
       fetchBalance();
 
@@ -240,26 +258,28 @@ export default {
           currentWallet.value,
           toWallet.value,
           amountCoin.value * 10 ** currentToken.value.decimals,
-          currentToken.value?.symbol
+          currentBlockchain.value.label
         ),
-        getFeeData(currentToken.value?.symbol),
+        getFeeData(currentToken.value?.networkLabel),
       ]);
 
       intervalId.value = setInterval(async () => {
         [coinPrice.value, feeData.value] = await Promise.all([
           fetchEtherPrice(currentBlockchain.value.label),
-          getFeeData(currentToken.value?.symbol),
+          getFeeData(currentToken.value?.networkLabel),
         ]);
       }, 10000);
     });
 
     const fetchBalance = async () => {
+      // if (currentBlockchain.value.label === "ETH") {
       const balance = await getTokenBalance(
         currentToken.value,
         fromWallet.value
       );
 
       tokenBalance.value = balance / 10 ** currentToken.value.decimals;
+      // }
     };
 
     onUnmounted(() => {

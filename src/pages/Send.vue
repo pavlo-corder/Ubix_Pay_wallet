@@ -161,6 +161,10 @@
 
 <script>
 import { getTokenBalance } from "src/helper/ethers-interact";
+import {
+  getUbikiriBalanceApi,
+  getUbixTokenBalances,
+} from "src/helper/ubx-interact";
 import { computed, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
@@ -188,6 +192,9 @@ export default {
     const currentTokens = computed(
       () => store.getters["account/getCurrentTokens"]
     );
+    const currentBlockchain = computed(
+      () => store.getters["account/getCurrentBlockchain"]
+    );
 
     const fromToken = ref(0);
     const toWallet = ref("");
@@ -198,15 +205,26 @@ export default {
     };
 
     const fetchBalance = async () => {
-      const balances = await Promise.all(
-        tokenList.value.map((token) =>
-          getTokenBalance(token, currentWallet.value.wallet)
-        )
-      );
+      if (currentBlockchain.value.label === "ETH") {
+        const balances = await Promise.all(
+          tokenList.value.map((token) =>
+            getTokenBalance(token, currentWallet.value.wallet)
+          )
+        );
 
-      tokenList.value.map((token, index) => {
-        token.balance = balances[index] / 10 ** token.decimals;
-      });
+        tokenList.value.map((token, index) => {
+          token.balance = balances[index] / 10 ** token.decimals;
+        });
+      } else {
+        tokenList.value = [tokenList.value[0]];
+        tokenList.value[0].balance = await getUbikiriBalanceApi(
+          currentWallet.value.wallet
+        );
+        const t10Balances = await getUbixTokenBalances(
+          currentWallet.value.wallet
+        );
+        tokenList.value = tokenList.value.concat(t10Balances);
+      }
     };
 
     onMounted(async () => {
@@ -229,14 +247,24 @@ export default {
     });
 
     const onNextHandler = () => {
-      router.push({
-        path: "/send/amount",
-        query: {
-          from: currentWallet.value.wallet,
-          to: toWallet.value,
-          token: tokenList.value[fromToken.value].address,
-        },
-      });
+      if (tokenList.value[fromToken.value].networkLabel === "ETH")
+        router.push({
+          path: "/send/amount",
+          query: {
+            from: currentWallet.value.wallet,
+            to: toWallet.value,
+            token: tokenList.value[fromToken.value].address,
+          },
+        });
+      else
+        router.push({
+          path: "/send/amount",
+          query: {
+            from: currentWallet.value.wallet,
+            to: toWallet.value,
+            token: tokenList.value[fromToken.value].name,
+          },
+        });
     };
 
     return {

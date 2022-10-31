@@ -190,7 +190,7 @@
                     color="blue-transparent"
                     text-color="blue-light"
                   >
-                    {{ token.type === "erc20" ? "T" : "T" }}
+                    {{ token.type === "erc20" ? "T" : token.symbol[0] }}
                   </q-avatar>
                 </q-avatar></q-btn
               >
@@ -479,6 +479,7 @@ export default {
           token.balance = balances[index] / 10 ** token.decimals;
         });
       } else {
+        tokenList.value = [tokenList.value[0]];
         tokenList.value[0].balance = await getUbikiriBalanceApi(
           model_wallet.value.value
         );

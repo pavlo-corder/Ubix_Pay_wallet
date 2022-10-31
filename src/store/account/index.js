@@ -162,7 +162,7 @@ export default {
       else if (state.account.current_blockchain.label === "UBX")
         customTokens.push({
           decimals: 0,
-          name: "Ubix Network",
+          name: "UBX",
           symbol: "UBX",
           balance: "0.0",
           wallet: true,
