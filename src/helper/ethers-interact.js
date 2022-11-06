@@ -36,7 +36,21 @@ const SEPOLIA_TESTNET = {
   label: "ETH",
   chainId: 11155111,
 };
-const CURRNET_NETWORK = SEPOLIA_TESTNET;
+
+const NETWORKS = {
+  'SEPOLIA_TESTNET': {
+    RPC_URL: "https://rpc.sepolia.org",
+    label: "ETH",
+    chainId: 11155111,
+  },
+  'MAINNET': {
+    RPC_URL: "https://rpc.ankr.com/eth",
+    label: "ETH",
+    chainId: 1,
+  }
+}
+
+const CURRNET_NETWORK = NETWORKS[process.env.URL_ETH];
 
 const mainnet_provider = new ethers.providers.JsonRpcProvider(
   CURRNET_NETWORK.RPC_URL

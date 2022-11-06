@@ -76,16 +76,28 @@
     </main>
     <q-dialog v-model="confirm" persistent>
       <q-card>
-        <q-card-section class="row items-center">
-          <span class="q-ml-sm">Are you sure you want to continue?</span>
+        <q-card-section class=" items-center">
+
+          <h5>Attention!</h5>
+
+          <p class="q-mt-md q-mb-sm"><b>Don't Lose It</b></p>
+          <p>Be careful, it can not be recovered if you lose it.</p>
+
+          <p class="q-mt-md q-mb-sm"><b>Make a Backup</b></p>
+          <p>Secure it like the money it may one day be worth.</p>
+
+          <p class="q-mt-md q-mb-sm"><b>Don't Share It</b></p>
+          <p>Your funds will be stolen if you use this file on a malicious phishing site</p>
+
+<!--          <span class="q-ml-sm">Are you sure you want to continue?</span>-->
         </q-card-section>
 
         <q-card-actions align="right">
-          <q-btn flat label="Cancel" color="primary" v-close-popup />
+          <q-btn flat label="Back" color="primary" v-close-popup />
           <q-btn
             @click="nextConfirm"
             flat
-            label="Yes"
+            label="Acquainted"
             color="primary"
             v-close-popup
           />

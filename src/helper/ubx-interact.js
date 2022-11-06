@@ -3,7 +3,9 @@ import { UBX_MAX_FEE, UBX_T10_MAX_FEE } from "./constants";
 import Transaction from "./transaction/transaction";
 
 // export const UBIKIRI_API_URL = "https://explorer.ubikiri.com";
-export const UBIKIRI_API_URL = "https://test-explorer.ubikiri.com";
+// export const UBIKIRI_API_URL = "https://test-explorer.ubikiri.com";
+export const UBIKIRI_API_URL = process.env.URL_UBX;
+
 
 export const getUbixTokenList = async () => {
   try {
@@ -147,7 +149,7 @@ export const submitSendUbxTransaction = async (
   const txSig = tx.encode().toString("hex");
 
   let response = await axios.post(
-    "http://rpc-dv-1.ubikiri.com:18222",
+    process.env.URL_UBX_RPC,
     {
       jsonrpc: "2.0",
       method: "sendRawTx",
