@@ -161,7 +161,7 @@ export const submitSendUbxTransaction = async (
     {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Basic ${process.env.UBX_AUTH_TOKEN}`,
+        Authorization: "Basic dWJpa2lyaTo2MjJjYTg4YzRlMmVhODAyMTc=",
       },
     }
   );
