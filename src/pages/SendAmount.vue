@@ -134,14 +134,18 @@ export default {
     const currentToken = ref({});
 
     const fetchBalance = async () => {
-      // if (currentBlockchain.value.label === "ETH") {
-      const balance = await getTokenBalance(
-        currentToken.value,
-        fromWallet.value
-      );
+      console.log(currentBlockchain.value.label, currentToken.value.symbol);
+      if (
+        currentBlockchain.value.label === "ETH" ||
+        currentToken.value.symbol === "UBX"
+      ) {
+        const balance = await getTokenBalance(
+          currentToken.value,
+          fromWallet.value
+        );
 
-      tokenBalance.value = balance / 10 ** currentToken.value.decimals;
-      // }
+        tokenBalance.value = balance / 10 ** currentToken.value.decimals;
+      }
     };
 
     const onNextHandler = () => {

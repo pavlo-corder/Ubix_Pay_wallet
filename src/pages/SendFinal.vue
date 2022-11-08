@@ -272,14 +272,17 @@ export default {
     });
 
     const fetchBalance = async () => {
-      // if (currentBlockchain.value.label === "ETH") {
-      const balance = await getTokenBalance(
-        currentToken.value,
-        fromWallet.value
-      );
+      if (
+        currentBlockchain.value.label === "ETH" ||
+        currentToken.value.symbol === "UBX"
+      ) {
+        const balance = await getTokenBalance(
+          currentToken.value,
+          fromWallet.value
+        );
 
-      tokenBalance.value = balance / 10 ** currentToken.value.decimals;
-      // }
+        tokenBalance.value = balance / 10 ** currentToken.value.decimals;
+      }
     };
 
     onUnmounted(() => {

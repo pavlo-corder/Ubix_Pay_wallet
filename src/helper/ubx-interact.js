@@ -6,7 +6,6 @@ import Transaction from "./transaction/transaction";
 // export const UBIKIRI_API_URL = "https://test-explorer.ubikiri.com";
 export const UBIKIRI_API_URL = process.env.URL_UBX;
 
-
 export const getUbixTokenList = async () => {
   try {
     let response = await axios.get(`${UBIKIRI_API_URL}/api/token`);
@@ -146,7 +145,8 @@ export const submitSendUbxTransaction = async (
     console.log(tx);
     // return;
   }
-  const txSig = tx.encode().toString("hex");
+  const txSig = Buffer(tx.encode()).toString("hex");
+  console.log(txSig);
 
   let response = await axios.post(
     process.env.URL_UBX_RPC,
@@ -161,7 +161,7 @@ export const submitSendUbxTransaction = async (
     {
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Basic Y2lsVGVzdDpkNDljMWQyNzM1NTM2YmFhNGRlMWNjNg==",
+        Authorization: `Basic ${process.env.UBX_AUTH_TOKEN}`,
       },
     }
   );
@@ -180,32 +180,27 @@ const formT10TransferTx = async (
   let nGatheredCoins = 0;
   let bDoneWithTx = false;
 
-  // const kp = this._cryptoBuilder(buffPk);
-
   const t10Token = await getT10Token(currentToken.symbol);
-  console.log(t10Token);
   const contractCode = {
     method: "transfer",
-    arrArguments: [currentToken.symbol, addressTo.toString("hex"), amount],
+    arrArguments: [currentToken.symbol, addressTo.slice(2), amount],
   };
 
   const tx = Transaction.invokeContract(
-    t10Token.contractAddress,
+    t10Token.contractAddress.slice(2),
     contractCode,
     0,
-    currentWallet.wallet
+    currentWallet.wallet.slice(2)
   );
   tx.conciliumId = 1;
 
   const utxos = await getUTXOs(currentWallet.wallet);
-  console.log(utxos && Array.isArray(utxos));
 
   const feeWeNeed = UBX_T10_MAX_FEE;
 
   for (let utxoRecord of utxos) {
     if (!utxoRecord.amount || utxoRecord.amount < feeWeNeed / 20) continue;
-
-    tx.addInput(utxoRecord.hash, utxoRecord.nOut);
+    tx.addInput(Buffer.from(utxoRecord.hash, "hex"), utxoRecord.nOut);
 
     nGatheredCoins += utxoRecord.amount;
     bDoneWithTx = nGatheredCoins >= feeWeNeed;
@@ -213,8 +208,8 @@ const formT10TransferTx = async (
   }
 
   tx.signForContract(currentWallet.privateKey);
-  // console.log(tx, tx.inputs, currentWallet.privateKey);
-  // tx.verify();
+  tx.verify();
+  // console.log(tx);
 
   return tx;
 };
