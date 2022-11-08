@@ -49,7 +49,7 @@
       <q-list class="drawer__list">
         <q-item>
           <q-item-section>
-            <a href="#">
+            <a href="https://t.me/UBIX_Network" target="_blank">
               <span class="link--big link--noUnderline">Support</span>
             </a>
           </q-item-section>
