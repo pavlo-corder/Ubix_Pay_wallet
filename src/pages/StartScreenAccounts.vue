@@ -142,7 +142,7 @@
             class="btn col"
             :href="
               currentBlockchain?.label === 'ETH'
-                ? `https://etherscan.io/address/${currentWallet?.wallet}}`
+                ? `https://etherscan.io/address/${currentWallet?.wallet}`
                 : `https://explorer.ubikiri.com/#address/${currentWallet?.wallet}`
             "
             target="_blank"
