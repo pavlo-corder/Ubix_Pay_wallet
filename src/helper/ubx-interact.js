@@ -148,6 +148,7 @@ export const submitSendUbxTransaction = async (
   const txSig = Buffer(tx.encode()).toString("hex");
   console.log(txSig);
 
+  const strAuth=Buffer.from(`${process.env.UBX_RPC_USER}:${process.env.UBX_RPC_PASS}`).toString('base64');
   let response = await axios.post(
     process.env.URL_UBX_RPC,
     {
@@ -161,7 +162,7 @@ export const submitSendUbxTransaction = async (
     {
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Basic dWJpa2lyaTo2MjJjYTg4YzRlMmVhODAyMTc=",
+        Authorization: `Basic ${strAuth}`,
       },
     }
   );
