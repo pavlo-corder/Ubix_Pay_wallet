@@ -14,7 +14,7 @@
                 class="import__inputWrap"
               >
                 <input-phrase
-                  :number="key"
+                  :number="key+1"
                   :phrase="tg1.value"
                   :isPassword="true"
                   @phrase="phraseFromInput"
@@ -28,7 +28,7 @@
                 class="import__inputWrap"
               >
                 <input-phrase
-                  :number="key + 6"
+                  :number="key + 7"
                   :phrase="tg2.value"
                   :isPassword="true"
                   @phrase="phraseFromInput"
