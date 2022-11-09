@@ -96,7 +96,6 @@ import {
   getTokenBalance,
 } from "src/helper/ethers-interact";
 import { numberConverter } from "src/helper/formater";
-import { UBX_MAX_FEE } from "src/helper/constants";
 import { getUbixTokenBalances } from "src/helper/ubx-interact";
 
 export default {
@@ -216,7 +215,7 @@ export default {
       if (currentBlockchain.value.label === "UBX") {
         amountCoin.value = (
           tokenBalance.value -
-          (currentToken.value.type === "T10" ? 0 : UBX_MAX_FEE)
+          (currentToken.value.type === "T10" ? 0 : parseInt(proces.env.UBX_T10_FEE))
         ).toFixed(4);
         onChangeAmount(amountCoin.value);
         return;

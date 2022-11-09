@@ -1,10 +1,11 @@
 import axios from "axios";
-import { UBX_MAX_FEE, UBX_T10_MAX_FEE } from "./constants";
+import { UBX_T10_MAX_FEE } from "./constants";
 import Transaction from "./transaction/transaction";
 
 // export const UBIKIRI_API_URL = "https://explorer.ubikiri.com";
 // export const UBIKIRI_API_URL = "https://test-explorer.ubikiri.com";
 export const UBIKIRI_API_URL = process.env.URL_UBX;
+
 
 export const getUbixTokenList = async () => {
   try {
@@ -84,7 +85,11 @@ export const findT10Token = async (address = "") => {
   }
 };
 
-export const _calcFee = (nInputUsed, bSingle, bSweep) => {
+function getTransferFee () {
+  return process.env.UBX_TX_FEE;
+}
+
+function calcFee (nInputUsed, bSingle, bSweep) {
   // одна подпись - 67
   // один инпут - 38 или 39 (если nOut больше 256 он будет занимать 2 байта!
   // один аутпут - 33
@@ -99,7 +104,7 @@ export const _calcFee = (nInputUsed, bSingle, bSweep) => {
 
   const nFee =
     parseInt(
-      (this._getTransferFee() / 1024) *
+      (parseInt(process.env.UBX_TX_FEE) / 1024) *
         (nEmptyTx + nOutByteSize + nInSize + nSigSize + 2)
     ) + 1;
 
@@ -128,25 +133,31 @@ export const submitSendUbxTransaction = async (
     // tx.addInput(Buffer.from(currentWallet.wallet.slice(2), "hex"), 7);
     let totalInputAmount = 0;
     let inputCnt = 0;
-    while (totalInputAmount < amount) {
-      tx.addInput(Buffer.from(utxos[inputCnt].hash, "hex"), inputCnt);
+    while (totalInputAmount +calcFee(inputCnt, true, false) < amount) {
+      tx.addInput(Buffer.from(utxos[inputCnt].hash, "hex"), utxos[inputCnt].nOut);
       totalInputAmount += utxos[inputCnt].amount;
       inputCnt++;
     }
-    tx.addReceiver(amount, Buffer.from(receiver.slice(2), "hex"));
-    tx.addReceiver(
-      totalInputAmount - amount - UBX_MAX_FEE,
-      Buffer.from(currentWallet.wallet.slice(2), "hex")
-    );
+    tx.addReceiver(amount, Buffer.from(stripPrefix(receiver), "hex"));
+    const nFee=calcFee(inputCnt, true, false);
+
+    console.log(`To send ${amount}. Gathered ${totalInputAmount}. Inputs ${inputCnt}. Fee ${nFee}. Change ${totalInputAmount - amount - nFee}`);
+
+    if(totalInputAmount - amount - nFee !==0) {
+      tx.addReceiver(
+        totalInputAmount - amount - nFee,
+        Buffer.from(stripPrefix(currentWallet.wallet), "hex")
+      );
+    }
+    tx.conciliumId = 1;
 
     tx.signForContract(currentWallet.privateKey);
   } else {
     tx = await formT10TransferTx(currentWallet, receiver, amount, currentToken);
-    console.log(tx);
-    // return;
   }
-  const txSig = Buffer(tx.encode()).toString("hex");
-  console.log(txSig);
+  console.log(tx);
+
+  const txSig = tx.encode().toString("hex");
 
   const strAuth=Buffer.from(`${process.env.UBX_RPC_USER}:${process.env.UBX_RPC_PASS}`).toString('base64');
   let response = await axios.post(
@@ -172,45 +183,51 @@ export const submitSendUbxTransaction = async (
   }
 };
 
+function stripPrefix (strAddr){
+  return strAddr.startsWith('Ux') ? strAddr.slice(2) : strAddr;
+}
+
 const formT10TransferTx = async (
   currentWallet,
   addressTo,
   amount,
   currentToken
 ) => {
-  let nGatheredCoins = 0;
-  let bDoneWithTx = false;
+
+  // const kp = this._cryptoBuilder(buffPk);
 
   const t10Token = await getT10Token(currentToken.symbol);
+  console.log(t10Token);
   const contractCode = {
     method: "transfer",
-    arrArguments: [currentToken.symbol, addressTo.slice(2), amount],
+    arrArguments: [currentToken.symbol, stripPrefix(addressTo), amount],
   };
 
   const tx = Transaction.invokeContract(
-    t10Token.contractAddress.slice(2),
+    t10Token.contractAddress,
     contractCode,
     0,
-    currentWallet.wallet.slice(2)
+    stripPrefix(currentWallet.wallet)
   );
   tx.conciliumId = 1;
 
+  console.log(`Stripped address ${stripPrefix(currentWallet.wallet)}`);
+
   const utxos = await getUTXOs(currentWallet.wallet);
+  console.log(utxos && Array.isArray(utxos));
 
-  const feeWeNeed = UBX_T10_MAX_FEE;
-
-  for (let utxoRecord of utxos) {
-    if (!utxoRecord.amount || utxoRecord.amount < feeWeNeed / 20) continue;
-    tx.addInput(Buffer.from(utxoRecord.hash, "hex"), utxoRecord.nOut);
-
-    nGatheredCoins += utxoRecord.amount;
-    bDoneWithTx = nGatheredCoins >= feeWeNeed;
-    if (bDoneWithTx) break;
+  const feeCall = parseInt(process.env.UBX_T10_FEE);
+  let totalInputAmount = 0;
+  let inputCnt = 0;
+  while (totalInputAmount < feeCall + calcFee(inputCnt, true, false)) {
+    tx.addInput(Buffer.from(utxos[inputCnt].hash, "hex"), utxos[inputCnt].nOut);
+    totalInputAmount += utxos[inputCnt].amount;
+    inputCnt++;
   }
 
   tx.signForContract(currentWallet.privateKey);
-  tx.verify();
-  // console.log(tx);
+  // console.log(tx, tx.inputs, currentWallet.privateKey);
+  // tx.verify();
 
   return tx;
 };
