@@ -4,7 +4,7 @@ const Buffer = require("buffer/").Buffer;
 const jsonDescriptor = require("./structures.json");
 const Crypto = require("./crypto");
 const Coins = require("./coins");
-const { assert } = require("./utils");
+const {assert} = require("./utils");
 
 const CURRENT_TX_VERSION = 1;
 const MAX_BLOCK_SIZE = 1024 * 1024;
@@ -28,15 +28,16 @@ class Transaction {
         payload: {
           conciliumId: 0,
           ins: [],
-          outs: [],
+          outs: []
         },
-        claimProofs: [],
+        claimProofs: []
       };
     } else {
       throw new Error("Construct from Buffer|Object|Empty");
     }
-    if (!this._data.payload.version)
+    if (!this._data.payload.version) {
       this._data.payload.version = CURRENT_TX_VERSION;
+    }
     if (this._data.payload.conciliumId === undefined) {
       throw new Error("Specify witness concilium, who will notarize this TX");
     }
@@ -127,7 +128,7 @@ class Transaction {
       receiverAddr: Crypto.getAddrContractCreation(),
       contractCode: strCode,
       addrChangeReceiver,
-      amount: 0,
+      amount: 0
     });
     return tx;
   }
@@ -155,7 +156,7 @@ class Transaction {
       amount,
       receiverAddr: Buffer.from(strContractAddr, "hex"),
       contractCode: JSON.stringify(objInvokeCode),
-      addrChangeReceiver,
+      addrChangeReceiver
     });
     return tx;
   }
@@ -180,7 +181,7 @@ class Transaction {
     if (typeof strHash === "string") strHash = Buffer.from(strHash, "hex");
 
     this._checkDone();
-    this._data.payload.ins.push({ txHash: strHash, nTxOutput: index });
+    this._data.payload.ins.push({txHash: strHash, nTxOutput: index});
   }
 
   /**
@@ -192,7 +193,7 @@ class Transaction {
     this._checkDone();
     this._data.payload.outs.push({
       amount,
-      receiverAddr: Buffer.from(addr, "hex"),
+      receiverAddr: Buffer.from(addr, "hex")
     });
   }
 
@@ -240,8 +241,9 @@ class Transaction {
    * @param {String} enc -encoding of key
    */
   claim(idx, key, enc = "hex") {
-    if (idx > this._data.payload.ins.length)
+    if (idx > this._data.payload.ins.length) {
       throw new Error("Bad index: greater than inputs length");
+    }
 
     const hash = this.hash(idx);
     this._data.claimProofs[idx] = Crypto.sign(hash, key, enc);
@@ -259,14 +261,15 @@ class Transaction {
   }
 
   signAllInputs(key, enc = "hex") {
-    if (this._data.claimProofs.length)
+    if (this._data.claimProofs.length) {
       throw 'You should choose: "signAllInputs" or claim per input';
+    }
     this.signForContract(key, enc);
   }
 
   getTxSignature() {
     return Buffer.isBuffer(this._data.txSignature) ||
-      (Array.isArray(this._data.txSignature) && this._data.txSignature.length)
+           (Array.isArray(this._data.txSignature) && this._data.txSignature.length)
       ? this._data.txSignature
       : undefined;
   }
@@ -301,7 +304,7 @@ class Transaction {
   }
 
   encode() {
-    return transactionProto.encode(this._data).finish();
+    return Buffer.from(transactionProto.encode(this._data).finish());
   }
 
   verify() {
