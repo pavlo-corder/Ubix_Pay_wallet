@@ -133,7 +133,6 @@ export default {
     const currentToken = ref({});
 
     const fetchBalance = async () => {
-      console.log(currentBlockchain.value.label, currentToken.value.symbol);
       if (
         currentBlockchain.value.label === "ETH" ||
         currentToken.value.symbol === "UBX"
@@ -215,7 +214,9 @@ export default {
       if (currentBlockchain.value.label === "UBX") {
         amountCoin.value = (
           tokenBalance.value -
-          (currentToken.value.type === "T10" ? 0 : parseInt(proces.env.UBX_T10_FEE))
+          (currentToken.value.type === "T10"
+            ? 0
+            : parseInt(proces.env.UBX_T10_FEE))
         ).toFixed(4);
         onChangeAmount(amountCoin.value);
         return;
@@ -229,7 +230,6 @@ export default {
           ).toFixed(4);
           onChangeAmount(amountCoin.value);
         } else if (currentToken.value.type === "erc20") {
-          console.log(tokenBalance.value);
           onChangeAmount(tokenBalance.value);
         }
       }

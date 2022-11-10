@@ -233,7 +233,6 @@ export default {
       token.value = route.query.token;
 
       if (currentBlockchain.value.label === "ETH") {
-        console.log("ETH token");
         currentToken.value = currentTokens.value.find(
           (item) => item.address === token.value
         );

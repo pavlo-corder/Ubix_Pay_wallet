@@ -44,7 +44,6 @@ function account({ next, store }) {
     accounts[0].blockchains.length > 0 &&
     accounts[0].blockchains[0].wallets.length > 0
   ) {
-    console.log(1);
     return next({ name: "accounts" });
   }
   return next();

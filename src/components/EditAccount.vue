@@ -70,7 +70,6 @@ export default {
     const onOKClick = () => {
       account.value.name = name.value;
       account.value.details = details.value;
-      console.log("account", account.value);
       accounts.value[0] = account.value;
       this.$global.$emit("ACCOUNT_UPDATE", true);
       dialog = false;
