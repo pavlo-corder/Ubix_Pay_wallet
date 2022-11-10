@@ -152,9 +152,10 @@
         </div>
 
         <!-- tokenList list -->
-        <q-list class="q-pb-md">
+        <q-list class="q-pb-md token-list">
+          <p class="text-subtitle1 text-bold heading">Balance</p>
           <q-item
-            v-for="token in tokenList"
+            v-for="token in tokenList.filter((item) => item.type === 'coin')"
             v-show="token.wallet"
             :key="token.symbol"
             class="q-pl-none"
@@ -183,6 +184,56 @@
                   >
                     U
                   </q-avatar>
+                </q-avatar>
+              </q-btn>
+            </q-item-section>
+            <q-item-section>
+              <q-item-label caption>Balance:</q-item-label>
+              <q-item-label class="text-subtitle2 text-bold">
+                {{
+                  numberConverter(
+                    token.balance,
+                    currentBlockchain.label === "UBX" ? null : 2
+                  )
+                }}
+                {{ token.symbol }}
+              </q-item-label>
+            </q-item-section>
+            <q-item-section side>
+              <q-btn
+                round
+                unelevated
+                color="grey-gradient"
+                @click="showWallet"
+                text-color="dark"
+                :icon="matChevronRight"
+              />
+            </q-item-section>
+          </q-item>
+          <p
+            v-if="tokenList.filter((item) => item.type !== 'coin').length > 0"
+            class="text-subtitle1 text-bold heading"
+          >
+            Tokens
+          </p>
+
+          <q-item
+            v-for="token in tokenList.filter((item) => item.type !== 'coin')"
+            v-show="token.wallet"
+            :key="token.symbol"
+            class="q-pl-none token-item"
+          >
+            <q-item-section side>
+              <q-btn
+                class="q-pa-none"
+                :to="`/accountdetails?wallet=${currentWallet?.wallet}&token=${token?.address}`"
+              >
+                <q-avatar
+                  rounded
+                  size="56px"
+                  color="blue-transparent"
+                  text-color="blue-light"
+                >
                   <q-avatar
                     v-show="token.symbol !== 'UBX' && token.symbol !== 'ETH'"
                     rounded
@@ -202,7 +253,7 @@
                   token.type === "erc20" || token.type === "coin"
                     ? numberConverter(
                         token.balance,
-                        currentBlockchain.label === "UBX" ? 0 : 2
+                        currentBlockchain.label === "UBX" ? undefined : 2
                       )
                     : token.balance
                 }}
@@ -270,6 +321,7 @@ import { useRouter } from "vue-router";
 import {
   getUbikiriBalanceApi,
   getUbixTokenBalances,
+  validateAddress,
 } from "src/helper/ubx-interact";
 
 export default {
@@ -507,10 +559,12 @@ export default {
     };
 
     const sendTransaction = () => {
-      router.push({
-        path: "/send",
-        query: { to: model_wallet_to.value },
-      });
+      if (validateAddress(model_wallet_to.value, currentBlockchain.value.label))
+        router.push({
+          path: "/send",
+          query: { to: model_wallet_to.value },
+        });
+      else alert("Invalid Address");
     };
 
     return {

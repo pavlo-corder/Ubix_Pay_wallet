@@ -3,19 +3,13 @@ import { Wallet, ethers } from "ethers";
 
 import ERC20_ABI from "./abis/ERC20_ABI.json";
 import ERC721_ABI from "./abis/ERC721_ABI.json";
-import {
-  ETHERSCAN_KEY,
-  NULL_ADDRESS,
-  UBX_MAX_FEE,
-  UBX_T10_MAX_FEE,
-} from "./constants";
+import { ETHERSCAN_KEY, NULL_ADDRESS } from "./constants";
 import { findT10Token, getUbikiriBalanceApi } from "./ubx-interact";
 import {
   getPublic,
   keyPairFromPrivate,
   ubxAddressFromPublicKey,
 } from "./utils";
-
 const MAINNET = {
   RPC_URL: "https://rpc.ankr.com/eth",
   label: "ETH",
@@ -38,17 +32,17 @@ const SEPOLIA_TESTNET = {
 };
 
 const NETWORKS = {
-  'SEPOLIA_TESTNET': {
+  SEPOLIA_TESTNET: {
     RPC_URL: "https://rpc.sepolia.org",
     label: "ETH",
     chainId: 11155111,
   },
-  'MAINNET': {
+  MAINNET: {
     RPC_URL: "https://rpc.ankr.com/eth",
     label: "ETH",
     chainId: 1,
-  }
-}
+  },
+};
 
 const CURRNET_NETWORK = NETWORKS[process.env.URL_ETH];
 
@@ -203,8 +197,8 @@ export const getEstimatedGas = async (
   label = "ETH"
 ) => {
   if (label === "UBX") {
-    if (tokenAddress === "UBX") return UBX_MAX_FEE;
-    else return UBX_T10_MAX_FEE;
+    if (tokenAddress === "UBX") return process.env.UBX_TX_FEE;
+    else return process.env.UBX_T10_FEE;
   }
   const signer = new Wallet(walletObj?.privateKey, mainnet_provider);
   if (tokenAddress === NULL_ADDRESS) {
@@ -249,7 +243,6 @@ export const fetchEtherPrice = async (label = "ETH") => {
 export const fetchTokenInformation = async (address = "") => {
   if (address.slice(0, 2) === "Ux") {
     const t10Token = await findT10Token(address);
-    console.log(t10Token);
     return {
       address,
       name: t10Token.symbol,

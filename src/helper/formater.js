@@ -3,7 +3,7 @@ export const getElipseText = (wallet) => {
 };
 
 export const numberConverter = (value, decimals = 3) => {
-  return Number(value).toFixed(decimals);
+  return decimals === null ? value : Number(value).toFixed(decimals);
   // Nine Zeroes for Billions
   return Math.abs(Number(value)) >= 1.0e12
     ? (Math.abs(Number(value)) / 1.0e12).toFixed(decimals) + " T"

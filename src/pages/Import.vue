@@ -14,7 +14,7 @@
                 class="import__inputWrap"
               >
                 <input-phrase
-                  :number="key+1"
+                  :number="key"
                   :phrase="tg1.value"
                   :isPassword="true"
                   @phrase="phraseFromInput"
@@ -28,7 +28,7 @@
                 class="import__inputWrap"
               >
                 <input-phrase
-                  :number="key + 7"
+                  :number="key + 6"
                   :phrase="tg2.value"
                   :isPassword="true"
                   @phrase="phraseFromInput"
@@ -124,7 +124,6 @@ export default {
   },
   methods: {
     phraseFromInput(data) {
-      console.log(data);
       if (data.number <= 5) {
         this.text_group_1[data.number].value = data.phrase;
       }
@@ -134,10 +133,10 @@ export default {
     },
     onSubmit() {
       this.mnemonicPhrase = [];
-      this.text_group_1.map((item) => {
+      this.text_group_1.forEach((item) => {
         this.mnemonicPhrase.push(item.value);
       });
-      this.text_group_2.map((item) => {
+      this.text_group_2.forEach((item) => {
         this.mnemonicPhrase.push(item.value);
       });
       if (validationPhrase(this.mnemonicPhrase)) {
