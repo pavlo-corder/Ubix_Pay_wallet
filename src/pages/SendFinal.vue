@@ -206,7 +206,6 @@ export default {
     const token = ref({});
     const amountCoin = ref(0);
 
-    const intervalId = ref(-1);
     const feeData = ref({});
     const estimatedGas = ref({});
     const coinPrice = ref(1);
@@ -253,21 +252,16 @@ export default {
       [coinPrice.value, estimatedGas.value, feeData.value] = await Promise.all([
         fetchEtherPrice(currentBlockchain.value.label),
         getEstimatedGas(
-          token.value,
           currentWallet.value,
           toWallet.value,
-          amountCoin.value * 10 ** currentToken.value.decimals,
-          currentBlockchain.value.label
+          amountCoin.value *
+            (currentToken.value.networkLabel === "ETH"
+              ? 10 ** currentToken.value.decimals
+              : 1),
+          currentToken.value
         ),
         getFeeData(currentToken.value?.networkLabel),
       ]);
-
-      intervalId.value = setInterval(async () => {
-        [coinPrice.value, feeData.value] = await Promise.all([
-          fetchEtherPrice(currentBlockchain.value.label),
-          getFeeData(currentToken.value?.networkLabel),
-        ]);
-      }, 10000);
     });
 
     const fetchBalance = async () => {
@@ -284,16 +278,12 @@ export default {
       }
     };
 
-    onUnmounted(() => {
-      clearInterval(intervalId.value);
-    });
-
     const onSumbitTransaction = async () => {
       if (currentBlockchain.value.label === "UBX") {
         const transactionObj = await submitSendUbxTransaction(
           currentWallet.value,
           toWallet.value,
-          amountCoin.value * 10 ** currentToken.value.decimals,
+          amountCoin.value,
           currentToken.value
         );
 
