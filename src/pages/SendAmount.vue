@@ -110,7 +110,6 @@ export default {
     const amountCoin = ref(0);
     const amountDollar = ref(0);
 
-    const intervalId = ref(-1);
     const fromWallet = ref("");
     const toWallet = ref("");
     const token = ref("");
@@ -185,14 +184,6 @@ export default {
 
       if (currentBlockchain.value.label === "UBX") return;
       feeData.value = await getFeeData();
-      intervalId.value = setInterval(async () => {
-        coinPrice.value = await fetchEtherPrice();
-        feeData.value = await getFeeData();
-      }, 10000);
-    });
-
-    onUnmounted(() => {
-      clearInterval(intervalId.value);
     });
 
     const onChangeAmount = (coin) => {
@@ -216,7 +207,7 @@ export default {
           tokenBalance.value -
           (currentToken.value.type === "T10"
             ? 0
-            : parseInt(proces.env.UBX_T10_FEE))
+            : parseInt(process.env.UBX_T10_FEE))
         ).toFixed(4);
         onChangeAmount(amountCoin.value);
         return;

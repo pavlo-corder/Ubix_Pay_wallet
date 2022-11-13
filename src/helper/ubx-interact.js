@@ -6,6 +6,8 @@ import Transaction from "./transaction/transaction";
 // export const UBIKIRI_API_URL = "https://test-explorer.ubikiri.com";
 export const UBIKIRI_API_URL = process.env.URL_UBX;
 
+// export const UBX_T10_FEE = process.env.UBX_T10_FEE;
+
 export const getUbixTokenList = async () => {
   try {
     let response = await axios.get(`${UBIKIRI_API_URL}/api/token`);
@@ -84,10 +86,6 @@ export const findT10Token = async (address = "") => {
   }
 };
 
-const getTransferFee = () => {
-  return process.env.UBX_TX_FEE;
-};
-
 function calcFee(nInputUsed, bSingle, bSweep) {
   // одна подпись - 67
   // один инпут - 38 или 39 (если nOut больше 256 он будет занимать 2 байта!
@@ -113,7 +111,8 @@ export const submitSendUbxTransaction = async (
   currentWallet,
   receiver,
   amount,
-  currentToken
+  currentToken,
+  gasEstimation = false
 ) => {
   let tx;
   if (currentToken.type === "coin") {
@@ -148,9 +147,11 @@ export const submitSendUbxTransaction = async (
     }
 
     if (enoughFee === false) {
+      if (gasEstimation) return 0;
       alert("You don't have enough UBX to cost fee!");
       return;
     }
+    if (gasEstimation) return calcFee(inputCnt, true, false);
     tx.addReceiver(amount, Buffer.from(stripPrefix(receiver), "hex"));
     const nFee = calcFee(inputCnt, true, false);
 
@@ -164,7 +165,14 @@ export const submitSendUbxTransaction = async (
 
     tx.signForContract(currentWallet.privateKey);
   } else {
-    tx = await formT10TransferTx(currentWallet, receiver, amount, currentToken);
+    tx = await formT10TransferTx(
+      currentWallet,
+      receiver,
+      amount,
+      currentToken,
+      gasEstimation
+    );
+    if (gasEstimation) return tx;
   }
   console.log(tx);
 
@@ -204,7 +212,8 @@ const formT10TransferTx = async (
   currentWallet,
   addressTo,
   amount,
-  currentToken
+  currentToken,
+  gasEstimation = false
 ) => {
   // const kp = this._cryptoBuilder(buffPk);
 
@@ -226,9 +235,9 @@ const formT10TransferTx = async (
   console.log(`Stripped address ${stripPrefix(currentWallet.wallet)}`);
 
   const utxos = await getUTXOs(currentWallet.wallet);
-  console.log(utxos && Array.isArray(utxos));
 
   const feeCall = parseInt(process.env.UBX_T10_FEE);
+
   let totalInputAmount = 0;
   let inputCnt = 0;
   let enoughFee = true;
@@ -244,9 +253,12 @@ const formT10TransferTx = async (
   }
 
   if (enoughFee === false) {
+    if (gasEstimation) return 0;
     alert("You don't have enough UBX to cost fee!");
     return;
   }
+
+  if (gasEstimation) return feeCall + calcFee(inputCnt, true, false);
 
   tx.signForContract(currentWallet.privateKey);
   // console.log(tx, tx.inputs, currentWallet.privateKey);

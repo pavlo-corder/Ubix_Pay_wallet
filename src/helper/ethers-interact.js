@@ -4,7 +4,11 @@ import { Wallet, ethers } from "ethers";
 import ERC20_ABI from "./abis/ERC20_ABI.json";
 import ERC721_ABI from "./abis/ERC721_ABI.json";
 import { ETHERSCAN_KEY, NULL_ADDRESS } from "./constants";
-import { findT10Token, getUbikiriBalanceApi } from "./ubx-interact";
+import {
+  findT10Token,
+  getUbikiriBalanceApi,
+  submitSendUbxTransaction,
+} from "./ubx-interact";
 import {
   getPublic,
   keyPairFromPrivate,
@@ -189,22 +193,19 @@ export const getFeeData = async (label = "ETH") => {
   return await mainnet_provider.getFeeData();
 };
 
-export const getEstimatedGas = async (
-  tokenAddress,
-  walletObj,
-  to,
-  amount,
-  label = "ETH"
-) => {
-  if (label === "UBX") {
-    if (tokenAddress === "UBX") return process.env.UBX_TX_FEE;
-    else return process.env.UBX_T10_FEE;
+export const getEstimatedGas = async (walletObj, to, amount, currentToken) => {
+  if (currentToken.networkLabel === "UBX") {
+    return submitSendUbxTransaction(walletObj, to, amount, currentToken, true);
   }
   const signer = new Wallet(walletObj?.privateKey, mainnet_provider);
-  if (tokenAddress === NULL_ADDRESS) {
+  if (currentToken.address === NULL_ADDRESS) {
     return 21000;
   } else {
-    const contract = new ethers.Contract(tokenAddress, ERC20_ABI, signer);
+    const contract = new ethers.Contract(
+      currentToken.address,
+      ERC20_ABI,
+      signer
+    );
     const gas = await contract.estimateGas.transfer(
       to,
       amount.toLocaleString("fullwide", { useGrouping: false })
