@@ -148,8 +148,9 @@ export const submitSendUbxTransaction = async (
 
     if (enoughFee === false) {
       if (gasEstimation) return 0;
-      alert("You don't have enough UBX to cost fee!");
-      return;
+      const errorMsg = "You don't have enough UBX to cost fee!";
+      alert(errorMsg);
+      return errorMsg;
     }
     if (gasEstimation) return calcFee(inputCnt, true, false);
     tx.addReceiver(amount, Buffer.from(stripPrefix(receiver), "hex"));
