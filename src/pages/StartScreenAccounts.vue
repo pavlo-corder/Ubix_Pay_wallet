@@ -501,8 +501,8 @@ export default {
 
       // return;
       const createdWallet = createWalletFromMnenomic(
-        account.value.phrase,
-        count_wallets,
+        "lift fun they infant civil blue devote again now level analyst report".split(" "),
+        0,
         model_blockchain.value.value
       );
 

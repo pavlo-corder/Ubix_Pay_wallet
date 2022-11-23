@@ -138,8 +138,8 @@
                     : `${amountCoin} ${currentToken?.symbol} +  ${(
                         (feeData?.maxFeePerGas * estimatedGas) /
                         10 ** currentToken?.decimals
-                      ).toFixed(4)} ${currentBlockchain.label}`
-                }}
+                      ).toFixed(currentBlockchain.label === "UBX" ? 0 : 4)} ${currentBlockchain.label}`
+                }} 
               </q-item-label>
               <q-item-label caption class="text-grey">
                 Max amount:

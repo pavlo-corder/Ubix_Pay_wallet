@@ -27,7 +27,7 @@ export const getUbixTokenBalances = async (address) => {
     ]);
     response = await response.data;
     response.forEach((token) => {
-      const tokenData = tokenList.find((item) => (item.symbol = token.symbol));
+      const tokenData = tokenList.find((item) => (item.symbol == token.symbol));
       token.decimals = tokenData.decimals;
       token.name = tokenData.symbol;
       token.balance = parseInt(token.balance);
@@ -102,7 +102,7 @@ function calcFee(nInputUsed, bSingle, bSweep) {
   const nFee =
     parseInt(
       (parseInt(process.env.UBX_TX_FEE) / 1024) *
-        (nEmptyTx + nOutByteSize + nInSize + nSigSize + 2)
+      (nEmptyTx + nOutByteSize + nInSize + nSigSize + 2)
     ) + 1;
 
   return nFee;
@@ -140,7 +140,7 @@ export const submitSendUbxTransaction = async (
       totalInputAmount += utxos[inputCnt].amount;
       inputCnt++;
 
-      if (inputCnt >= utxos.length) {
+      if (inputCnt > utxos.length) {
         enoughFee = false;
         break;
       }
@@ -219,7 +219,6 @@ const formT10TransferTx = async (
   // const kp = this._cryptoBuilder(buffPk);
 
   const t10Token = await getT10Token(currentToken.symbol);
-  console.log(t10Token);
   const contractCode = {
     method: "transfer",
     arrArguments: [currentToken.symbol, stripPrefix(addressTo), amount],
@@ -233,7 +232,6 @@ const formT10TransferTx = async (
   );
   tx.conciliumId = 1;
 
-  console.log(`Stripped address ${stripPrefix(currentWallet.wallet)}`);
 
   const utxos = await getUTXOs(currentWallet.wallet);
 
@@ -247,7 +245,7 @@ const formT10TransferTx = async (
     totalInputAmount += utxos[inputCnt].amount;
     inputCnt++;
 
-    if (inputCnt >= utxos.length) {
+    if (inputCnt > utxos.length) {
       enoughFee = false;
       break;
     }
@@ -262,8 +260,8 @@ const formT10TransferTx = async (
   if (gasEstimation) return feeCall + calcFee(inputCnt, true, false);
 
   tx.signForContract(currentWallet.privateKey);
-  // console.log(tx, tx.inputs, currentWallet.privateKey);
-  // tx.verify();
+  console.log(tx);
+  tx.verify();
 
   return tx;
 };
