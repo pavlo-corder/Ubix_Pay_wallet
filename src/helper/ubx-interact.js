@@ -241,14 +241,15 @@ const formT10TransferTx = async (
   let inputCnt = 0;
   let enoughFee = true;
   while (totalInputAmount < feeCall + calcFee(inputCnt, true, false)) {
+
+    if (inputCnt >= utxos.length) {
+      enoughFee = false;
+      break;
+    }
     tx.addInput(Buffer.from(utxos[inputCnt].hash, "hex"), utxos[inputCnt].nOut);
     totalInputAmount += utxos[inputCnt].amount;
     inputCnt++;
 
-    if (inputCnt > utxos.length) {
-      enoughFee = false;
-      break;
-    }
   }
 
   if (enoughFee === false) {
@@ -259,10 +260,16 @@ const formT10TransferTx = async (
 
   if (gasEstimation) return feeCall + calcFee(inputCnt, true, false);
 
+  if (totalInputAmount - (feeCall + calcFee(inputCnt, true, false)) > 0)
+    tx.addReceiver(
+      totalInputAmount - (feeCall + calcFee(inputCnt, true, false)),
+      Buffer.from(stripPrefix(currentWallet.wallet), "hex")
+    );
+
   tx.signForContract(currentWallet.privateKey);
   console.log(tx);
   tx.verify();
-
+  // return;
   return tx;
 };
 
