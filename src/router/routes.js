@@ -25,6 +25,14 @@ const routes = [
     children: [{ path: "", component: () => import("pages/Import.vue") }],
   },
   {
+    path: "/importprivate",
+    meta: {
+      middlewares: [lock],
+    },
+    component: () => import("layouts/MainLayout.vue"),
+    children: [{ path: "", component: () => import("pages/Importprivate.vue") }],
+  },
+  {
     path: "/createwalletstep1",
     meta: {
       middlewares: [account, lock],

@@ -238,6 +238,11 @@ export default {
       Object.assign(state.account, payload);
     },
 
+    destroy: () => {
+      localStorage.removeItem("key_account");
+      localStorage.removeItem("accounts");
+    },
+
     setBalance: (state, { balance, label, wallet }) => {
       state.accounts.forEach((account) => {
         if (account.current_wallet.wallet === wallet)
