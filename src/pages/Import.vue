@@ -67,6 +67,7 @@
           >
             Import
           </button>
+          <router-link to="/" class="btn q-mt-lg">Cancel</router-link>
         </q-form>
       </div>
     </main>
