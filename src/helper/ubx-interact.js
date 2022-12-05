@@ -219,9 +219,10 @@ const formT10TransferTx = async (
   // const kp = this._cryptoBuilder(buffPk);
 
   const t10Token = await getT10Token(currentToken.symbol);
+
   const contractCode = {
     method: "transfer",
-    arrArguments: [currentToken.symbol, stripPrefix(addressTo), amount],
+    arrArguments: [currentToken.symbol, stripPrefix(addressTo), parseInt(amount) * 10 ** t10Token.decimals],
   };
 
   const tx = Transaction.invokeContract(
