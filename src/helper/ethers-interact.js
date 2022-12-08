@@ -163,6 +163,39 @@ export const createWalletFromMnenomic = (wordList, index = 0, pathId = 60) => {
   };
 };
 
+export const createWalletFromPrivateKey = (privateKey, index = 0, pathId = 60) => {
+
+  const bipPath = `m/44'/${pathId}'/0'/0/${index}`
+
+  const name_wallet = `Wallet ${index + 1}`;
+  let address = ''
+  try{
+    address = new Wallet(privateKey).address
+  }catch (error){
+    return {
+      error: true,
+      message: 'Private key invalid'
+    }
+  }
+
+  // if wallet mode is not for EVM
+  if (Number(pathId) !== 60) {
+    const keyPair = keyPairFromPrivate(privateKey);
+    address = `Ux${ubxAddressFromPublicKey(getPublic(keyPair, true))}`;
+  }
+
+  return {
+    label: name_wallet,
+    name: name_wallet,
+    balance: 0,
+    numberWallet: index,
+    value: address,
+    wallet: address,
+    privatekey: privateKey,
+    network: pathId === 60 ? "ETH" : "UBX",
+  };
+};
+
 export const getEtherBalance = async (address) => {
   const balance = await mainnet_provider.getBalance(address);
   return ethers.utils.formatEther(balance);

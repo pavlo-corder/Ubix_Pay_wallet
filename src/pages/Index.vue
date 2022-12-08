@@ -13,8 +13,10 @@
       <router-link to="/createwalletstep1" class="btn btn--primary welcome__btn"
         >create new wallet</router-link
       >
-      <h2 class="welcome__subtitle">Or</h2>
+      <div class="text-h5 text-center q-my-md">Or</div>
       <router-link to="/import" class="btn">import existing wallet</router-link>
+      <div class="text-h5 text-center q-my-md">Or</div>
+      <router-link to="/importprivate" class="btn">import existing privatkey</router-link>
     </div>
   </main>
 </template>
